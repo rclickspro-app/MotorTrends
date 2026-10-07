@@ -3,7 +3,7 @@
  * Comprehensive catalog of standard, reliable, and popular vehicles
  */
 
-const VEHICLES_DATA = [
+const DEFAULT_VEHICLES_DATA = [
   {
     id: "veh-001",
     year: 2023,
@@ -571,6 +571,36 @@ const VEHICLES_DATA = [
     overview: "The gold standard for family transportation. 36 MPG fuel economy in a full 8-passenger minivan with dual kick-sensor power sliding doors and AWD."
   }
 ];
+
+// LocalStorage Key for persistent marketplace edits
+const STORAGE_KEY_VEHICLES = 'silver_motors_vehicles_db';
+
+// Initialize VEHICLES_DATA from LocalStorage if available, otherwise use initial default catalog
+function getStoredVehicles() {
+  const localData = localStorage.getItem(STORAGE_KEY_VEHICLES);
+  if (localData) {
+    try {
+      const parsed = JSON.parse(localData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error reading localStorage vehicles data:', e);
+    }
+  }
+  // Store default copy
+  localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(DEFAULT_VEHICLES_DATA));
+  return DEFAULT_VEHICLES_DATA;
+}
+
+function saveVehiclesData(data) {
+  localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(data));
+  VEHICLES_DATA.length = 0;
+  VEHICLES_DATA.push(...data);
+}
+
+// Active working array
+const VEHICLES_DATA = [...getStoredVehicles()];
 
 // Helper functions for easy filtering and querying
 function getAllMakes() {

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal & Marketplace Manager | Silver Motors</title>
+  <meta name="description" content="Secure administrative management portal for Silver Motors inventory, pricing, vehicle additions, and customer inquiries.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Admin Portal Dedicated Styling */
+    .admin-auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: radial-gradient(circle at top right, #1e293b, #0a0a0d 60%);
+    }
+
+    .admin-auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-primary);
+    }
+
+    .admin-sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .admin-sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .admin-nav-list {
+      list-style: none;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      color: var(--silver-400);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .admin-nav-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .admin-nav-item.active {
+      color: #0a0a0d;
+      background: var(--silver-gradient);
+      font-weight: 700;
+    }
+
+    .admin-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .admin-top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-body-area {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--silver-gradient);
+    }
+
+    .kpi-title {
+      font-size: 0.8rem;
+      color: var(--silver-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-heading);
+    }
+
+    .admin-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .admin-table-toolbar {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    .admin-table th {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.85rem 1.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--silver-500);
+      border-bottom: 1px solid var(--border-medium);
+    }
+
+    .admin-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-toggle-featured {
+      background: transparent;
+      border: 1px solid var(--border-medium);
+      color: var(--silver-400);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-toggle-featured.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    .admin-alert {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+
+    .alert-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+    }
+
+    .alert-info {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #bae6fd;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .admin-nav-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .admin-body-area {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================
+       AUTHENTICATION & EMAIL VERIFICATION SCREEN
+  ==================================================== -->
+  <div id="admin-auth-screen" class="admin-auth-container">
+    <div class="admin-auth-card">
+      
+      <!-- Brand Logo Header -->
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="brand-logo" style="display: inline-flex; margin-bottom: 0.5rem;">
+          <div class="logo-symbol">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+          </div>
+          <div class="logo-text" style="text-align: left;">
+            <span class="logo-title">SILVER MOTORS</span>
+            <span class="logo-subtitle">Dealership Portal</span>
+          </div>
+        </div>
+        <h2 style="font-size: 1.4rem; color: #fff; margin-top: 0.5rem;">Admin Management System</h2>
+        <p style="font-size: 0.85rem; color: var(--silver-500);">Secure access for inventory updates & management</p>
+      </div>
+
+      <!-- Alert Notification -->
+      <div id="auth-error-alert" class="admin-alert"></div>
+
+      <!-- 1. LOGIN FORM -->
+      <div id="auth-login-box">
+        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Admin Email Address</label>
+            <input type="email" id="login-email" class="form-control" required placeholder="admin@silvermotors.com" value="admin@silvermotors.com">
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="margin-bottom: 0;">Password</label>
+              <span style="font-size: 0.75rem; color: var(--silver-500);">Demo pass: <strong>admin</strong></span>
+            </div>
+            <input type="password" id="login-password" class="form-control" required placeholder="••••••••" value="admin">
+          </div>
+
+          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%; margin-top: 0.5rem;">
+            Sign In to Admin Portal
+          </button>
+        </form>
+
+        <div style="margin-top: 1.75rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <p style="font-size: 0.85rem; color: var(--silver-400);">
+            Don't have an admin account? 
+            <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Create Account</a>
+          </p>
+          <p style="font-size: 0.8rem; margin-top: 0.75rem;">
+            <a href="index.html" style="color: var(--silver-500);">← Back to Public Dealership Website</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- 2. REGISTRATION FORM -->
+      <div id="auth-register-box" style="display: none;">
+        <form id="admin-register-form" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="reg-name" class="form-control" required placeholder="e.g. Shantha Perera">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Official Work Email *</label>
+            <input type="email" id="reg-email" class="form-control" required placeholder="manager@yourdealership.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role / Department</label>
+            <select id="reg-role" class="form-control">
+              <option value="Inventory Manager">Inventory Manager</option>
+              <option value="General Sales Manager">General Sales Manager</option>
+              <option value="Dealership Director">Dealership Director</option>
+            </select>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input type="password" id="reg-password" class="form-control" required placeholder="At least 5 chars">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm Password *</label>
+              <input type="password" id="reg-confirm-password" class="form-control" required placeholder="Repeat password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%; margin-top: 0.5rem;">
+            Register & Send Verification Code
+          </button>
+        </form>
+
+        <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+          <p style="font-size: 0.85rem; color: var(--silver-400);">
+            Already registered? 
+            <a href="#" class="btn-show-login" style="color: #60a5fa; font-weight: 600;">Sign In</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- 3. EMAIL OTP VERIFICATION BOX -->
+      <div id="auth-verify-box" style="display: none;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #38bdf8;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </div>
+          <h3 style="font-size: 1.25rem; color: #fff;">Verify Your Email</h3>
+          <p style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;">
+            A 6-digit confirmation code was sent to <br><strong id="verify-user-email-text" style="color: #fff;">user@email.com</strong>
+          </p>
+        </div>
+
+        <form id="admin-verify-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <input type="hidden" id="verify-target-email">
+
+          <div class="form-group">
+            <label class="form-label" style="text-align: center; display: block;">Enter 6-Digit Code</label>
+            <input type="text" id="verify-otp-code" class="form-control" maxlength="6" required placeholder="123456" style="text-align: center; letter-spacing: 6px; font-size: 1.4rem; font-weight: 800;">
+          </div>
+
+          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%;">
+            Verify Account & Open Admin Dashboard
+          </button>
+        </form>
+
+        <!-- Simulated Inbox Banner -->
+        <div id="simulated-email-inbox"></div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+          <button type="button" id="btn-resend-otp" style="background: none; border: none; color: #60a5fa; cursor: pointer; text-decoration: underline;">
+            Resend Verification Code
+          </button>
+          <a href="#" class="btn-show-login" style="color: var(--silver-500);">Cancel</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       AUTHENTICATED ADMIN DASHBOARD SCREEN
+  ==================================================== -->
+  <div id="admin-dashboard-screen" style="display: none;">
+    <div class="admin-layout">
+      
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <a href="index.html" class="brand-logo">
+            <div class="logo-symbol">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+            </div>
+            <div class="logo-text">
+              <span class="logo-title">SILVER MOTORS</span>
+              <span class="logo-subtitle">Admin Workspace</span>
+            </div>
+          </a>
+        </div>
+
+        <ul class="admin-nav-list">
+          <li>
+            <a href="#" class="admin-nav-item active" data-tab="vehicles">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              Marketplace Vehicles
+            </a>
+          </li>
+          <li>
+            <a href="#" class="admin-nav-item" data-tab="analytics">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Inventory Analytics
+            </a>
+          </li>
+          <li>
+            <a href="#" class="admin-nav-item" data-tab="inquiries">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Customer Leads & Drives
+            </a>
+          </li>
+          <li>
+            <a href="inventory.html" target="_blank" class="admin-nav-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              Live Marketplace ↗
+            </a>
+          </li>
+        </ul>
+
+        <!-- User Profile Footer in Sidebar -->
+        <div style="padding: 1.25rem; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--silver-gradient); color: #0a0a0d; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+              SM
+            </div>
+            <div style="overflow: hidden;">
+              <div id="admin-user-display-name" style="font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Manager</div>
+              <div id="admin-user-role-badge" style="font-size: 0.7rem; color: #38bdf8;">Admin</div>
+            </div>
+          </div>
+          <div id="admin-user-email" style="font-size: 0.75rem; color: var(--silver-500); margin-bottom: 0.75rem; word-break: break-all;">admin@silvermotors.com</div>
+          <button id="btn-admin-logout" class="btn btn-dark btn-sm" style="width: 100%; font-size: 0.8rem; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Admin Content Area -->
+      <div class="admin-content">
+        
+        <!-- Top Toolbar -->
+        <header class="admin-top-nav">
+          <div>
+            <h1 style="font-size: 1.4rem; margin-bottom: 0.15rem;">Marketplace & Inventory Manager</h1>
+            <p style="font-size: 0.85rem; color: var(--silver-500);">Live synchronization with public auto dealership marketplace</p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <button id="btn-export-inventory" class="btn btn-outline btn-sm" title="Export database as JSON">
+              📥 Export Data
+            </button>
+            <button id="btn-restore-defaults" class="btn btn-dark btn-sm" title="Reset to original 16 vehicles">
+              🔄 Reset to Defaults
+            </button>
+            <button id="btn-add-vehicle" class="btn btn-silver btn-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add New Vehicle
+            </button>
+          </div>
+        </header>
+
+        <div class="admin-body-area">
+          
+          <!-- TAB 1: VEHICLES MANAGEMENT -->
+          <div id="tab-view-vehicles">
+            
+            <!-- KPI Overview Cards -->
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-title">Total In-Stock</div>
+                <div id="kpi-total-inventory" class="kpi-val">16</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Certified Pre-Owned</div>
+                <div id="kpi-certified-count" class="kpi-val" style="color: #60a5fa;">8</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Total Inventory Value</div>
+                <div id="kpi-total-value" class="kpi-val" style="color: #34d399;">$0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Average Car Price</div>
+                <div id="kpi-avg-price" class="kpi-val">$0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Homepage Featured</div>
+                <div id="kpi-featured-count" class="kpi-val" style="color: #fbbf24;">6</div>
+              </div>
+            </div>
+
+            <!-- Vehicles Table Container -->
+            <div class="admin-table-card">
+              <div class="admin-table-toolbar">
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; max-width: 600px;">
+                  <input type="text" id="admin-search-input" class="form-control" placeholder="Search by make, model, stock # or VIN..." style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                  
+                  <select id="admin-filter-category" class="form-control" style="width: auto; padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <option value="all">All Body Types</option>
+                    <option value="SUV">SUVs</option>
+                    <option value="Sedan">Sedans</option>
+                    <option value="Truck">Trucks</option>
+                    <option value="Hatchback">Hatchbacks</option>
+                    <option value="Minivan">Minivans</option>
+                  </select>
+
+                  <select id="admin-filter-status" class="form-control" style="width: auto; padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <option value="all">All Inventory</option>
+                    <option value="featured">Featured Deals Only</option>
+                    <option value="certified">Certified Only</option>
+                    <option value="preowned">Pre-Owned Only</option>
+                  </select>
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--silver-500);">
+                  Real-time updates apply directly to public website
+                </div>
+              </div>
+
+              <div style="overflow-x: auto;">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Image</th>
+                      <th>Vehicle Info</th>
+                      <th>Stock & Condition</th>
+                      <th>Body & Specs</th>
+                      <th>Price / Monthly</th>
+                      <th>Featured</th>
+                      <th style="text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-vehicles-tbody">
+                    <!-- Populated via admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TAB 2: ANALYTICS -->
+          <div id="tab-view-analytics" style="display: none;"></div>
+
+          <!-- TAB 3: INQUIRIES & LEADS -->
+          <div id="tab-view-inquiries" style="display: none;"></div>
+
+          <!-- TAB 4: SETTINGS -->
+          <div id="tab-view-settings" style="display: none;"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       VEHICLE ADD / EDIT MODAL
+  ==================================================== -->
+  <div id="vehicle-edit-modal-backdrop" class="modal-backdrop">
+    <div class="modal-container" style="max-width: 800px; padding: 2rem;">
+      <button class="modal-close-btn" id="btn-close-vehicle-modal">✕</button>
+      
+      <h2 id="vehicle-modal-title" style="font-size: 1.5rem; margin-bottom: 0.25rem;">Edit Vehicle Details</h2>
+      <p style="color: var(--silver-500); font-size: 0.85rem; margin-bottom: 1.5rem;">Fill out all vehicle specifications to update the marketplace catalog</p>
+
+      <form id="vehicle-editor-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <input type="hidden" id="form-car-id">
+
+        <!-- Row 1: Basic identity -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Year *</label>
+            <input type="number" id="form-car-year" class="form-control" required min="2000" max="2027" value="2023">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Make / Brand *</label>
+            <input type="text" id="form-car-make" class="form-control" required placeholder="e.g. Toyota, Honda, Ford">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Model Name *</label>
+            <input type="text" id="form-car-model" class="form-control" required placeholder="e.g. RAV4, Civic, F-150">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trim / Package *</label>
+            <input type="text" id="form-car-trim" class="form-control" required placeholder="e.g. XLE Premium AWD">
+          </div>
+        </div>
+
+        <!-- Row 2: Pricing -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Retail Price ($ USD) *</label>
+            <input type="number" id="form-car-price" class="form-control" required min="1000" step="50" placeholder="28500">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Est. Monthly Payment ($/mo)</label>
+            <input type="number" id="form-car-monthly" class="form-control" placeholder="385">
+          </div>
+        </div>
+
+        <!-- Row 3: Specs -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Mileage (Miles) *</label>
+            <input type="number" id="form-car-mileage" class="form-control" required min="0" placeholder="24000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Body Style *</label>
+            <select id="form-car-body" class="form-control" required>
+              <option value="SUV">SUV</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Truck">Truck</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Minivan">Minivan</option>
+              <option value="Coupe">Coupe</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Fuel Type *</label>
+            <select id="form-car-fuel" class="form-control" required>
+              <option value="Gasoline">Gasoline</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Electric">Electric (EV)</option>
+              <option value="Diesel">Diesel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Drivetrain</label>
+            <select id="form-car-drivetrain" class="form-control">
+              <option value="AWD">AWD</option>
+              <option value="FWD">FWD</option>
+              <option value="4WD">4WD</option>
+              <option value="RWD">RWD</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Transmission</label>
+            <input type="text" id="form-car-trans" class="form-control" placeholder="8-Speed Automatic" value="Automatic">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Engine Description</label>
+            <input type="text" id="form-car-engine" class="form-control" placeholder="2.5L 4-Cylinder DOHC">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Exterior Color</label>
+            <input type="text" id="form-car-ext-color" class="form-control" placeholder="Silver Sky Metallic">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Interior Color</label>
+            <input type="text" id="form-car-int-color" class="form-control" placeholder="Black Leather">
+          </div>
+        </div>
+
+        <!-- Row 4: Dealership identifiers -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">VIN Number *</label>
+            <input type="text" id="form-car-vin" class="form-control" required placeholder="17-character VIN">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Number *</label>
+            <input type="text" id="form-car-stock" class="form-control" required placeholder="SM-4850">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Condition Status</label>
+            <select id="form-car-condition" class="form-control">
+              <option value="Certified Pre-Owned">Certified Pre-Owned</option>
+              <option value="Pre-Owned">Pre-Owned</option>
+            </select>
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; margin-top: 1.75rem;">
+            <label class="checkbox-label" style="cursor: pointer;">
+              <input type="checkbox" id="form-car-featured">
+              <span style="color: #fff; font-weight: 600; margin-left: 0.5rem;">⭐ Feature this car on Homepage Deals</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Row 5: 10 Vehicle Images Attachment Section -->
+        <div class="form-group" style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-medium);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div>
+              <label class="form-label" style="font-size: 1rem; color: #fff; margin-bottom: 0.15rem;">
+                📸 Vehicle Photo Gallery (Up to 10 Images)
+              </label>
+              <div style="font-size: 0.8rem; color: var(--silver-500);">
+                Add high-resolution exterior, interior & angle photos. Select files from device or enter image URLs.
+              </div>
+            </div>
+            <label for="bulk-image-upload" class="btn btn-silver btn-sm" style="cursor: pointer;">
+              📁 Browse Files (Max 10)
+            </label>
+            <input type="file" id="bulk-image-upload" accept="image/*" multiple style="display: none;">
+          </div>
+
+          <!-- 10 Visual Image Slots Grid -->
+          <div id="image-slots-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+            <!-- Generated 10 image slots with preview & remove -->
+          </div>
+
+          <!-- Direct URL Quick Paste Input -->
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="url" id="quick-image-url-input" class="form-control" placeholder="Or paste direct image URL (https://...) and click Add" style="font-size: 0.85rem;">
+            <button type="button" id="btn-add-image-url" class="btn btn-dark btn-sm" style="white-space: nowrap;">
+              + Add URL
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 6: Video Walkaround Attachment Section -->
+        <div class="form-group" style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-medium);">
+          <div style="margin-bottom: 0.75rem;">
+            <label class="form-label" style="font-size: 1rem; color: #fff; margin-bottom: 0.15rem;">
+              🎥 Vehicle Video Walkaround (1 Video Attachment)
+            </label>
+            <div style="font-size: 0.8rem; color: var(--silver-500);">
+              Attach a YouTube video, Vimeo, or direct MP4 link for customers to preview this car.
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <input type="url" id="form-car-video" class="form-control" placeholder="e.g. https://www.youtube.com/watch?v=... or MP4 URL" style="flex: 1; min-width: 240px;">
+            <label for="file-video-upload" class="btn btn-outline btn-sm" style="cursor: pointer; white-space: nowrap;">
+              📹 Upload Video File
+            </label>
+            <button type="button" id="btn-remove-video" class="btn btn-dark btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); white-space: nowrap; display: none;">
+              🗑️ Remove Video
+            </button>
+            <input type="file" id="file-video-upload" accept="video/mp4,video/webm" style="display: none;">
+          </div>
+          <div id="video-preview-tag" style="margin-top: 0.65rem; font-size: 0.85rem; color: #38bdf8; display: none; align-items: center; gap: 8px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Key Features (One feature per line)</label>
+          <textarea id="form-car-features" class="form-control" rows="3" placeholder="Apple CarPlay\nHeated Seats\nBlind Spot Monitor"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Highlight Badges (Comma-separated)</label>
+          <input type="text" id="form-car-badges" class="form-control" placeholder="1-Owner, Clean Carfax, Great Price">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Description & Overview</label>
+          <textarea id="form-car-overview" class="form-control" rows="3" placeholder="Detailed condition, inspection status and highlights..."></textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+          <button type="button" id="btn-cancel-vehicle-modal" class="btn btn-dark">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-silver btn-lg">
+            💾 Save Vehicle to Marketplace
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (Free Tier Compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

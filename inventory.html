@@ -123,13 +123,13 @@
         <div class="filter-group">
           <div class="filter-group-title">
             <span>Max Price</span>
-            <span id="filter-price-val" style="color: #fff; font-weight: 700;">$60,000</span>
+            <span id="filter-price-val" style="color: #fff; font-weight: 700;">$250,000</span>
           </div>
           <div class="range-slider-wrap">
-            <input type="range" id="filter-price-slider" min="15000" max="60000" step="1000" value="60000">
+            <input type="range" id="filter-price-slider" min="5000" max="250000" step="5000" value="250000">
             <div class="range-values">
-              <span>$15,000</span>
-              <span>$60,000</span>
+              <span>$5,000</span>
+              <span>$250,000</span>
             </div>
           </div>
         </div>
@@ -312,10 +312,17 @@
         <div style="display: flex; gap: 1.5rem;">
           <a href="#" class="text-silver">Privacy Policy</a>
           <a href="#" class="text-silver">Terms of Service</a>
+          <a href="admin.index.html" class="text-silver" style="font-weight: 600; color: #94a3b8;">🔒 Staff Portal</a>
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- Firebase SDKs (Realtime Cloud Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>

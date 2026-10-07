@@ -15,8 +15,8 @@ let currentFilters = {
   condition: 'all',
   fuelType: 'all',
   transmission: 'all',
-  maxPrice: 60000,
-  minYear: 2019,
+  maxPrice: 250000,
+  minYear: 2000,
   sortBy: 'featured'
 };
 
@@ -41,6 +41,19 @@ function initApp() {
   } else if (isHomePage) {
     populateHomeDropdowns();
     renderFeaturedVehicles();
+  }
+
+  // Real-time Cloud Sync with Firebase
+  if (typeof subscribeToMarketplaceVehicles === 'function') {
+    subscribeToMarketplaceVehicles((cloudVehicles) => {
+      if (isInventoryPage) {
+        populateFilterDropdowns();
+        renderInventory();
+      } else if (isHomePage) {
+        populateHomeDropdowns();
+        renderFeaturedVehicles();
+      }
+    });
   }
 
   setupGlobalModals();
@@ -137,7 +150,7 @@ function parseUrlParams() {
   if (params.has('bodyType')) currentFilters.bodyType = params.get('bodyType');
   if (params.has('condition')) currentFilters.condition = params.get('condition');
   if (params.has('fuelType')) currentFilters.fuelType = params.get('fuelType');
-  if (params.has('maxPrice')) currentFilters.maxPrice = parseInt(params.get('maxPrice')) || 60000;
+  if (params.has('maxPrice')) currentFilters.maxPrice = parseInt(params.get('maxPrice')) || 250000;
   if (params.has('q')) currentFilters.keyword = params.get('q');
 }
 
@@ -279,15 +292,15 @@ function setupInventoryFilters() {
         condition: 'all',
         fuelType: 'all',
         transmission: 'all',
-        maxPrice: 60000,
-        minYear: 2019,
+        maxPrice: 250000,
+        minYear: 2000,
         sortBy: 'featured'
       };
       if (keywordInput) keywordInput.value = '';
       if (makeFilter) makeFilter.value = 'all';
       if (bodyFilter) bodyFilter.value = 'all';
-      if (priceSlider) priceSlider.value = 60000;
-      if (priceValText) priceValText.textContent = formatPrice(60000);
+      if (priceSlider) priceSlider.value = 250000;
+      if (priceValText) priceValText.textContent = formatPrice(250000);
       
       const allConditionRadio = document.querySelector('input[name="filter-condition"][value="all"]');
       if (allConditionRadio) allConditionRadio.checked = true;
@@ -297,6 +310,37 @@ function setupInventoryFilters() {
       renderInventory();
       showToast('Filters reset to default');
     });
+  }
+
+  // Quick Filter Chips on top
+  const chipBtns = document.querySelectorAll('.filter-chip-btn');
+  chipBtns.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const type = chip.dataset.filterType;
+      const value = chip.dataset.filterValue;
+      if (type === 'price') {
+        currentFilters.maxPrice = parseInt(value);
+        const priceSlider = document.getElementById('filter-price-slider');
+        const priceValText = document.getElementById('filter-price-val');
+        if (priceSlider) priceSlider.value = value;
+        if (priceValText) priceValText.textContent = formatPrice(parseInt(value));
+      } else if (type === 'bodyType') {
+        currentFilters.bodyType = value;
+        const bodyFilter = document.getElementById('filter-body');
+        if (bodyFilter) bodyFilter.value = value;
+      } else if (type === 'fuelType') {
+        currentFilters.fuelType = value;
+        const fuelRadio = document.querySelector(`input[name="filter-fuel"][value="${value}"]`);
+        if (fuelRadio) fuelRadio.checked = true;
+      } else if (type === 'condition') {
+        currentFilters.condition = value;
+        const condRadio = document.querySelector(`input[name="filter-condition"][value="${value}"]`);
+        if (condRadio) condRadio.checked = true;
+      }
+      renderInventory();
+    });
+  });
+
   // Mobile filter drawer triggers
   const mobileFilterOpenBtn = document.getElementById('btn-mobile-filter-open');
   const mobileFilterCloseBtn = document.getElementById('btn-mobile-filter-close');
@@ -390,15 +434,18 @@ function renderInventory() {
 function createVehicleCardHtml(car) {
   const isWishlisted = wishlist.includes(car.id);
   const isCompared = compareList.includes(car.id);
+  const mainImage = (car.images && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80';
+  const badgesList = Array.isArray(car.badges) ? car.badges : [];
+  const transmissionShort = car.transmission ? car.transmission.split(' ')[0] : 'Auto';
 
   return `
     <article class="vehicle-card" data-vehicle-id="${car.id}">
       <div class="vehicle-thumb-wrap">
-        <img src="${car.images[0]}" alt="${car.year} ${car.make} ${car.model}" class="vehicle-img" loading="lazy">
+        <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         
         <div class="vehicle-badge-overlay">
-          <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
-          ${car.badges.map(b => `<span class="badge badge-green">${b}</span>`).slice(0, 1).join('')}
+          <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition || 'Pre-Owned'}</span>
+          ${badgesList.slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
         </div>
 
         <button class="btn-wishlist ${isWishlisted ? 'active' : ''}" title="Save to Wishlist" data-id="${car.id}" aria-label="Save to Wishlist">
@@ -410,34 +457,34 @@ function createVehicleCardHtml(car) {
 
       <div class="vehicle-details">
         <div class="vehicle-header-info">
-          <div class="vehicle-year-make">${car.year} • ${car.make} • Stock #${car.stockNumber}</div>
-          <h3 class="vehicle-name">${car.model}</h3>
-          <div class="vehicle-trim">${car.trim}</div>
+          <div class="vehicle-year-make">${car.year || 2024} • ${car.make || ''} • Stock #${car.stockNumber || 'SM-0000'}</div>
+          <h3 class="vehicle-name">${car.model || 'Vehicle'}</h3>
+          <div class="vehicle-trim">${car.trim || ''}</div>
         </div>
 
         <div class="vehicle-specs-pills">
           <div class="spec-item" title="Mileage">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            <span>${formatNumber(car.mileage)} mi</span>
+            <span>${formatNumber(car.mileage || 0)} mi</span>
           </div>
           <div class="spec-item" title="Drivetrain">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            <span>${car.drivetrain}</span>
+            <span>${car.drivetrain || 'FWD'}</span>
           </div>
           <div class="spec-item" title="Fuel Type">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-            <span>${car.fuelType}</span>
+            <span>${car.fuelType || 'Gasoline'}</span>
           </div>
           <div class="spec-item" title="Transmission">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span>${car.transmission.split(' ')[0]}</span>
+            <span>${transmissionShort}</span>
           </div>
         </div>
 
         <div class="vehicle-pricing">
           <div>
-            <div class="price-main">${formatPrice(car.price)}</div>
-            <div class="price-est">Est. $${car.monthlyEst}/mo</div>
+            <div class="price-main">${formatPrice(car.price || 0)}</div>
+            <div class="price-est">Est. $${car.monthlyEst || 0}/mo</div>
           </div>
           <button class="btn btn-dark btn-sm btn-compare ${isCompared ? 'active' : ''}" data-id="${car.id}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -694,12 +741,18 @@ function openVehicleModal(carId) {
     <button class="modal-close-btn" id="modal-close">✕</button>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;" class="vehicle-modal-grid">
       <div>
-        <div style="aspect-ratio: 16/10; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem;">
+        <div style="aspect-ratio: 16/10; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative;" id="modal-media-container">
           <img id="modal-main-img" src="${car.images[0]}" alt="${car.model}" style="width: 100%; height: 100%; object-fit: cover;">
+          ${car.video ? `
+            <button id="btn-play-walkaround-video" style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Watch Video Walkaround
+            </button>
+          ` : ''}
         </div>
-        <div style="display: flex; gap: 0.5rem; overflow-x: auto;">
+        <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px;">
           ${car.images.map((img, idx) => `
-            <img src="${img}" class="modal-thumb ${idx === 0 ? 'active' : ''}" data-idx="${idx}" style="width: 70px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? '#fff' : 'transparent'}; opacity: ${idx === 0 ? '1' : '0.6'};">
+            <img src="${img}" class="modal-thumb ${idx === 0 ? 'active' : ''}" data-idx="${idx}" style="width: 65px; height: 46px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? '#fff' : 'transparent'}; opacity: ${idx === 0 ? '1' : '0.6'}; flex-shrink: 0;">
           `).join('')}
         </div>
 
@@ -762,7 +815,10 @@ function openVehicleModal(carId) {
   modalContainer.querySelectorAll('.modal-thumb').forEach(thumb => {
     thumb.addEventListener('click', (e) => {
       const idx = parseInt(thumb.dataset.idx);
-      document.getElementById('modal-main-img').src = car.images[idx];
+      const mainImg = document.getElementById('modal-main-img');
+      if (mainImg && car.images[idx]) {
+        mainImg.src = car.images[idx];
+      }
       modalContainer.querySelectorAll('.modal-thumb').forEach(t => {
         t.style.borderColor = 'transparent';
         t.style.opacity = '0.6';
@@ -771,6 +827,29 @@ function openVehicleModal(carId) {
       thumb.style.opacity = '1';
     });
   });
+
+  // Video Walkaround Click Handler
+  const videoBtn = modalContainer.querySelector('#btn-play-walkaround-video');
+  if (videoBtn && car.video) {
+    videoBtn.addEventListener('click', () => {
+      const mediaWrap = document.getElementById('modal-media-container');
+      if (mediaWrap) {
+        let embedHtml = '';
+        if (car.video.includes('youtube.com') || car.video.includes('youtu.be')) {
+          let videoId = '';
+          if (car.video.includes('youtu.be/')) {
+            videoId = car.video.split('youtu.be/')[1].split('?')[0];
+          } else if (car.video.includes('v=')) {
+            videoId = car.video.split('v=')[1].split('&')[0];
+          }
+          embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" style="width: 100%; height: 100%; border: none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+          embedHtml = `<video src="${car.video}" controls autoplay style="width: 100%; height: 100%; object-fit: contain; background: #000;"></video>`;
+        }
+        mediaWrap.innerHTML = embedHtml;
+      }
+    });
+  }
 
   modalBackdrop.classList.add('active');
   document.getElementById('modal-close').onclick = () => modalBackdrop.classList.remove('active');
