@@ -58,14 +58,52 @@ function saveAdminUsers(users) {
 }
 
 function checkAuthSession() {
+  // Check Firebase Auth state
+  if (typeof firebase !== 'undefined' && fbAuth) {
+    fbAuth.onAuthStateChanged((user) => {
+      if (user) {
+        if (user.emailVerified) {
+          const loggedUser = {
+            id: user.uid,
+            name: user.displayName || 'Admin User',
+            email: user.email,
+            role: 'Dealership Admin',
+            verified: true
+          };
+          currentAdminUser = loggedUser;
+          localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(loggedUser));
+          showDashboardView();
+          return;
+        } else {
+          // If logged in but unverified, show verify screen
+          initiateEmailVerification({ email: user.email, name: user.displayName });
+          return;
+        }
+      } else {
+        // Check local session fallback (for demo admin)
+        const session = localStorage.getItem(ADMIN_STORAGE_KEY_SESSION);
+        if (session) {
+          try {
+            const parsed = JSON.parse(session);
+            if (parsed && parsed.verified) {
+              currentAdminUser = parsed;
+              showDashboardView();
+              return;
+            }
+          } catch (e) {}
+        }
+        showAuthView('login');
+      }
+    });
+    return;
+  }
+
   try {
     const session = localStorage.getItem(ADMIN_STORAGE_KEY_SESSION);
     if (session) {
       const user = JSON.parse(session);
-      const allUsers = getAdminUsers();
-      const freshUser = allUsers.find(u => u.id === user.id);
-      if (freshUser && freshUser.verified) {
-        currentAdminUser = freshUser;
+      if (user && user.verified) {
+        currentAdminUser = user;
         showDashboardView();
         return;
       }
@@ -123,140 +161,187 @@ function setupAuthEventListeners() {
   // Login Form Submission
   const loginForm = document.getElementById('admin-login-form');
   if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim().toLowerCase();
       const password = document.getElementById('login-password').value;
+      const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-      const users = getAdminUsers();
-      const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
-
-      if (!user) {
-        showAuthAlert('Invalid email or password. Use demo account (admin@silvermotors.com / admin) or register a new account.', 'error');
+      // 1. Check Demo Account fallback
+      if (email === 'admin@silvermotors.com' && password === 'admin') {
+        currentAdminUser = DEFAULT_ADMIN;
+        localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(DEFAULT_ADMIN));
+        showToast(`Welcome back, ${DEFAULT_ADMIN.name}!`, 'success');
+        showDashboardView();
         return;
       }
 
-      if (!user.verified) {
-        showAuthAlert('Your email is not verified yet. Please complete verification.', 'warning');
-        initiateEmailVerification(user);
-        return;
-      }
+      // 2. Firebase Authentication Login
+      if (typeof firebase !== 'undefined' && fbAuth) {
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Signing In...';
+          }
+          const userCredential = await fbAuth.signInWithEmailAndPassword(email, password);
+          const fbUser = userCredential.user;
 
-      // Successful Login
-      currentAdminUser = user;
-      localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(user));
-      showToast(`Welcome back, ${user.name}!`, 'success');
-      showDashboardView();
+          // Check if email verified
+          await fbUser.reload();
+          if (!fbUser.emailVerified) {
+            showAuthAlert('Your email address has not yet been verified. Please click the link in your inbox.', 'warning');
+            initiateEmailVerification({ email: fbUser.email, name: fbUser.displayName || 'Admin' });
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = 'Sign In to Admin Portal';
+            }
+            return;
+          }
+
+          const loggedUser = {
+            id: fbUser.uid,
+            name: fbUser.displayName || 'Admin User',
+            email: fbUser.email,
+            role: 'Dealership Admin',
+            verified: true
+          };
+
+          currentAdminUser = loggedUser;
+          localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(loggedUser));
+          showToast(`Welcome back, ${loggedUser.name}!`, 'success');
+          showDashboardView();
+        } catch (error) {
+          console.error('Firebase Login Error:', error);
+          showAuthAlert(getFirebaseErrorMessage(error), 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Sign In to Admin Portal';
+          }
+        }
+      } else {
+        // Fallback local storage auth
+        const users = getAdminUsers();
+        const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+        if (!user) {
+          showAuthAlert('Invalid email or password.', 'error');
+          return;
+        }
+        currentAdminUser = user;
+        localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(user));
+        showToast(`Welcome back, ${user.name}!`, 'success');
+        showDashboardView();
+      }
     });
   }
 
-  // Register Form Submission
+  // Register Form Submission (Firebase Auth + Auto Email Verification Link)
   const registerForm = document.getElementById('admin-register-form');
   if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim().toLowerCase();
       const role = document.getElementById('reg-role').value;
       const password = document.getElementById('reg-password').value;
       const confirmPassword = document.getElementById('reg-confirm-password').value;
+      const submitBtn = registerForm.querySelector('button[type="submit"]');
 
       if (password !== confirmPassword) {
         showAuthAlert('Passwords do not match! Please re-check.', 'error');
         return;
       }
 
-      if (password.length < 5) {
-        showAuthAlert('Password must be at least 5 characters long.', 'error');
+      if (password.length < 6) {
+        showAuthAlert('Password must be at least 6 characters long.', 'error');
         return;
       }
 
-      const users = getAdminUsers();
-      if (users.some(u => u.email.toLowerCase() === email)) {
-        showAuthAlert('An account with this email address already exists.', 'error');
-        return;
+      // Firebase Registration + Send Verification Email
+      if (typeof firebase !== 'undefined' && fbAuth) {
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Creating Account & Sending Link...';
+          }
+
+          const userCredential = await fbAuth.createUserWithEmailAndPassword(email, password);
+          const fbUser = userCredential.user;
+
+          // Update display name
+          await fbUser.updateProfile({ displayName: name });
+
+          // Send verification email link directly from Google Firebase
+          await fbUser.sendEmailVerification({
+            url: window.location.origin + window.location.pathname
+          });
+
+          showToast('✅ A verification link has been sent to your email! Please check your inbox.', 'success');
+          initiateEmailVerification({ email, name, role });
+
+        } catch (error) {
+          console.error('Firebase Register Error:', error);
+          showAuthAlert(getFirebaseErrorMessage(error), 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Register & Send Verification Link';
+          }
+        }
       }
-
-      // Generate 6-digit OTP code
-      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      const newUser = {
-        id: 'usr-' + Date.now(),
-        name,
-        email,
-        role,
-        password,
-        verified: false,
-        verificationCode: otpCode,
-        createdAt: new Date().toISOString()
-      };
-
-      users.push(newUser);
-      saveAdminUsers(users);
-
-      initiateEmailVerification(newUser);
     });
   }
 
-  // OTP Verification Form Submission
-  const verifyForm = document.getElementById('admin-verify-form');
-  if (verifyForm) {
-    verifyForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const targetEmail = document.getElementById('verify-target-email').value;
-      const enteredCode = document.getElementById('verify-otp-code').value.trim();
-
-      const users = getAdminUsers();
-      const userIndex = users.findIndex(u => u.email.toLowerCase() === targetEmail.toLowerCase());
-
-      if (userIndex === -1) {
-        showAuthAlert('User not found. Please register again.', 'error');
-        return;
+  // Resend Link Button
+  document.getElementById('btn-resend-otp')?.addEventListener('click', async () => {
+    if (typeof firebase !== 'undefined' && fbAuth && fbAuth.currentUser) {
+      try {
+        await fbAuth.currentUser.sendEmailVerification({
+          url: window.location.origin + window.location.pathname
+        });
+        showToast('The verification email link has been resent!', 'success');
+      } catch (err) {
+        showAuthAlert(getFirebaseErrorMessage(err), 'error');
       }
+    } else {
+      showToast('Please sign in or re-register to receive the verification link.', 'info');
+    }
+  });
 
-      const user = users[userIndex];
-      if (user.verificationCode !== enteredCode) {
-        showAuthAlert('Invalid verification code! Please check the code shown in the simulation box.', 'error');
-        return;
+  // Check Email Verification Status Button / Refresh
+  document.getElementById('btn-check-verified')?.addEventListener('click', async () => {
+    if (typeof firebase !== 'undefined' && fbAuth && fbAuth.currentUser) {
+      await fbAuth.currentUser.reload();
+      if (fbAuth.currentUser.emailVerified) {
+        const loggedUser = {
+          id: fbAuth.currentUser.uid,
+          name: fbAuth.currentUser.displayName || 'Admin User',
+          email: fbAuth.currentUser.email,
+          role: 'Dealership Admin',
+          verified: true
+        };
+        currentAdminUser = loggedUser;
+        localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(loggedUser));
+        showToast('🎉 Email Verified Successfully!', 'success');
+        showDashboardView();
+      } else {
+        showAuthAlert('The email has not yet been verified. Please click the link in the email.', 'warning');
       }
-
-      // Mark verified
-      user.verified = true;
-      delete user.verificationCode;
-      users[userIndex] = user;
-      saveAdminUsers(users);
-
-      currentAdminUser = user;
-      localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(user));
-      showToast('🎉 Email verified successfully! Welcome to Silver Motors Admin.', 'success');
-      showDashboardView();
-    });
-  }
-
-  // Resend Code Button
-  document.getElementById('btn-resend-otp')?.addEventListener('click', () => {
-    const targetEmail = document.getElementById('verify-target-email').value;
-    const users = getAdminUsers();
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === targetEmail.toLowerCase());
-    if (userIndex > -1) {
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      users[userIndex].verificationCode = newOtp;
-      saveAdminUsers(users);
-      initiateEmailVerification(users[userIndex]);
-      showToast('New verification code sent!', 'info');
     }
   });
 
   // Logout Button
   const logoutBtn = document.getElementById('btn-admin-logout');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
+    logoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
+      if (typeof firebase !== 'undefined' && fbAuth) {
+        await fbAuth.signOut().catch(() => {});
+      }
       localStorage.removeItem(ADMIN_STORAGE_KEY_SESSION);
       currentAdminUser = null;
       showToast('Logged out of Admin Portal.', 'info');
       showAuthView('login');
-      // Reset password input
       const passInp = document.getElementById('login-password');
       if (passInp) passInp.value = '';
     });
@@ -266,29 +351,17 @@ function setupAuthEventListeners() {
 function initiateEmailVerification(user) {
   document.getElementById('verify-target-email').value = user.email;
   document.getElementById('verify-user-email-text').textContent = user.email;
-  
-  // Show simulated verification code prompt banner
-  const simBox = document.getElementById('simulated-email-inbox');
-  if (simBox) {
-    simBox.innerHTML = `
-      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-        <div style="font-size: 0.8rem; text-transform: uppercase; color: #10b981; font-weight: 700; margin-bottom: 0.25rem;">
-          📬 Simulated Verification Email Sent
-        </div>
-        <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">
-          To: <strong>${user.email}</strong> | Subject: <em>Verify your Silver Motors Admin Account</em>
-        </div>
-        <div style="font-size: 1.25rem; font-weight: 800; letter-spacing: 4px; color: #fff; background: #0f172a; padding: 0.5rem; text-align: center; border-radius: 6px; border: 1px solid #334155;">
-          ${user.verificationCode}
-        </div>
-        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; text-align: center;">
-          (Copy this 6-digit code or enter it above to verify your account)
-        </div>
-      </div>
-    `;
-  }
-
   showAuthView('verify');
+}
+
+function getFirebaseErrorMessage(error) {
+  if (!error) return 'An error occurred. Please try again.';
+  if (error.code === 'auth/email-already-in-use') return 'An account with this email address already exists. Please sign in.';
+  if (error.code === 'auth/invalid-email') return 'Please enter a valid email address.';
+  if (error.code === 'auth/weak-password') return 'Password must be at least 6 characters long.';
+  if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') return 'Invalid email or password.';
+  if (error.code === 'auth/too-many-requests') return 'Too many attempts. Please wait a few moments and try again.';
+  return error.message || 'Operation failed.';
 }
 
 function showAuthAlert(msg, type = 'error') {

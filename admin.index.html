@@ -362,37 +362,37 @@
         </div>
       </div>
 
-      <!-- 3. EMAIL OTP VERIFICATION BOX -->
+      <!-- 3. EMAIL LINK VERIFICATION BOX -->
       <div id="auth-verify-box" style="display: none;">
         <div style="text-align: center; margin-bottom: 1.5rem;">
-          <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #38bdf8;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #38bdf8;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
           </div>
-          <h3 style="font-size: 1.25rem; color: #fff;">Verify Your Email</h3>
-          <p style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;">
-            A 6-digit confirmation code was sent to <br><strong id="verify-user-email-text" style="color: #fff;">user@email.com</strong>
+          <h3 style="font-size: 1.3rem; color: #fff;">Verify Your Email</h3>
+          <p style="font-size: 0.88rem; color: var(--silver-400); margin-top: 0.35rem; line-height: 1.5;">
+            We have sent a verification link to:<br>
+            <strong id="verify-user-email-text" style="color: #38bdf8; font-size: 0.95rem;">user@email.com</strong>
           </p>
         </div>
 
-        <form id="admin-verify-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
-          <input type="hidden" id="verify-target-email">
+        <input type="hidden" id="verify-target-email">
 
-          <div class="form-group">
-            <label class="form-label" style="text-align: center; display: block;">Enter 6-Digit Code</label>
-            <input type="text" id="verify-otp-code" class="form-control" maxlength="6" required placeholder="123456" style="text-align: center; letter-spacing: 6px; font-size: 1.4rem; font-weight: 800;">
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 1.1rem; text-align: center; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            📨 Please check your email inbox (or spam folder) and <strong>Click the verification link.</strong>.
           </div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">
+            (After clicking the link, press the button below or reload the page.)
+          </div>
+        </div>
 
-          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%;">
-            Verify Account & Open Admin Dashboard
-          </button>
-        </form>
-
-        <!-- Simulated Inbox Banner -->
-        <div id="simulated-email-inbox"></div>
+        <button type="button" id="btn-check-verified" class="btn btn-silver btn-lg" style="width: 100%;">
+          ✓ I Have Verified My Email (Continue)
+        </button>
 
         <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-          <button type="button" id="btn-resend-otp" style="background: none; border: none; color: #60a5fa; cursor: pointer; text-decoration: underline;">
-            Resend Verification Code
+          <button type="button" id="btn-resend-otp" style="background: none; border: none; color: #60a5fa; cursor: pointer; text-decoration: underline; font-size: 0.85rem;">
+            Resend Verification Link
           </button>
           <a href="#" class="btn-show-login" style="color: var(--silver-500);">Cancel</a>
         </div>
