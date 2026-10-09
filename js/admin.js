@@ -210,8 +210,19 @@ function showDashboardView() {
     document.getElementById('admin-user-display-name').textContent = currentAdminUser.name;
     document.getElementById('admin-user-role-badge').textContent = currentAdminUser.role || 'Admin';
     document.getElementById('admin-user-email').textContent = currentAdminUser.email;
+    const avatarBadge = document.getElementById('admin-user-avatar-badge');
+    if (avatarBadge) {
+      avatarBadge.textContent = (currentAdminUser.name || 'Admin').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    }
   }
 
+  // Ensure active tab state is synchronized
+  currentTab = currentTab || 'vehicles';
+  document.querySelectorAll('.admin-nav-item[data-tab]').forEach(i => {
+    if (i.dataset.tab === currentTab) i.classList.add('active');
+    else i.classList.remove('active');
+  });
+  switchAdminTab(currentTab);
   loadMarketplaceDashboard();
 
   if (typeof window.hideActionLoader === 'function') {
@@ -434,10 +445,9 @@ function setupAuthEventListeners() {
     }
   });
 
-  // Logout Button
-  const logoutBtn = document.getElementById('btn-admin-logout');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
+  // Logout Buttons (Top Navbar, Sidebar Header, and User Profile)
+  document.querySelectorAll('.btn-admin-logout-trigger, #btn-admin-logout').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       if (typeof window.showActionLoader === 'function') {
         window.showActionLoader('Signing out of Admin Portal...');
@@ -457,7 +467,7 @@ function setupAuthEventListeners() {
         }
       }, 350);
     });
-  }
+  });
 }
 
 function initiateEmailVerification(user) {
@@ -493,14 +503,14 @@ function showAuthAlert(msg, type = 'error') {
 ----------------------------------------------------- */
 function setupDashboardEventListeners() {
   // Navigation Tabs
-  document.querySelectorAll('.admin-nav-item').forEach(item => {
+  document.querySelectorAll('.admin-nav-item[data-tab]').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.admin-nav-item[data-tab]').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
       const tab = item.dataset.tab;
-      currentTab = tab;
-      switchAdminTab(tab);
+      currentTab = tab || 'vehicles';
+      switchAdminTab(currentTab);
     });
   });
 
@@ -626,9 +636,12 @@ function renderVehiclesTable(query = '') {
       </td>
       <td>
         <div style="font-size: 0.85rem; font-weight: 600; color: #cbd5e1;">${car.stockNumber}</div>
-        <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}" style="font-size: 0.7rem; padding: 2px 6px;">
-          ${car.condition}
-        </span>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px;">
+          ${car.isNewVehicle ? `<span class="badge badge-new" style="font-size: 0.65rem; padding: 2px 5px;">🔥 New</span>` : ''}
+          <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}" style="font-size: 0.7rem; padding: 2px 6px;">
+            ${car.condition}
+          </span>
+        </div>
       </td>
       <td>
         <div style="font-size: 0.85rem; color: #fff;">${car.bodyType} • ${car.fuelType}</div>
@@ -648,8 +661,8 @@ function renderVehiclesTable(query = '') {
           <button class="btn btn-silver btn-sm btn-edit-car" data-id="${car.id}" title="Edit Vehicle Details & Pricing">
             ✏️ Edit
           </button>
-          <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace">
-            👁️
+          <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.45rem 0.65rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
           <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Delete Vehicle from Inventory" style="color: #ef4444;">
             🗑️
@@ -719,11 +732,14 @@ function attachTableActionEvents() {
 
   // Live preview
   document.querySelectorAll('.btn-view-live-car').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const carId = btn.dataset.id;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetBtn = e.target.closest('.btn-view-live-car') || btn;
+      const carId = targetBtn.dataset.id;
       const car = getVehicleById(carId);
-      const queryParam = (car && car.stockNumber) ? car.stockNumber : carId;
-      window.open(`inventory.html?q=${encodeURIComponent(queryParam)}`, '_blank');
+      const stock = car && car.stockNumber ? car.stockNumber : '';
+      window.open(`inventory.html?preview=${encodeURIComponent(carId)}&q=${encodeURIComponent(stock)}`, '_blank');
     });
   });
 }
@@ -1050,11 +1066,19 @@ async function saveVehicleFromForm() {
 
     const existingIndex = VEHICLES_DATA.findIndex(v => v.id === id);
     if (existingIndex > -1) {
+      const prev = VEHICLES_DATA[existingIndex];
+      vehicleObject.isNewVehicle = prev.isNewVehicle !== undefined ? prev.isNewVehicle : false;
+      vehicleObject.createdAt = prev.createdAt || new Date().toISOString();
       VEHICLES_DATA[existingIndex] = vehicleObject;
       showToast(`Vehicle ${make} ${model} (#${stockNumber}) updated successfully!`, 'success');
     } else {
+      vehicleObject.isNewVehicle = true;
+      vehicleObject.createdAt = new Date().toISOString();
+      if (!vehicleObject.badges.includes('New Vehicle')) {
+        vehicleObject.badges.unshift('New Vehicle');
+      }
       VEHICLES_DATA.unshift(vehicleObject);
-      showToast(`New vehicle ${make} ${model} added to marketplace!`, 'success');
+      showToast(`New vehicle "${make} ${model}" added to marketplace with top priority!`, 'success');
     }
 
     saveVehiclesData(VEHICLES_DATA);

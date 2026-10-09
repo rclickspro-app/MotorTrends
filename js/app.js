@@ -99,6 +99,7 @@ let wishlist = JSON.parse(localStorage.getItem('silver_wishlist') || '[]');
 let compareList = JSON.parse(localStorage.getItem('silver_compare') || '[]');
 
 function initApp() {
+  setupGlobalModals();
   initMobileMenu();
   updateWishlistCount();
   updateCompareDrawer();
@@ -112,6 +113,15 @@ function initApp() {
     populateFilterDropdowns();
     setupInventoryFilters();
     renderInventory();
+    
+    // Auto-open quick view modal if vehicle id or preview is specified in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const previewId = urlParams.get('id') || urlParams.get('preview');
+    if (previewId) {
+      setTimeout(() => {
+        openVehicleModal(previewId);
+      }, 100);
+    }
   } else if (isHomePage) {
     initHeroSlideshow();
     populateHomeDropdowns();
@@ -197,6 +207,78 @@ function initMobileMenu() {
 function initHeroSlideshow() {
   const slider = document.getElementById('hero-banner-slider');
   if (!slider) return;
+
+  // Check if there is a newly added vehicle or top priority vehicle to dynamically populate into Hero Slide 1
+  const sortedInventory = [...VEHICLES_DATA].sort((a, b) => {
+    const newA = a.isNewVehicle ? 1 : 0;
+    const newB = b.isNewVehicle ? 1 : 0;
+    if (newB !== newA) return newB - newA;
+    if (a.createdAt || b.createdAt) {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+    }
+    return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+  });
+
+  const newestVehicle = sortedInventory[0];
+  if (newestVehicle && (newestVehicle.isNewVehicle || newestVehicle.createdAt)) {
+    const slide1Card = slider.querySelector('.hero-slide:first-child .hero-vehicle-card');
+    const slide1Pill = document.querySelector('.hero-vehicle-switcher-bar .switcher-pill:first-child');
+    
+    if (slide1Card) {
+      const img = (Array.isArray(newestVehicle.images) && newestVehicle.images[0]) ? newestVehicle.images[0] : 'images/vehicles/jeep/main.jpg';
+      const mainBadge = newestVehicle.isNewVehicle ? '<span class="v-badge v-badge-new">🔥 New Vehicle</span>' : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
+      
+      slide1Card.innerHTML = `
+        <div class="vehicle-card-badge-row">
+          ${mainBadge}
+          <span class="v-badge v-badge-success">Stock #${newestVehicle.stockNumber || 'MT-NEW'}</span>
+          <span class="v-badge v-badge-dark">${newestVehicle.condition || 'Clean Title'}</span>
+        </div>
+        <div class="vehicle-card-image-wrapper">
+          <img src="${img}" alt="${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}" class="hero-card-img" onerror="this.src='images/vehicles/jeep/main.jpg'">
+          <div class="vehicle-image-shine"></div>
+        </div>
+        <div class="vehicle-card-details">
+          <div class="vehicle-card-header">
+            <div>
+              <div class="vehicle-card-year-make">${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}</div>
+              <div class="vehicle-card-trim">${newestVehicle.trim || ''}</div>
+            </div>
+            <div class="vehicle-card-price-block">
+              <div class="vehicle-card-price">${formatPrice(newestVehicle.price)}</div>
+              <div class="vehicle-card-monthly">Est. ${formatMonthly(newestVehicle.monthlyEst)}</div>
+            </div>
+          </div>
+          <div class="vehicle-card-specs-row">
+            <span class="v-spec-pill">🛣️ ${formatNumber(newestVehicle.mileage || 0)} KM</span>
+            <span class="v-spec-pill">⚡ ${newestVehicle.fuelType || 'Gasoline'}</span>
+            <span class="v-spec-pill">🛡️ ${newestVehicle.drivetrain || 'AWD'}</span>
+            <span class="v-spec-pill">✨ ${newestVehicle.transmission ? newestVehicle.transmission.split(' ')[0] : 'Auto'}</span>
+          </div>
+          <div class="vehicle-card-actions">
+            <a href="inventory.html?q=${encodeURIComponent(newestVehicle.stockNumber || newestVehicle.model)}" class="btn btn-blue btn-sm" style="flex: 1; justify-content: center;">
+              View This Car In Stock
+            </a>
+            <a href="financing.html?stock=${encodeURIComponent(newestVehicle.stockNumber || '')}" class="btn btn-silver btn-sm" style="justify-content: center;">
+              Finance This Car
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    if (slide1Pill) {
+      slide1Pill.innerHTML = `
+        <span class="switcher-icon">${newestVehicle.isNewVehicle ? '🔥' : '🚙'}</span>
+        <div class="switcher-text">
+          <div class="switcher-title">${newestVehicle.isNewVehicle ? '[NEW] ' : ''}${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}</div>
+          <div class="switcher-sub">${formatNumber(newestVehicle.mileage || 0)} KM • ${formatPrice(newestVehicle.price)}</div>
+        </div>
+      `;
+    }
+  }
 
   const slides = slider.querySelectorAll('.hero-slide');
   const dots = slider.querySelectorAll('.slider-dot');
@@ -362,8 +444,23 @@ function renderFeaturedVehicles() {
   const container = document.getElementById('featured-vehicles-grid');
   if (!container) return;
 
-  const featured = VEHICLES_DATA.filter(v => v.featured).slice(0, 6);
-  container.innerHTML = featured.map(car => createVehicleCardHtml(car)).join('');
+  const sortedFeatured = [...VEHICLES_DATA]
+    .filter(v => v.featured || v.isNewVehicle)
+    .sort((a, b) => {
+      const newA = a.isNewVehicle ? 1 : 0;
+      const newB = b.isNewVehicle ? 1 : 0;
+      if (newB !== newA) return newB - newA;
+
+      if (a.createdAt || b.createdAt) {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        if (timeB !== timeA) return timeB - timeA;
+      }
+      return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+    })
+    .slice(0, 6);
+
+  container.innerHTML = sortedFeatured.map(car => createVehicleCardHtml(car)).join('');
   attachCardEvents(container);
 }
 
@@ -377,7 +474,9 @@ function parseUrlParams() {
   if (params.has('condition')) currentFilters.condition = params.get('condition');
   if (params.has('fuelType')) currentFilters.fuelType = params.get('fuelType');
   if (params.has('maxPrice')) currentFilters.maxPrice = parseInt(params.get('maxPrice')) || 250000;
-  if (params.has('q')) currentFilters.keyword = params.get('q');
+  if (params.has('q')) currentFilters.keyword = params.get('q').trim().toLowerCase();
+  if (params.has('search')) currentFilters.keyword = params.get('search').trim().toLowerCase();
+  if (params.has('stock')) currentFilters.keyword = params.get('stock').trim().toLowerCase();
 }
 
 function populateFilterDropdowns() {
@@ -631,7 +730,22 @@ function getFilteredVehicles() {
       case 'price-desc': return priceB - priceA;
       case 'mileage-asc': return mileageA - mileageB;
       case 'year-desc': return yearB - yearA;
-      default: return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      default: {
+        // Priority 1: New Vehicle Added Flag
+        const newA = a.isNewVehicle ? 1 : 0;
+        const newB = b.isNewVehicle ? 1 : 0;
+        if (newB !== newA) return newB - newA;
+
+        // Priority 2: Creation timestamp if available
+        if (a.createdAt || b.createdAt) {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          if (timeB !== timeA) return timeB - timeA;
+        }
+
+        // Priority 3: Featured flag
+        return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      }
     }
   });
 }
@@ -684,8 +798,9 @@ function createVehicleCardHtml(car) {
         <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         
         <div class="vehicle-badge-overlay">
+          ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Vehicle</span>` : ''}
           <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition || 'Pre-Owned'}</span>
-          ${badgesList.slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
+          ${badgesList.filter(b => b !== 'New Vehicle').slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
         </div>
 
         <button class="btn-wishlist ${isWishlisted ? 'active' : ''}" title="Save to Wishlist" data-id="${car.id}" aria-label="Save to Wishlist">
@@ -975,48 +1090,81 @@ function openVehicleModal(carId) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalBackdrop || !modalContainer) return;
 
-  let activeImgIndex = 0;
-
-  const carImages = Array.isArray(car.images) && car.images.length > 0 ? car.images : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+  const carImages = (Array.isArray(car.images) && car.images.length > 0)
+    ? car.images
+    : (car.image ? [car.image] : ['images/vehicles/jeep/main.jpg']);
   const carFeatures = Array.isArray(car.features) ? car.features : [];
+
+  let currentImgIdx = 0;
+  const totalImgs = carImages.length;
 
   modalContainer.innerHTML = `
     <button class="modal-close-btn" id="modal-close">✕</button>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;" class="vehicle-modal-grid">
-      <div>
-        <div style="aspect-ratio: 16/10; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative;" id="modal-media-container">
-          <img id="modal-main-img" src="${carImages[0]}" alt="${car.model}" style="width: 100%; height: 100%; object-fit: cover;">
+    <div class="vehicle-modal-grid">
+      <div class="modal-gallery-wrapper">
+        <!-- Main Image with Arrows & Counter -->
+        <div class="modal-main-image-stage" id="modal-media-container">
+          <img id="modal-main-img" src="${carImages[0]}" alt="${car.model}">
+          
+          <div class="modal-image-counter">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span id="modal-img-counter-text">1 / ${totalImgs}</span>
+          </div>
+
+          ${totalImgs > 1 ? `
+            <button class="modal-nav-arrow modal-nav-prev" id="modal-prev-img" aria-label="Previous Image">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="modal-nav-arrow modal-nav-next" id="modal-next-img" aria-label="Next Image">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          ` : ''}
+
           ${car.video ? `
-            <button id="btn-play-walkaround-video" style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
+            <button id="btn-play-walkaround-video" style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.85); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); z-index: 5;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              Watch Video Walkaround
+              Watch Video
             </button>
           ` : ''}
         </div>
-        <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px;">
-          ${carImages.map((img, idx) => `
-            <img src="${img}" class="modal-thumb ${idx === 0 ? 'active' : ''}" data-idx="${idx}" style="width: 65px; height: 46px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? '#fff' : 'transparent'}; opacity: ${idx === 0 ? '1' : '0.6'}; flex-shrink: 0;">
-          `).join('')}
+
+        <!-- Thumbnails Strip with Side Scroll Controls -->
+        <div class="modal-thumbs-carousel-wrap">
+          ${totalImgs > 4 ? `
+            <button class="thumb-scroll-btn" id="thumb-scroll-left" aria-label="Scroll Left">‹</button>
+          ` : ''}
+          <div class="modal-thumbs-scroll" id="modal-thumbs-container">
+            ${carImages.map((img, idx) => `
+              <div class="modal-thumb-item ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
+                <img src="${img}" alt="${car.model} Photo ${idx + 1}" loading="lazy">
+              </div>
+            `).join('')}
+          </div>
+          ${totalImgs > 4 ? `
+            <button class="thumb-scroll-btn" id="thumb-scroll-right" aria-label="Scroll Right">›</button>
+          ` : ''}
         </div>
 
-        <div style="margin-top: 1.5rem; background: var(--bg-input); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-          <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #fff;">Estimated Monthly Payment</h4>
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+        <!-- Monthly Payment Calculator Card -->
+        <div style="background: var(--bg-input); padding: 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-top: 0.5rem;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: #fff;">Estimated Monthly Payment</h4>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
             <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">${formatMonthly(car.monthlyEst)}</span>
             <span style="font-size: 0.8rem; color: var(--silver-500);">/month for 72 mos @ 5.9% APR</span>
           </div>
-          <p style="font-size: 0.775rem; color: var(--silver-500);">*Based on $2,500 down payment. Terms subject to credit approval.</p>
+          <p style="font-size: 0.75rem; color: var(--silver-500);">*Based on $2,500 down payment. In-house financing available.</p>
         </div>
       </div>
 
       <div>
         <div style="margin-bottom: 1.25rem;">
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Vehicle</span>` : ''}
             <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
             ${car.vin && car.vin !== 'N/A' ? `<span class="badge badge-green">VIN: ${car.vin}</span>` : `<span class="badge badge-silver" style="opacity: 0.8;">VIN: Optional / N/A</span>`}
           </div>
-          <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem;">${car.year} ${car.make} ${car.model}</h2>
-          <div style="font-size: 1rem; color: var(--silver-400);">${car.trim}</div>
+          <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem; line-height: 1.2;">${car.year} ${car.make} ${car.model}</h2>
+          <div style="font-size: 0.95rem; color: var(--silver-400);">${car.trim}</div>
           <div style="font-size: 2rem; font-weight: 800; color: #fff; margin-top: 0.5rem; font-family: var(--font-heading);">${formatPrice(car.price)}</div>
         </div>
 
@@ -1042,11 +1190,11 @@ function openVehicleModal(carId) {
           `).join('')}
         </ul>
 
-        <div style="display: flex; gap: 0.75rem;">
-          <button class="btn btn-silver" style="flex: 1;" onclick="openTestDriveModal('${car.id}')">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-silver" style="flex: 1; min-width: 160px;" onclick="openTestDriveModal('${car.id}')">
             Book a Test Drive
           </button>
-          <a href="financing.html?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1;">
+          <a href="financing.html?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 160px;">
             Calculate Financing
           </a>
         </div>
@@ -1054,21 +1202,62 @@ function openVehicleModal(carId) {
     </div>
   `;
 
-  // Gallery thumbnail clicks
-  modalContainer.querySelectorAll('.modal-thumb').forEach(thumb => {
-    thumb.addEventListener('click', (e) => {
-      const idx = parseInt(thumb.dataset.idx);
-      const mainImg = document.getElementById('modal-main-img');
-      if (mainImg && car.images[idx]) {
-        mainImg.src = car.images[idx];
+  // Image Switch Function
+  function switchModalImage(index) {
+    if (index < 0) index = totalImgs - 1;
+    if (index >= totalImgs) index = 0;
+    currentImgIdx = index;
+
+    const mainImg = document.getElementById('modal-main-img');
+    const counterText = document.getElementById('modal-img-counter-text');
+    if (mainImg && carImages[currentImgIdx]) {
+      mainImg.style.opacity = '0.4';
+      setTimeout(() => {
+        mainImg.src = carImages[currentImgIdx];
+        mainImg.style.opacity = '1';
+      }, 100);
+    }
+    if (counterText) {
+      counterText.textContent = `${currentImgIdx + 1} / ${totalImgs}`;
+    }
+
+    // Update active thumb state & scroll into view smoothly
+    modalContainer.querySelectorAll('.modal-thumb-item').forEach((thumb, idx) => {
+      if (idx === currentImgIdx) {
+        thumb.classList.add('active');
+        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } else {
+        thumb.classList.remove('active');
       }
-      modalContainer.querySelectorAll('.modal-thumb').forEach(t => {
-        t.style.borderColor = 'transparent';
-        t.style.opacity = '0.6';
-      });
-      thumb.style.borderColor = '#fff';
-      thumb.style.opacity = '1';
     });
+  }
+
+  // Next / Prev button listeners
+  document.getElementById('modal-prev-img')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchModalImage(currentImgIdx - 1);
+  });
+
+  document.getElementById('modal-next-img')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchModalImage(currentImgIdx + 1);
+  });
+
+  // Thumbnail clicks
+  modalContainer.querySelectorAll('.modal-thumb-item').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+      const idx = parseInt(thumb.dataset.idx);
+      switchModalImage(idx);
+    });
+  });
+
+  // Thumbnail strip scroll buttons
+  const thumbsContainer = document.getElementById('modal-thumbs-container');
+  document.getElementById('thumb-scroll-left')?.addEventListener('click', () => {
+    thumbsContainer?.scrollBy({ left: -160, behavior: 'smooth' });
+  });
+  document.getElementById('thumb-scroll-right')?.addEventListener('click', () => {
+    thumbsContainer?.scrollBy({ left: 160, behavior: 'smooth' });
   });
 
   // Video Walkaround Click Handler

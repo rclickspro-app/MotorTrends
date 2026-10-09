@@ -186,6 +186,27 @@ button, input, select, textarea {
   border: 1px solid rgba(245, 158, 11, 0.5);
 }
 
+.badge-new {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(249, 115, 22, 0.95));
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  font-weight: 800;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  animation: pulseNewBadge 2s infinite;
+}
+
+@keyframes pulseNewBadge {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.9);
+    transform: scale(1.04);
+  }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -698,6 +719,16 @@ button, input, select, textarea {
   background: rgba(245, 158, 11, 0.2);
   border: 1px solid rgba(245, 158, 11, 0.5);
   color: #fbbf24;
+}
+
+.v-badge-new {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+  letter-spacing: 0.05em;
+  animation: pulseNewBadge 2s infinite;
 }
 
 .vehicle-card-image-wrapper {
@@ -1814,18 +1845,200 @@ select.form-control option {
   background: var(--bg-card);
   border: 1px solid var(--border-silver);
   border-radius: var(--radius-lg);
-  max-width: 850px;
-  width: 100%;
-  max-height: 90vh;
+  max-width: 980px;
+  width: 95vw;
+  max-height: 92vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
   transform: scale(0.95);
   transition: transform var(--transition-smooth);
 }
 
 .modal-backdrop.active .modal-container {
   transform: scale(1);
+}
+
+/* Vehicle Modal Grid & Columns */
+.vehicle-modal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.vehicle-modal-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Vehicle Modal Gallery & Navigation */
+.modal-gallery-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.modal-main-image-stage {
+  position: relative;
+  aspect-ratio: 16/10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  width: 100%;
+}
+
+.modal-main-image-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.25s ease;
+}
+
+.modal-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(10, 10, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+.modal-nav-arrow:hover {
+  background: #007BFF;
+  border-color: #60a5fa;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.modal-nav-prev { left: 10px; }
+.modal-nav-next { right: 10px; }
+
+.modal-image-counter {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 4;
+}
+
+.modal-thumbs-carousel-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-thumbs-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 2px;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #007BFF rgba(255, 255, 255, 0.05);
+}
+
+.modal-thumbs-scroll::-webkit-scrollbar {
+  height: 5px;
+}
+
+.modal-thumbs-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.modal-thumbs-scroll::-webkit-scrollbar-thumb {
+  background: #007BFF;
+  border-radius: 3px;
+}
+
+.modal-thumb-item {
+  position: relative;
+  width: 72px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.55;
+  transition: all 0.2s ease;
+  background: #111;
+}
+
+.modal-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-thumb-item:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.modal-thumb-item.active {
+  border-color: #007BFF;
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.thumb-scroll-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.thumb-scroll-btn:hover {
+  background: #007BFF;
+  border-color: #007BFF;
 }
 
 .modal-close-btn {
@@ -2329,28 +2542,30 @@ select.form-control option {
 
 .mt-preloader-gif-wrap {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 320px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, rgba(0, 123, 255, 0.18) 0%, rgba(10, 10, 10, 0) 70%);
+  background: radial-gradient(ellipse at center, rgba(0, 123, 255, 0.3) 0%, rgba(0, 123, 255, 0.1) 50%, rgba(10, 10, 10, 0) 75%);
   border-radius: 50%;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  overflow: visible;
 }
 
 .mt-preloader-gif {
-  width: 110px;
+  width: 290px;
   height: auto;
-  max-height: 110px;
+  max-width: 95vw;
   object-fit: contain;
-  filter: drop-shadow(0 0 16px rgba(0, 123, 255, 0.35));
+  filter: drop-shadow(0 0 18px rgba(0, 123, 255, 0.65)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+  transform: scale(1.6);
   animation: pulseLoader 2.2s infinite ease-in-out;
 }
 
 @keyframes pulseLoader {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+  0%, 100% { transform: scale(1.6); }
+  50% { transform: scale(1.72); }
 }
 
 .mt-preloader-brand {
