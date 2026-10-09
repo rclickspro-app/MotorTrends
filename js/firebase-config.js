@@ -1,10 +1,10 @@
 /**
- * Silver Motors Firebase Cloud Integration
+ * Motor Trends Auto Group Firebase Cloud Integration
  * Powered by Firebase Realtime Database / Firestore & Firebase Authentication
  * 100% Free Tier (No Blaze plan required)
  */
 
-const firebaseConfig = {
+const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyDxEBLM519ABP8y9YK0xQsywKiQr0GChTM",
   authDomain: "silverdealership-5ea40.firebaseapp.com",
   databaseURL: "https://silverdealership-5ea40-default-rtdb.firebaseio.com",
@@ -14,6 +14,17 @@ const firebaseConfig = {
   appId: "1:950098344159:web:c912b0480f7eb48548d16a",
   measurementId: "G-8TTRYKW7JW"
 };
+
+let firebaseConfig = { ...DEFAULT_FIREBASE_CONFIG };
+try {
+  const custom = localStorage.getItem('motortrends_custom_fb_config');
+  if (custom) {
+    const parsed = JSON.parse(custom);
+    if (parsed && parsed.apiKey) {
+      firebaseConfig = parsed;
+    }
+  }
+} catch (e) {}
 
 let fbApp = null;
 let fbAuth = null;
@@ -32,7 +43,7 @@ function initFirebaseApp() {
       fbAuth = firebase.auth();
       fbDb = firebase.database();
       isFirebaseReady = true;
-      console.log('🔥 Firebase initialized successfully for Silver Motors');
+      console.log('🔥 Firebase initialized successfully for Motor Trends Auto Group');
     } else {
       console.warn('Firebase SDK script not loaded yet.');
     }
@@ -126,7 +137,7 @@ async function resetFirebaseToDefaults() {
 }
 
 function saveLocalCacheVehicles(data) {
-  localStorage.setItem('silver_motors_vehicles_db', JSON.stringify(data));
+  localStorage.setItem('motortrends_vehicles_db', JSON.stringify(data));
   if (typeof VEHICLES_DATA !== 'undefined') {
     VEHICLES_DATA.length = 0;
     VEHICLES_DATA.push(...data);

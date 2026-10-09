@@ -3,18 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact & Showroom Directions | Silver Motors Dealership</title>
-  <meta name="description" content="Contact Silver Motors dealership. View showroom hours, get turn-by-turn driving directions, schedule appointments, or speak with our sales advisors.">
-  
+  <title>Contact & Showroom Directions | Motor Trends Auto Group Richmond BC</title>
+  <meta name="description" content="Visit Motor Trends Auto Group at 10740 Cambie Road, Richmond, BC. Call 604-270-7662 for pre-owned vehicle sales, leasing, financing, rentals and service.">
+  <link rel="icon" type="image/png" href="images/logo.png">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- Motor Trends Page Preloader -->
+  <div id="mt-page-preloader" class="mt-page-preloader">
+    <div class="mt-preloader-content">
+      <div class="mt-preloader-gif-wrap">
+        <img src="images/vw leo.gif" alt="Motor Trends Loading" class="mt-preloader-gif">
+      </div>
+      <div class="mt-preloader-brand">MOTOR TRENDS <span>AUTO GROUP</span></div>
+      <div class="mt-preloader-subtext">VANCOUVER &amp; RICHMOND, BC • BUY HERE PAY HERE</div>
+      <div class="mt-preloader-bar">
+        <div class="mt-preloader-bar-fill"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Top Bar -->
   <div class="top-bar">
@@ -22,16 +37,26 @@
       <div class="top-bar-left">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <span>10850 Motorway Blvd, Auto Mall Center</span>
+          <span>10740 Cambie Road, Richmond, BC V6X 1K8</span>
         </div>
         <div class="top-bar-item">
-          <span class="top-bar-badge">● Open Today 9:00 AM - 8:00 PM</span>
+          <span class="top-bar-badge">● Open Mon - Sat 9:00 AM - 7:00 PM</span>
         </div>
       </div>
       <div class="top-bar-right">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          <span>Sales Hotline: <strong>(555) 839-2000</strong></span>
+          <span>Sales Hotline: <a href="tel:6042707662" style="color: #fff; font-weight: 700;">604-270-7662</a></span>
+        </div>
+        <div class="top-bar-item lang-selector-container">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <select class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">🇨🇦 English</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+          </select>
         </div>
       </div>
     </div>
@@ -41,23 +66,19 @@
   <header class="site-header">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="index.html" class="brand-logo">
-          <div class="logo-symbol">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
-          </div>
-          <div class="logo-text">
-            <span class="logo-title">SILVER MOTORS</span>
-            <span class="logo-subtitle">Auto Marketplace</span>
+        <a href="index.html" class="brand-logo" title="Motor Trends Auto Group">
+          <div class="brand-logo-badge">
+            <img src="images/logo.png" alt="Motor Trends Auto Group" class="brand-logo-img">
           </div>
         </a>
 
         <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="inventory.html" class="nav-link">Inventory</a></li>
-          <li><a href="sell-trade.html" class="nav-link">Sell / Trade</a></li>
-          <li><a href="financing.html" class="nav-link">Financing</a></li>
-          <li><a href="about.html" class="nav-link">Why Choose Us</a></li>
-          <li><a href="contact.html" class="nav-link active">Contact</a></li>
+          <li><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
+          <li><a href="inventory.html" class="nav-link" data-i18n="nav_inventory">Inventory</a></li>
+          <li><a href="financing.html" class="nav-link" data-i18n="nav_financing">In-House Financing</a></li>
+          <li><a href="sell-trade.html" class="nav-link" data-i18n="nav_sell_trade">Sell / Trade</a></li>
+          <li><a href="about.html" class="nav-link" data-i18n="nav_why_us">Why Choose Us</a></li>
+          <li><a href="contact.html" class="nav-link active" data-i18n="nav_contact">Contact</a></li>
         </ul>
 
         <div class="nav-actions">
@@ -65,8 +86,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             <span class="fav-counter" style="display: none;">0</span>
           </a>
-          <a href="inventory.html" class="btn btn-silver btn-sm">
-            Browse All Cars
+          <a href="financing.html" class="btn btn-blue btn-sm">
+            In-House Financing
           </a>
           <button class="mobile-toggle" aria-label="Toggle navigation">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -79,10 +100,10 @@
   <!-- Main Section -->
   <main class="container" style="padding: 3rem 1.25rem 4.5rem;">
     <div class="page-hero">
-      <span class="badge badge-silver" style="margin-bottom: 0.75rem;">We Are Here to Help</span>
-      <h1 class="page-title">Contact & Visit Us</h1>
+      <span class="slide-pill" style="margin-bottom: 0.75rem;">RICHMOND, BC DEALERSHIP • 604-270-7662</span>
+      <h1 class="page-title">Contact & Visit Our Showroom</h1>
       <p class="page-subtitle">
-        Whether you have questions about a vehicle in stock, want to schedule a test drive, or need trade-in advice, our team is ready.
+        Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC. Whether you have questions about a vehicle in stock or need in-house credit approval, we are here to help.
       </p>
     </div>
 
@@ -91,8 +112,8 @@
       
       <!-- Contact Form -->
       <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-lg);">
-        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff;">Send an Inquiry</h2>
-        <p style="color: var(--silver-500); font-size: 0.875rem; margin-bottom: 1.5rem;">Our customer care team typically responds within 30 minutes during showroom hours.</p>
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff;">Send Us a Message</h2>
+        <p style="color: var(--silver-400); font-size: 0.875rem; margin-bottom: 1.5rem;">Our customer advisors typically respond within 30 minutes during showroom hours.</p>
 
         <form id="general-contact-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
           <div class="form-row-2">
@@ -102,7 +123,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Phone Number *</label>
-              <input type="tel" class="form-control" required placeholder="(555) 000-0000">
+              <input type="tel" class="form-control" required placeholder="(604) 270-7662">
             </div>
           </div>
 
@@ -112,23 +133,24 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Department</label>
+            <label class="form-label">Department / Inquiry Type</label>
             <select class="form-control">
-              <option>General Sales Inquiry</option>
-              <option>Vehicle Test Drive Scheduling</option>
-              <option>Financing & Loan Approval</option>
+              <option>In-House Financing & Buy Here Pay Here</option>
+              <option>General Vehicle Sales Inquiry</option>
+              <option>Schedule Test Drive in Richmond</option>
               <option>Sell / Trade-In Valuation</option>
-              <option>Service & Warranty Support</option>
+              <option>Vehicle Rentals & Leasing</option>
+              <option>Service & Mechanical Support</option>
             </select>
           </div>
 
           <div class="form-group">
             <label class="form-label">Your Message *</label>
-            <textarea class="form-control" rows="4" required placeholder="How can we assist you today?"></textarea>
+            <textarea class="form-control" rows="4" required placeholder="How can our Richmond BC team assist you today?"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%;">
-            Send Message
+          <button type="submit" class="btn btn-blue btn-lg" style="width: 100%;">
+            Send Message to Dealership
           </button>
         </form>
       </div>
@@ -136,16 +158,19 @@
       <!-- Showroom Details & Hours -->
       <div style="display: flex; flex-direction: column; gap: 1.5rem;">
         
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.75rem;">
           <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             Showroom Location & Contact
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.925rem; color: var(--silver-300);">
-            <div><strong>Address:</strong> 10850 Motorway Blvd, Auto Mall Center</div>
-            <div><strong>Sales Desk:</strong> (555) 839-2000</div>
-            <div><strong>Finance Direct:</strong> (555) 839-2005</div>
-            <div><strong>Email:</strong> support@silvermotors.com</div>
+          <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.925rem; color: var(--silver-300);">
+            <div><strong>Dealership:</strong> Motor Trends Auto Group</div>
+            <div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div>
+            <div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div>
+            <div><strong>Email:</strong> sales@motortrendsautogroup.com</div>
+            <div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;">
+              <em>Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC.</em>
+            </div>
           </div>
         </div>
 
@@ -155,26 +180,22 @@
             Operating Hours
           </h3>
           <ul class="footer-hours-list" style="font-size: 0.9rem;">
-            <li class="footer-hours-item"><span>Monday:</span> <strong>9:00 AM - 8:00 PM</strong></li>
-            <li class="footer-hours-item"><span>Tuesday:</span> <strong>9:00 AM - 8:00 PM</strong></li>
-            <li class="footer-hours-item"><span>Wednesday:</span> <strong>9:00 AM - 8:00 PM</strong></li>
-            <li class="footer-hours-item"><span>Thursday:</span> <strong>9:00 AM - 8:00 PM</strong></li>
-            <li class="footer-hours-item"><span>Friday:</span> <strong>9:00 AM - 7:00 PM</strong></li>
+            <li class="footer-hours-item"><span>Monday - Friday:</span> <strong>9:00 AM - 7:00 PM</strong></li>
             <li class="footer-hours-item"><span>Saturday:</span> <strong>9:00 AM - 6:00 PM</strong></li>
-            <li class="footer-hours-item"><span>Sunday:</span> <strong>10:00 AM - 5:00 PM</strong></li>
+            <li class="footer-hours-item"><span>Sunday:</span> <strong>11:00 AM - 5:00 PM</strong></li>
           </ul>
         </div>
 
         <!-- Map Mockup Container -->
-        <div style="background: #09090c; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;">
-          <div style="color: var(--silver-400); font-size: 0.85rem; margin-bottom: 0.75rem;">Interactive Map & Directions</div>
-          <div style="background: #14141d; height: 140px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; border: 1px dashed var(--border-subtle);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
-            <span style="font-size: 0.85rem; color: #fff; font-weight: 600;">10850 Motorway Blvd, Auto Mall Center</span>
-            <span style="font-size: 0.75rem; color: var(--silver-500);">Conveniently located right off Exit 42 on Highway 1</span>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-blue); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;">
+          <div style="color: #60a5fa; font-size: 0.85rem; margin-bottom: 0.75rem; font-weight: 700; text-transform: uppercase;">Location & Directions</div>
+          <div style="background: #111114; height: 140px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; border: 1px dashed var(--border-blue);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#007BFF" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+            <span style="font-size: 0.9rem; color: #fff; font-weight: 700;">10740 Cambie Road, Richmond, BC V6X 1K8</span>
+            <span style="font-size: 0.8rem; color: var(--silver-400);">Conveniently situated in Richmond, minutes from Vancouver</span>
           </div>
-          <a href="https://maps.google.com" target="_blank" class="btn btn-dark btn-sm" style="margin-top: 1rem; width: 100%;">
-            Open in Google Maps ↗
+          <a href="https://www.google.com/maps/search/?api=1&query=10740+Cambie+Road,+Richmond,+BC+V6X+1K8" target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm" style="margin-top: 1rem; width: 100%;">
+            Get Directions on Google Maps ↗
           </a>
         </div>
 
@@ -188,74 +209,72 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <div class="brand-logo" style="margin-bottom: 1rem;">
-            <div class="logo-symbol">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+          <a href="index.html" class="brand-logo" style="margin-bottom: 1rem; display: inline-block;">
+            <div class="footer-logo-badge">
+              <img src="images/logo.png" alt="Motor Trends Auto Group" class="footer-brand-logo-img">
             </div>
-            <div class="logo-text">
-              <span class="logo-title">SILVER MOTORS</span>
-              <span class="logo-subtitle">Auto Marketplace</span>
-            </div>
-          </div>
-          <p style="font-size: 0.875rem; color: var(--silver-500); line-height: 1.6; margin-bottom: 1.25rem; max-width: 320px;">
-            Your trusted marketplace for certified pre-owned cars, reliable family SUVs, trucks, and low-rate auto financing.
+          </a>
+          <p style="font-size: 0.875rem; color: var(--silver-400); line-height: 1.6; margin-bottom: 1.25rem; max-width: 340px;">
+            Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC. We approve car loans for all Canadians regardless of credit!
           </p>
-          <div style="font-size: 0.875rem; color: var(--silver-400);">
-            <strong>Address:</strong> 10850 Motorway Blvd, Auto Center<br>
-            <strong>Phone:</strong> (555) 839-2000
+          <div style="font-size: 0.875rem; color: var(--silver-300); line-height: 1.7;">
+            <strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br>
+            <strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br>
+            <strong>Email:</strong> sales@motortrendsautogroup.com
           </div>
         </div>
 
         <div>
-          <div class="footer-col-title">Inventory</div>
+          <div class="footer-col-title">Inventory & Makes</div>
           <ul class="footer-links">
             <li><a href="inventory.html">All Vehicles In Stock</a></li>
             <li><a href="inventory.html?bodyType=SUV">SUVs & Crossovers</a></li>
             <li><a href="inventory.html?bodyType=Sedan">Sedans & Hatchbacks</a></li>
             <li><a href="inventory.html?bodyType=Truck">Trucks & 4x4</a></li>
+            <li><a href="inventory.html?fuelType=Hybrid">Hybrids & Electric</a></li>
+            <li><a href="inventory.html?maxPrice=25000">Vehicles Under $25,000</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Services</div>
+          <div class="footer-col-title" data-i18n="footer_services">Financing & Services</div>
           <ul class="footer-links">
-            <li><a href="sell-trade.html">Trade-In Appraisal</a></li>
-            <li><a href="financing.html">Auto Loan Calculator</a></li>
-            <li><a href="about.html">150-Point Inspection</a></li>
+            <li><a href="financing.html">Buy Here Pay Here Financing</a></li>
+            <li><a href="financing.html">In-House Financing BC</a></li>
+            <li><a href="sell-trade.html">Instant Trade-In Appraisal</a></li>
+            <li><a href="about.html">150-Point Safety Check</a></li>
             <li><a href="contact.html">Schedule Test Drive</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Dealership Hours</div>
+          <div class="footer-col-title" data-i18n="footer_hours">Dealership Hours</div>
           <ul class="footer-hours-list">
-            <li class="footer-hours-item"><span>Monday - Thursday:</span> <span>9:00 AM - 8:00 PM</span></li>
-            <li class="footer-hours-item"><span>Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
+            <li class="footer-hours-item"><span>Monday - Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
             <li class="footer-hours-item"><span>Saturday:</span> <span>9:00 AM - 6:00 PM</span></li>
-            <li class="footer-hours-item"><span>Sunday:</span> <span>10:00 AM - 5:00 PM</span></li>
+            <li class="footer-hours-item"><span>Sunday:</span> <span>11:00 AM - 5:00 PM</span></li>
           </ul>
+          <div style="margin-top: 1rem;">
+            <a href="tel:6042707662" class="btn btn-blue btn-sm" style="width: 100%;">
+              📞 Call 604-270-7662
+            </a>
+          </div>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <div>© 2026 Silver Motors Auto Marketplace Ltd. All rights reserved. Licensed Motor Vehicle Dealer #64821. • Designed & Developed by <a href="https://rightclicks.lk/" target="_blank" rel="noopener noreferrer" style="color: #cbd5e1; text-decoration: underline;">RightClicks.lk</a></div>
+        <div data-i18n="footer_rights">© 2026 Motor Trends Auto Group. All rights reserved. Richmond, BC Licensed Motor Dealer.</div>
         <div style="display: flex; gap: 1.5rem;">
-          <a href="#" class="text-silver">Privacy Policy</a>
-          <a href="#" class="text-silver">Terms of Service</a>
+          <a href="#" class="text-silver" data-i18n="footer_privacy">Privacy Policy</a>
+          <a href="#" class="text-silver" data-i18n="footer_terms">Terms of Service</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Multi-Language Pack & Core Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    document.getElementById('general-contact-form')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      showToast('✉️ Message sent successfully! Our sales advisor will get back to you shortly.', 'success');
-      e.target.reset();
-    });
-  </script>
 </body>
 </html>

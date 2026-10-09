@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal & Marketplace Manager | Silver Motors</title>
-  <meta name="description" content="Secure administrative management portal for Silver Motors inventory, pricing, vehicle additions, and customer inquiries.">
+  <title>Admin Portal & Inventory Manager | Motor Trends Auto Group</title>
+  <meta name="description" content="Secure administrative management portal for Motor Trends Auto Group inventory, pricing, vehicle additions, and customer inquiries.">
+  <link rel="icon" type="image/png" href="images/logo.png">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -260,6 +261,20 @@
 </head>
 <body>
 
+  <!-- Motor Trends Page Preloader -->
+  <div id="mt-page-preloader" class="mt-page-preloader">
+    <div class="mt-preloader-content">
+      <div class="mt-preloader-gif-wrap">
+        <img src="images/vw leo.gif" alt="Motor Trends Loading" class="mt-preloader-gif">
+      </div>
+      <div class="mt-preloader-bar">
+        <div class="mt-preloader-bar-fill"></div>
+      </div>
+      <div class="mt-preloader-brand">MOTOR TRENDS <span>AUTO GROUP</span></div>
+      <div class="mt-preloader-subtext">ADMIN &amp; INVENTORY CONTROL • CAD PORTAL</div>
+    </div>
+  </div>
+
   <!-- ====================================================
        AUTHENTICATION & EMAIL VERIFICATION SCREEN
   ==================================================== -->
@@ -268,17 +283,59 @@
       
       <!-- Brand Logo Header -->
       <div style="text-align: center; margin-bottom: 2rem;">
-        <div class="brand-logo" style="display: inline-flex; margin-bottom: 0.5rem;">
-          <div class="logo-symbol">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+        <a href="index.html" class="brand-logo" style="display: inline-block; margin-bottom: 0.75rem;">
+          <div class="brand-logo-badge" style="background: #ffffff; padding: 6px 14px; border-radius: 8px; display: inline-flex;">
+            <img src="images/logo.png" alt="Motor Trends Auto Group" style="height: 48px; width: auto; object-fit: contain;">
           </div>
-          <div class="logo-text" style="text-align: left;">
-            <span class="logo-title">SILVER MOTORS</span>
-            <span class="logo-subtitle">Dealership Portal</span>
-          </div>
+        </a>
+        <h2 style="font-size: 1.4rem; color: #fff; margin-top: 0.75rem;">Staff & Admin Portal</h2>
+        <p style="font-size: 0.85rem; color: var(--silver-400);">Log in to manage inventory, sales accounts, HR & leads</p>
+      </div>
+
+      <!-- Live Auth & Firebase Status Indicator -->
+      <div id="auth-status-chip" style="background: rgba(0, 123, 255, 0.12); border: 1px solid rgba(0, 123, 255, 0.35); border-radius: 8px; padding: 0.65rem 0.95rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
+        <span style="display: flex; align-items: center; gap: 0.45rem; color: #93c5fd; font-weight: 600;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+          <span id="firebase-conn-text">Firebase Auth: Initialized & Ready</span>
+        </span>
+        <span class="badge badge-blue" style="font-size: 0.7rem;">Free Tier</span>
+      </div>
+
+      <!-- Quick Role Preset Selector for Testing & Fast Sign-In -->
+      <div style="margin-bottom: 1.25rem;">
+        <label style="font-size: 0.75rem; color: var(--silver-400); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem; font-weight: 700;">
+          ⚡ Quick Role Fill (Click to Test Any Department):
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin-bottom: 0.4rem;">
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="admin" data-pass="admin" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="General Manager (Admin)">
+            👑 Admin 1 (General Manager)
+          </button>
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="admin2" data-pass="admin123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Operations Admin">
+            👑 Admin 2 (Inventory Director)
+          </button>
         </div>
-        <h2 style="font-size: 1.4rem; color: #fff; margin-top: 0.5rem;">Admin Management System</h2>
-        <p style="font-size: 0.85rem; color: var(--silver-500);">Secure access for inventory updates & management</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.4rem;">
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales" data-pass="sales" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Jason Wong)">
+            💼 Sales 1 (Jason)
+          </button>
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales2" data-pass="sales123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Amrit Singh)">
+            💼 Sales 2 (Amrit)
+          </button>
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales3" data-pass="sales123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Chloe Tremblay)">
+            💼 Sales 3 (Chloe)
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="finance" data-pass="finance123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="F&I Finance Director">
+            💳 Finance Director
+          </button>
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="hr" data-pass="hr" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="HR Manager">
+            👥 HR Manager
+          </button>
+          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="tech" data-pass="tech" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Inspection Tech">
+            🔧 Tech &amp; Service
+          </button>
+        </div>
       </div>
 
       <!-- Alert Notification -->
@@ -286,29 +343,29 @@
 
       <!-- 1. LOGIN FORM -->
       <div id="auth-login-box">
-        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 1.1rem;">
           <div class="form-group">
-            <label class="form-label">Admin Email Address</label>
-            <input type="email" id="login-email" class="form-control" required placeholder="admin@silvermotors.com" value="admin@silvermotors.com">
+            <label class="form-label" for="login-username">Username or Work Email</label>
+            <input type="text" id="login-username" class="form-control" required placeholder="admin" value="admin" autocomplete="username">
           </div>
 
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label" style="margin-bottom: 0;">Password</label>
-              <span style="font-size: 0.75rem; color: var(--silver-500);">Demo pass: <strong>admin</strong></span>
+              <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
+              <span id="role-pass-hint" style="font-size: 0.75rem; color: #60a5fa;">Default: <strong>admin</strong></span>
             </div>
-            <input type="password" id="login-password" class="form-control" required placeholder="••••••••" value="admin">
+            <input type="password" id="login-password" class="form-control" required placeholder="••••••••" value="admin" autocomplete="current-password">
           </div>
 
-          <button type="submit" class="btn btn-silver btn-lg" style="width: 100%; margin-top: 0.5rem;">
+          <button type="submit" class="btn btn-blue btn-lg" style="width: 100%; margin-top: 0.5rem;">
             Sign In to Admin Portal
           </button>
         </form>
 
-        <div style="margin-top: 1.75rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+        <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 1.15rem;">
           <p style="font-size: 0.85rem; color: var(--silver-400);">
-            Don't have an admin account? 
-            <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Create Account</a>
+            Need a new account? 
+            <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Register Staff / Firebase</a>
           </p>
           <p style="font-size: 0.8rem; margin-top: 0.75rem;">
             <a href="index.html" style="color: var(--silver-500);">← Back to Public Dealership Website</a>
@@ -411,12 +468,8 @@
       <aside class="admin-sidebar">
         <div class="admin-sidebar-header">
           <a href="index.html" class="brand-logo">
-            <div class="logo-symbol">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
-            </div>
-            <div class="logo-text">
-              <span class="logo-title">SILVER MOTORS</span>
-              <span class="logo-subtitle">Admin Workspace</span>
+            <div class="brand-logo-badge" style="background: #ffffff; padding: 4px 10px; border-radius: 6px; display: inline-flex;">
+              <img src="images/logo.png" alt="Motor Trends Auto Group" style="height: 38px; width: auto; object-fit: contain;">
             </div>
           </a>
         </div>
@@ -441,6 +494,18 @@
             </a>
           </li>
           <li>
+            <a href="#" class="admin-nav-item" data-tab="users">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Team & Staff Users
+            </a>
+          </li>
+          <li>
+            <a href="#" class="admin-nav-item" data-tab="firebase">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+              Firebase Cloud & Auth
+            </a>
+          </li>
+          <li>
             <a href="inventory.html" target="_blank" class="admin-nav-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               Live Marketplace ↗
@@ -451,15 +516,15 @@
         <!-- User Profile Footer in Sidebar -->
         <div style="padding: 1.25rem; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2);">
           <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-            <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--silver-gradient); color: #0a0a0d; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
-              SM
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: #007BFF; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">
+              MT
             </div>
             <div style="overflow: hidden;">
               <div id="admin-user-display-name" style="font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Manager</div>
               <div id="admin-user-role-badge" style="font-size: 0.7rem; color: #38bdf8;">Admin</div>
             </div>
           </div>
-          <div id="admin-user-email" style="font-size: 0.75rem; color: var(--silver-500); margin-bottom: 0.75rem; word-break: break-all;">admin@silvermotors.com</div>
+          <div id="admin-user-email" style="font-size: 0.75rem; color: var(--silver-500); margin-bottom: 0.75rem; word-break: break-all;">admin@motortrendsautogroup.com</div>
           <button id="btn-admin-logout" class="btn btn-dark btn-sm" style="width: 100%; font-size: 0.8rem; justify-content: center;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             Sign Out
@@ -556,7 +621,7 @@
                       <th>Vehicle Info</th>
                       <th>Stock & Condition</th>
                       <th>Body & Specs</th>
-                      <th>Price / Monthly</th>
+                      <th>Price ($ CAD) / Monthly</th>
                       <th>Featured</th>
                       <th style="text-align: right;">Actions</th>
                     </tr>
@@ -578,6 +643,12 @@
 
           <!-- TAB 4: SETTINGS -->
           <div id="tab-view-settings" style="display: none;"></div>
+
+          <!-- TAB 5: TEAM & USERS MANAGEMENT -->
+          <div id="tab-view-users" style="display: none;"></div>
+
+          <!-- TAB 6: FIREBASE CLOUD SYNC & AUTH -->
+          <div id="tab-view-firebase" style="display: none;"></div>
 
         </div>
 
@@ -625,12 +696,12 @@
         <!-- Row 2: Pricing -->
         <div class="form-row-2">
           <div class="form-group">
-            <label class="form-label">Retail Price ($ USD) *</label>
-            <input type="number" id="form-car-price" class="form-control" required min="1000" step="50" placeholder="28500">
+            <label class="form-label">Retail Price ($ CAD) *</label>
+            <input type="number" id="form-car-price" class="form-control" required step="any" placeholder="Retail Price in CAD (e.g. 28500 or 8888.50)">
           </div>
           <div class="form-group">
-            <label class="form-label">Est. Monthly Payment ($/mo)</label>
-            <input type="number" id="form-car-monthly" class="form-control" placeholder="385">
+            <label class="form-label">Est. Monthly Payment ($ CAD/mo)</label>
+            <input type="number" id="form-car-monthly" class="form-control" step="any" placeholder="e.g. 385">
           </div>
         </div>
 
@@ -699,12 +770,12 @@
         <!-- Row 4: Dealership identifiers -->
         <div class="form-row-2">
           <div class="form-group">
-            <label class="form-label">VIN Number *</label>
-            <input type="text" id="form-car-vin" class="form-control" required placeholder="17-character VIN">
+            <label class="form-label">VIN Number (Optional)</label>
+            <input type="text" id="form-car-vin" class="form-control" placeholder="17-character VIN (Optional)">
           </div>
           <div class="form-group">
             <label class="form-label">Stock Number *</label>
-            <input type="text" id="form-car-stock" class="form-control" required placeholder="SM-4850">
+            <input type="text" id="form-car-stock" class="form-control" required placeholder="MT-4850">
           </div>
         </div>
 
@@ -804,6 +875,76 @@
           </button>
         </div>
 
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add / Edit Dealership User -->
+  <div id="modal-user-backdrop" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 id="modal-user-title" style="font-size: 1.25rem; font-weight: 700; color: #fff;">Add Team Member</h3>
+        <button type="button" class="modal-close" id="btn-close-user-modal">&times;</button>
+      </div>
+      <form id="form-manage-user" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+        <input type="hidden" id="form-user-id">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="form-user-name" class="form-control" required placeholder="e.g. Jason Wong">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input type="text" id="form-user-username" class="form-control" required placeholder="e.g. sales">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Work Email *</label>
+            <input type="email" id="form-user-email" class="form-control" required placeholder="jason@motortrendsautogroup.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="text" id="form-user-password" class="form-control" required placeholder="e.g. sales123">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role & Position *</label>
+          <select id="form-user-role" class="form-control" required>
+            <option value="Dealership Admin">Dealership Admin / General Manager</option>
+            <option value="Sales Agent">Sales Agent (Can Add & Maintain Inventory)</option>
+            <option value="HR Manager">HR Manager (Staff & Personnel Operations)</option>
+            <option value="Tech">Tech (Vehicle Inspection Specialist)</option>
+            <option value="Service Tech">Service Tech (Automotive Service & Reconditioning)</option>
+          </select>
+        </div>
+
+        <div style="background: rgba(0, 123, 255, 0.08); border: 1px solid rgba(0, 123, 255, 0.25); border-radius: 8px; padding: 1rem;">
+          <label style="color: #fff; font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Access & Role Permissions:</label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="perm-inventory" checked>
+            <span><strong>Maintain Inventory:</strong> Can Add, Edit, Price, Feature & Delete Vehicles</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="perm-leads" checked>
+            <span><strong>Customer Leads:</strong> Can View & Follow up on Test Drives & Financing</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="perm-admin">
+            <span><strong>User Administration:</strong> Can Create & Manage Team Accounts</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" id="perm-hr">
+            <span><strong>HR & Staff Records:</strong> Staff Profiles, Roles & Department Records</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+          <button type="button" class="btn btn-dark" id="btn-cancel-user-modal">Cancel</button>
+          <button type="submit" class="btn btn-blue">Save Team Member</button>
+        </div>
       </form>
     </div>
   </div>

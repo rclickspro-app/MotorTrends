@@ -1,5 +1,5 @@
 /**
- * Silver Motors Financing & Loan Calculator
+ * Motor Trends Auto Group Financing & Loan Calculator
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -37,10 +37,10 @@ function initFinancingCalculator() {
     const principal = Math.max(0, price - downPayment - tradeValue);
 
     if (principal === 0) {
-      monthlyDisplay.textContent = '$0';
-      if (totalLoanDisplay) totalLoanDisplay.textContent = '$0';
-      if (totalInterestDisplay) totalInterestDisplay.textContent = '$0';
-      if (totalCostDisplay) totalCostDisplay.textContent = '$0';
+      monthlyDisplay.textContent = '$0 CAD';
+      if (totalLoanDisplay) totalLoanDisplay.textContent = '$0 CAD';
+      if (totalInterestDisplay) totalInterestDisplay.textContent = '$0 CAD';
+      if (totalCostDisplay) totalCostDisplay.textContent = '$0 CAD';
       return;
     }
 
@@ -54,10 +54,10 @@ function initFinancingCalculator() {
     const totalPayment = monthlyPayment * termMonths;
     const totalInterest = totalPayment - principal;
 
-    monthlyDisplay.textContent = formatPrice(Math.round(monthlyPayment));
-    if (totalLoanDisplay) totalLoanDisplay.textContent = formatPrice(Math.round(principal));
-    if (totalInterestDisplay) totalInterestDisplay.textContent = formatPrice(Math.round(totalInterest));
-    if (totalCostDisplay) totalCostDisplay.textContent = formatPrice(Math.round(totalPayment + downPayment + tradeValue));
+    monthlyDisplay.textContent = formatPrice(monthlyPayment.toFixed(2));
+    if (totalLoanDisplay) totalLoanDisplay.textContent = formatPrice(principal.toFixed(2));
+    if (totalInterestDisplay) totalInterestDisplay.textContent = formatPrice(totalInterest.toFixed(2));
+    if (totalCostDisplay) totalCostDisplay.textContent = formatPrice((totalPayment + downPayment + tradeValue).toFixed(2));
   }
 
   // Bind input listeners
@@ -90,8 +90,16 @@ function initFinancingCalculator() {
   if (financeForm) {
     financeForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      showToast('🎉 Pre-Approval Application Submitted! A finance specialist will contact you with loan terms.', 'success');
-      financeForm.reset();
+      if (typeof window.showActionLoader === 'function') {
+        window.showActionLoader('Processing Canadian Pre-Approval Application...');
+      }
+      setTimeout(() => {
+        if (typeof window.hideActionLoader === 'function') {
+          window.hideActionLoader();
+        }
+        showToast('🎉 Pre-Approval Application Submitted! A finance specialist will contact you with CAD loan terms.', 'success');
+        financeForm.reset();
+      }, 500);
     });
   }
 }

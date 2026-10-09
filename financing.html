@@ -3,18 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto Financing & Payment Calculator | Silver Motors</title>
-  <meta name="description" content="Calculate your monthly car payment, compare loan terms, and apply for low-rate auto financing pre-approval online in minutes.">
-  
+  <title>In-House Financing & Buy Here Pay Here BC | Motor Trends Auto Group</title>
+  <meta name="description" content="In-House Financing in Richmond BC. Buy Here Pay Here dealership approving car loans for all Canadians regardless of credit. Call 604-270-7662.">
+  <link rel="icon" type="image/png" href="images/logo.png">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- Motor Trends Page Preloader -->
+  <div id="mt-page-preloader" class="mt-page-preloader">
+    <div class="mt-preloader-content">
+      <div class="mt-preloader-gif-wrap">
+        <img src="images/vw leo.gif" alt="Motor Trends Loading" class="mt-preloader-gif">
+      </div>
+      <div class="mt-preloader-brand">MOTOR TRENDS <span>AUTO GROUP</span></div>
+      <div class="mt-preloader-subtext">VANCOUVER &amp; RICHMOND, BC • BUY HERE PAY HERE</div>
+      <div class="mt-preloader-bar">
+        <div class="mt-preloader-bar-fill"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Top Bar -->
   <div class="top-bar">
@@ -22,16 +37,26 @@
       <div class="top-bar-left">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <span>10850 Motorway Blvd, Auto Mall Center</span>
+          <span>10740 Cambie Road, Richmond, BC V6X 1K8</span>
         </div>
         <div class="top-bar-item">
-          <span class="top-bar-badge">● Open Today 9:00 AM - 8:00 PM</span>
+          <span class="top-bar-badge">● Open Mon - Sat 9:00 AM - 7:00 PM</span>
         </div>
       </div>
       <div class="top-bar-right">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          <span>Sales Hotline: <strong>(555) 839-2000</strong></span>
+          <span>Finance Hotline: <a href="tel:6042707662" style="color: #fff; font-weight: 700;">604-270-7662</a></span>
+        </div>
+        <div class="top-bar-item lang-selector-container">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <select class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">🇨🇦 English</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+          </select>
         </div>
       </div>
     </div>
@@ -41,23 +66,19 @@
   <header class="site-header">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="index.html" class="brand-logo">
-          <div class="logo-symbol">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
-          </div>
-          <div class="logo-text">
-            <span class="logo-title">SILVER MOTORS</span>
-            <span class="logo-subtitle">Auto Marketplace</span>
+        <a href="index.html" class="brand-logo" title="Motor Trends Auto Group">
+          <div class="brand-logo-badge">
+            <img src="images/logo.png" alt="Motor Trends Auto Group" class="brand-logo-img">
           </div>
         </a>
 
         <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="inventory.html" class="nav-link">Inventory</a></li>
-          <li><a href="sell-trade.html" class="nav-link">Sell / Trade</a></li>
-          <li><a href="financing.html" class="nav-link active">Financing</a></li>
-          <li><a href="about.html" class="nav-link">Why Choose Us</a></li>
-          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
+          <li><a href="inventory.html" class="nav-link" data-i18n="nav_inventory">Inventory</a></li>
+          <li><a href="financing.html" class="nav-link active" data-i18n="nav_financing">In-House Financing</a></li>
+          <li><a href="sell-trade.html" class="nav-link" data-i18n="nav_sell_trade">Sell / Trade</a></li>
+          <li><a href="about.html" class="nav-link" data-i18n="nav_why_us">Why Choose Us</a></li>
+          <li><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
         </ul>
 
         <div class="nav-actions">
@@ -79,14 +100,19 @@
   <!-- Main Content -->
   <main class="container" style="padding: 3rem 1.25rem 4.5rem;">
     <div class="page-hero">
-      <span class="badge badge-blue" style="margin-bottom: 0.75rem;">Fast Approvals • 15+ Major Lending Banks</span>
+      <span class="slide-pill" style="margin-bottom: 0.75rem;">⚡ BUY HERE PAY HERE DEALERSHIP • IN-HOUSE FINANCING IN BC</span>
       <h1 class="page-title">
-        Auto Loan Calculator &<br>
-        <span class="text-gradient-silver">Easy Financing Solutions.</span>
+        USED CAR FINANCING IN BC<br>
+        <span style="color: var(--brand-blue);">IN-HOUSE FINANCING AVAILABLE!</span>
       </h1>
       <p class="page-subtitle">
-        Find out exactly what your monthly car payment will be. Customize your down payment, loan length, and trade-in value with live math calculations.
+        We approve car loans for all Canadians regardless of your credit! Good credit, bad credit, bankruptcy, or new to Canada — get approved today at Motor Trends Auto Group.
       </p>
+      <div class="slide-dealer-info" style="margin: 1.5rem auto 0; width: fit-content;">
+        <span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span>
+        <span>•</span>
+        <span>📞 <a href="tel:6042707662">604-270-7662</a></span>
+      </div>
     </div>
 
     <!-- Loan Calculator Grid -->
@@ -94,22 +120,22 @@
       
       <!-- Controls Column -->
       <div class="calc-card">
-        <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem; color: #fff;">Customize Your Payment</h2>
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.25rem; color: #fff;">Customize Your In-House Payment</h2>
         
         <div style="display: flex; flex-direction: column; gap: 1.15rem;">
           <div class="form-group">
-            <label class="form-label">Vehicle Purchase Price ($)</label>
-            <input type="number" id="calc-vehicle-price" class="form-control" value="28500" step="500">
+            <label class="form-label">Vehicle Purchase Price ($ CAD)</label>
+            <input type="number" id="calc-vehicle-price" class="form-control" value="28500" step="any">
           </div>
 
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label">Down Payment ($)</label>
-              <input type="number" id="calc-down-payment" class="form-control" value="3000" step="500">
+              <label class="form-label">Down Payment ($ CAD)</label>
+              <input type="number" id="calc-down-payment" class="form-control" value="2500" step="any">
             </div>
             <div class="form-group">
-              <label class="form-label">Trade-In Allowance ($)</label>
-              <input type="number" id="calc-trade-value" class="form-control" value="0" step="500">
+              <label class="form-label">Trade-In Equity ($ CAD)</label>
+              <input type="number" id="calc-trade-value" class="form-control" value="0" step="any">
             </div>
           </div>
 
@@ -125,61 +151,61 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Interest Rate APR (%)</label>
-            <input type="number" id="calc-interest" class="form-control" value="5.9" step="0.1" min="0" max="25">
+            <label class="form-label">Estimated APR Rate (%)</label>
+            <input type="number" id="calc-interest" class="form-control" value="6.5" step="0.1" min="0" max="25">
           </div>
 
           <div>
-            <div class="form-label" style="margin-bottom: 0.5rem;">Estimated Credit Score Tier:</div>
+            <div class="form-label" style="margin-bottom: 0.5rem;">Select Your Credit Situation:</div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-dark btn-sm credit-tier-btn active" data-rate="5.4">Excellent (750+)</button>
-              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="6.9">Good (700-749)</button>
-              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="9.5">Fair (640-699)</button>
-              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="12.9">Rebuilding (&lt;640)</button>
+              <button type="button" class="btn btn-dark btn-sm credit-tier-btn active" data-rate="5.9">Prime (Good Credit)</button>
+              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="8.5">Rebuilding Credit</button>
+              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="10.9">In-House / No Credit</button>
+              <button type="button" class="btn btn-dark btn-sm credit-tier-btn" data-rate="12.9">New to Canada / Student</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Payment Output Display -->
-      <div class="calc-card" style="border-color: var(--silver-400);">
-        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff;">Payment Breakdown</h2>
-        <p style="color: var(--silver-500); font-size: 0.85rem; margin-bottom: 1.5rem;">Estimated monthly installment for your selected terms</p>
+      <div class="calc-card" style="border-color: var(--brand-blue);">
+        <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff;">Estimated Payment Breakdown</h2>
+        <p style="color: var(--silver-400); font-size: 0.85rem; margin-bottom: 1.5rem;">Flexible weekly, bi-weekly, or monthly financing options</p>
 
-        <div class="calc-display">
-          <div style="font-size: 0.85rem; color: var(--silver-400); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Estimated Payment</div>
-          <div id="calc-monthly-payment" class="calc-price-result">$491</div>
-          <div style="font-size: 0.85rem; color: #60a5fa; margin-top: 0.25rem;">Per Month</div>
+        <div class="calc-display" style="border-color: var(--brand-blue);">
+          <div style="font-size: 0.85rem; color: var(--silver-400); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Estimated Monthly Payment</div>
+          <div id="calc-monthly-payment" class="calc-price-result" style="color: var(--brand-blue);">$508 CAD</div>
+          <div style="font-size: 0.85rem; color: #60a5fa; margin-top: 0.25rem;">Or approx. <strong>$117 CAD/week</strong></div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.75rem; font-size: 0.9rem;">
           <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
-            <span style="color: var(--silver-400);">Principal Loan Amount:</span>
-            <strong id="calc-total-loan" style="color: #fff;">$25,500</strong>
+            <span style="color: var(--silver-400);">Financed Amount:</span>
+            <strong id="calc-total-loan" style="color: #fff;">$26,000 CAD</strong>
           </div>
           <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
-            <span style="color: var(--silver-400);">Total Interest Paid:</span>
-            <strong id="calc-total-interest" style="color: #fff;">$3,982</strong>
+            <span style="color: var(--silver-400);">Estimated Interest:</span>
+            <strong id="calc-total-interest" style="color: #fff;">$4,512 CAD</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem;">
-            <span style="color: var(--silver-400);">Total Cost of Loan:</span>
-            <strong id="calc-total-cost" style="color: #fff;">$32,482</strong>
+            <span style="color: var(--silver-400);">Total Obligation:</span>
+            <strong id="calc-total-cost" style="color: #fff;">$30,512 CAD</strong>
           </div>
         </div>
 
-        <a href="#preapproval" class="btn btn-silver btn-lg" style="width: 100%; margin-top: 1.5rem;">
-          Apply for Online Pre-Approval
+        <a href="#preapproval" class="btn btn-blue btn-lg" style="width: 100%; margin-top: 1.5rem;">
+          Apply for Guaranteed In-House Approval
         </a>
       </div>
 
     </div>
 
     <!-- Pre-Approval Application Form -->
-    <div id="preapproval" class="calc-card" style="max-width: 800px; margin: 0 auto;">
+    <div id="preapproval" class="calc-card" style="max-width: 820px; margin: 0 auto; border-color: var(--border-medium);">
       <div style="text-align: center; margin-bottom: 2rem;">
-        <span class="badge badge-green" style="margin-bottom: 0.5rem;">No Impact to Credit Score Initial Inquiry</span>
-        <h2 style="font-size: 1.6rem; margin-bottom: 0.35rem;">Online Financing Pre-Approval</h2>
-        <p style="color: var(--silver-500); font-size: 0.875rem;">Get approved in advance before you shop. Save hours at the showroom.</p>
+        <span class="badge badge-blue" style="margin-bottom: 0.5rem;">100% Secure • No Impact on Initial Score</span>
+        <h2 style="font-size: 1.7rem; margin-bottom: 0.35rem;">Online In-House Pre-Approval Application</h2>
+        <p style="color: var(--silver-400); font-size: 0.9rem;">Get pre-approved in under 2 minutes. We approve car loans for all Canadians regardless of credit!</p>
       </div>
 
       <form id="finance-preapproval-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
@@ -201,38 +227,50 @@
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number *</label>
-            <input type="tel" class="form-control" required placeholder="(555) 000-1234">
+            <input type="tel" class="form-control" required placeholder="(604) 000-0000">
           </div>
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
-            <label class="form-label">Employment Status *</label>
+            <label class="form-label">Employment / Income Status *</label>
             <select class="form-control" required>
               <option>Full-Time Employed</option>
-              <option>Part-Time Employed</option>
-              <option>Self-Employed / Business Owner</option>
+              <option>Part-Time / Contract</option>
+              <option>Self-Employed / Business</option>
+              <option>New Immigrant to Canada</option>
+              <option>Student / Work Permit</option>
               <option>Retired / Pension</option>
-              <option>Other / Student</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Gross Monthly Income ($) *</label>
-            <input type="number" class="form-control" required placeholder="e.g. 5200">
+            <label class="form-label">Monthly Gross Income ($ CAD) *</label>
+            <input type="number" class="form-control" required placeholder="e.g. 4500">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Vehicle You Are Interested In (Optional)</label>
-          <input type="text" class="form-control" placeholder="e.g. 2023 Toyota RAV4 or Ford F-150">
+          <label class="form-label">Credit Situation / Notes</label>
+          <select class="form-control">
+            <option>Good / Excellent Credit</option>
+            <option>Fair / Average Credit</option>
+            <option>Past Bankruptcy / Consumer Proposal</option>
+            <option>No Credit History / First Time Buyer</option>
+            <option>Newcomer / Work Permit</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehicle Preference (Optional)</label>
+          <input type="text" class="form-control" placeholder="e.g. SUV, Toyota RAV4, Honda Civic, Truck">
         </div>
 
         <div style="font-size: 0.8rem; color: var(--silver-500); line-height: 1.5;">
-          By submitting, you authorize Silver Motors to contact you regarding your financing inquiry. Your personal information is encrypted with 256-bit SSL security.
+          By submitting this form, you authorize Motor Trends Auto Group to contact you regarding your vehicle inquiry. Your information is held strictly confidential and never sold to third parties.
         </div>
 
-        <button type="submit" class="btn btn-silver btn-lg" style="width: 100%; margin-top: 0.5rem;">
-          Submit Pre-Approval Application
+        <button type="submit" class="btn btn-blue btn-lg" style="width: 100%; margin-top: 0.5rem;">
+          Submit Application for Instant Review
         </button>
       </form>
     </div>
@@ -243,66 +281,71 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <div class="brand-logo" style="margin-bottom: 1rem;">
-            <div class="logo-symbol">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+          <a href="index.html" class="brand-logo" style="margin-bottom: 1rem; display: inline-block;">
+            <div class="footer-logo-badge">
+              <img src="images/logo.png" alt="Motor Trends Auto Group" class="footer-brand-logo-img">
             </div>
-            <div class="logo-text">
-              <span class="logo-title">SILVER MOTORS</span>
-              <span class="logo-subtitle">Auto Marketplace</span>
-            </div>
-          </div>
-          <p style="font-size: 0.875rem; color: var(--silver-500); line-height: 1.6; margin-bottom: 1.25rem; max-width: 320px;">
-            Your trusted marketplace for certified pre-owned cars, reliable family SUVs, trucks, and low-rate auto financing.
+          </a>
+          <p style="font-size: 0.875rem; color: var(--silver-400); line-height: 1.6; margin-bottom: 1.25rem; max-width: 340px;">
+            Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC. We approve car loans for all Canadians regardless of credit!
           </p>
-          <div style="font-size: 0.875rem; color: var(--silver-400);">
-            <strong>Address:</strong> 10850 Motorway Blvd, Auto Center<br>
-            <strong>Phone:</strong> (555) 839-2000
+          <div style="font-size: 0.875rem; color: var(--silver-300); line-height: 1.7;">
+            <strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br>
+            <strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br>
+            <strong>Email:</strong> sales@motortrendsautogroup.com
           </div>
         </div>
 
         <div>
-          <div class="footer-col-title">Inventory</div>
+          <div class="footer-col-title">Inventory & Makes</div>
           <ul class="footer-links">
             <li><a href="inventory.html">All Vehicles In Stock</a></li>
             <li><a href="inventory.html?bodyType=SUV">SUVs & Crossovers</a></li>
             <li><a href="inventory.html?bodyType=Sedan">Sedans & Hatchbacks</a></li>
             <li><a href="inventory.html?bodyType=Truck">Trucks & 4x4</a></li>
+            <li><a href="inventory.html?fuelType=Hybrid">Hybrids & Electric</a></li>
+            <li><a href="inventory.html?maxPrice=25000">Vehicles Under $25,000</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Services</div>
+          <div class="footer-col-title" data-i18n="footer_services">Financing & Services</div>
           <ul class="footer-links">
-            <li><a href="sell-trade.html">Trade-In Appraisal</a></li>
-            <li><a href="financing.html">Auto Loan Calculator</a></li>
-            <li><a href="about.html">150-Point Inspection</a></li>
+            <li><a href="financing.html">Buy Here Pay Here Financing</a></li>
+            <li><a href="financing.html">In-House Financing BC</a></li>
+            <li><a href="sell-trade.html">Instant Trade-In Appraisal</a></li>
+            <li><a href="about.html">150-Point Safety Check</a></li>
             <li><a href="contact.html">Schedule Test Drive</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Dealership Hours</div>
+          <div class="footer-col-title" data-i18n="footer_hours">Dealership Hours</div>
           <ul class="footer-hours-list">
-            <li class="footer-hours-item"><span>Monday - Thursday:</span> <span>9:00 AM - 8:00 PM</span></li>
-            <li class="footer-hours-item"><span>Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
+            <li class="footer-hours-item"><span>Monday - Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
             <li class="footer-hours-item"><span>Saturday:</span> <span>9:00 AM - 6:00 PM</span></li>
-            <li class="footer-hours-item"><span>Sunday:</span> <span>10:00 AM - 5:00 PM</span></li>
+            <li class="footer-hours-item"><span>Sunday:</span> <span>11:00 AM - 5:00 PM</span></li>
           </ul>
+          <div style="margin-top: 1rem;">
+            <a href="tel:6042707662" class="btn btn-blue btn-sm" style="width: 100%;">
+              📞 Call 604-270-7662
+            </a>
+          </div>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <div>© 2026 Silver Motors Auto Marketplace Ltd. All rights reserved. Licensed Motor Vehicle Dealer #64821. • Designed & Developed by <a href="https://rightclicks.lk/" target="_blank" rel="noopener noreferrer" style="color: #cbd5e1; text-decoration: underline;">RightClicks.lk</a></div>
+        <div data-i18n="footer_rights">© 2026 Motor Trends Auto Group. All rights reserved. Richmond, BC Licensed Motor Dealer.</div>
         <div style="display: flex; gap: 1.5rem;">
-          <a href="#" class="text-silver">Privacy Policy</a>
-          <a href="#" class="text-silver">Terms of Service</a>
+          <a href="#" class="text-silver" data-i18n="footer_privacy">Privacy Policy</a>
+          <a href="#" class="text-silver" data-i18n="footer_terms">Terms of Service</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Multi-Language Pack & Core Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/data.js"></script>
   <script src="js/financing.js"></script>
   <script src="js/app.js"></script>

@@ -1,7 +1,72 @@
 /**
- * Silver Motors Main Application Logic
+ * Motor Trends Auto Group Main Application Logic
  * Interactive marketplace, filtering, quick view, test drive booking & favorites
+ * Features animated loader (vw leo.gif) on every page load & action
  */
+
+// Universal Page Preloader
+function initPreloader() {
+  const preloader = document.getElementById('mt-page-preloader');
+  if (!preloader) return;
+  const minDisplayTime = 500; // brief display for smooth gif playback
+  const startTime = Date.now();
+
+  function dismiss() {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minDisplayTime - elapsed);
+    setTimeout(() => {
+      preloader.classList.add('preloader-hidden');
+      setTimeout(() => {
+        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+      }, 450);
+    }, remaining);
+  }
+
+  if (document.readyState === 'complete') {
+    dismiss();
+  } else {
+    window.addEventListener('load', dismiss);
+    setTimeout(dismiss, 3000);
+  }
+}
+
+// Global action loader for dynamic operations (filtering, forms, saves)
+window.showActionLoader = function(msg) {
+  let loader = document.getElementById('mt-action-loader');
+  if (!loader) {
+    loader = document.createElement('div');
+    loader.id = 'mt-action-loader';
+    loader.className = 'mt-action-loader';
+    loader.innerHTML = `
+      <div class="mt-preloader-content">
+        <div class="mt-preloader-gif-wrap">
+          <img src="images/vw leo.gif" alt="Loading..." class="mt-preloader-gif">
+        </div>
+        <div id="mt-action-loader-msg" style="color: #fff; font-weight: 700; font-size: 1rem; margin-top: 0.5rem; letter-spacing: 0.03em;">${msg || 'Loading...'}</div>
+        <div style="font-size: 0.75rem; color: #60a5fa; margin-top: 0.25rem;">CAD Currency • Motor Trends Auto Group</div>
+      </div>
+    `;
+    document.body.appendChild(loader);
+  } else {
+    const msgEl = document.getElementById('mt-action-loader-msg');
+    if (msgEl) msgEl.textContent = msg || 'Loading...';
+  }
+  requestAnimationFrame(() => loader.classList.add('active'));
+};
+
+window.hideActionLoader = function() {
+  const loader = document.getElementById('mt-action-loader');
+  if (loader) {
+    loader.classList.remove('active');
+  }
+};
+
+// Start preloader as early as possible
+if (document.readyState === 'complete') {
+  initPreloader();
+} else {
+  window.addEventListener('DOMContentLoaded', initPreloader);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
@@ -39,6 +104,7 @@ function initApp() {
     setupInventoryFilters();
     renderInventory();
   } else if (isHomePage) {
+    initHeroSlideshow();
     populateHomeDropdowns();
     renderFeaturedVehicles();
   }
@@ -55,6 +121,17 @@ function initApp() {
       }
     });
   }
+
+  // Language change listener for live UI updates
+  window.addEventListener('motortrends:languageChanged', () => {
+    if (isInventoryPage) {
+      populateFilterDropdowns();
+      renderInventory();
+    } else if (isHomePage) {
+      populateHomeDropdowns();
+      renderFeaturedVehicles();
+    }
+  });
 
   setupGlobalModals();
 }
@@ -85,6 +162,128 @@ function initMobileMenu() {
       }
     });
   }
+}
+
+/* ----------------------------------------------------
+   Hero Banner Slideshow & Poster Animation
+----------------------------------------------------- */
+function initHeroSlideshow() {
+  const slider = document.getElementById('hero-banner-slider');
+  if (!slider) return;
+
+  const slides = slider.querySelectorAll('.hero-slide');
+  const dots = slider.querySelectorAll('.slider-dot');
+  const prevBtn = document.getElementById('prev-slide');
+  const nextBtn = document.getElementById('next-slide');
+
+  if (slides.length === 0) return;
+
+  let currentIndex = 0;
+  let slideInterval = null;
+  const autoPlayDelay = 5500;
+
+  const switcherPills = document.querySelectorAll('.switcher-pill');
+
+  function goToSlide(index) {
+    slides[currentIndex].classList.remove('active');
+    if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+    if (switcherPills[currentIndex]) switcherPills[currentIndex].classList.remove('active');
+
+    currentIndex = (index + slides.length) % slides.length;
+
+    slides[currentIndex].classList.add('active');
+    if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+    if (switcherPills[currentIndex]) switcherPills[currentIndex].classList.add('active');
+  }
+
+  switcherPills.forEach((pill, idx) => {
+    pill.addEventListener('click', () => {
+      goToSlide(idx);
+      startAutoplay();
+    });
+  });
+
+  function nextSlide() {
+    goToSlide(currentIndex + 1);
+  }
+
+  function prevSlide() {
+    goToSlide(currentIndex - 1);
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    slideInterval = setInterval(nextSlide, autoPlayDelay);
+  }
+
+  function stopAutoplay() {
+    if (slideInterval) {
+      clearInterval(slideInterval);
+      slideInterval = null;
+    }
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      nextSlide();
+      startAutoplay();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      prevSlide();
+      startAutoplay();
+    });
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      const idx = parseInt(e.target.dataset.index, 10);
+      if (!isNaN(idx)) {
+        goToSlide(idx);
+        startAutoplay();
+      }
+    });
+  });
+
+  // Pause on hover
+  slider.addEventListener('mouseenter', stopAutoplay);
+  slider.addEventListener('mouseleave', startAutoplay);
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') {
+      nextSlide();
+      startAutoplay();
+    } else if (e.key === 'ArrowLeft') {
+      prevSlide();
+      startAutoplay();
+    }
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  slider.addEventListener('touchstart', (e) => {
+    if (e.changedTouches && e.changedTouches[0]) {
+      touchStartX = e.changedTouches[0].screenX;
+    }
+  }, { passive: true });
+
+  slider.addEventListener('touchend', (e) => {
+    if (e.changedTouches && e.changedTouches[0]) {
+      const touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 45) {
+        nextSlide();
+        startAutoplay();
+      } else if (touchEndX - touchStartX > 45) {
+        prevSlide();
+        startAutoplay();
+      }
+    }
+  }, { passive: true });
+
+  startAutoplay();
 }
 
 /* ----------------------------------------------------
@@ -457,7 +656,7 @@ function createVehicleCardHtml(car) {
 
       <div class="vehicle-details">
         <div class="vehicle-header-info">
-          <div class="vehicle-year-make">${car.year || 2024} • ${car.make || ''} • Stock #${car.stockNumber || 'SM-0000'}</div>
+          <div class="vehicle-year-make">${car.year || 2024} • ${car.make || ''} • Stock #${car.stockNumber || 'MT-0000'}</div>
           <h3 class="vehicle-name">${car.model || 'Vehicle'}</h3>
           <div class="vehicle-trim">${car.trim || ''}</div>
         </div>
@@ -465,7 +664,7 @@ function createVehicleCardHtml(car) {
         <div class="vehicle-specs-pills">
           <div class="spec-item" title="Mileage">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            <span>${formatNumber(car.mileage || 0)} mi</span>
+            <span>${formatNumber(car.mileage || 0)} km</span>
           </div>
           <div class="spec-item" title="Drivetrain">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -484,7 +683,7 @@ function createVehicleCardHtml(car) {
         <div class="vehicle-pricing">
           <div>
             <div class="price-main">${formatPrice(car.price || 0)}</div>
-            <div class="price-est">Est. $${car.monthlyEst || 0}/mo</div>
+            <div class="price-est">Est. ${formatMonthly(car.monthlyEst)}</div>
           </div>
           <button class="btn btn-dark btn-sm btn-compare ${isCompared ? 'active' : ''}" data-id="${car.id}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -678,7 +877,7 @@ function openCompareModal() {
           <tbody>
             <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(255,255,255,0.02);">
               <td style="padding: 0.85rem 1rem; font-weight: 600; color: var(--silver-400);">Mileage</td>
-              ${cars.map(c => `<td style="padding: 0.85rem 1rem;">${formatNumber(c.mileage)} mi</td>`).join('')}
+              ${cars.map(c => `<td style="padding: 0.85rem 1rem;">${formatNumber(c.mileage)} km</td>`).join('')}
             </tr>
             <tr style="border-bottom: 1px solid var(--border-subtle);">
               <td style="padding: 0.85rem 1rem; font-weight: 600; color: var(--silver-400);">Body Type</td>
@@ -759,7 +958,7 @@ function openVehicleModal(carId) {
         <div style="margin-top: 1.5rem; background: var(--bg-input); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
           <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #fff;">Estimated Monthly Payment</h4>
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-            <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">$${car.monthlyEst}</span>
+            <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">$${car.monthlyEst} CAD</span>
             <span style="font-size: 0.8rem; color: var(--silver-500);">/month for 72 mos @ 5.9% APR</span>
           </div>
           <p style="font-size: 0.775rem; color: var(--silver-500);">*Based on $2,500 down payment. Terms subject to credit approval.</p>
@@ -770,7 +969,7 @@ function openVehicleModal(carId) {
         <div style="margin-bottom: 1.25rem;">
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
             <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
-            <span class="badge badge-green">VIN: ${car.vin}</span>
+            ${car.vin && car.vin !== 'N/A' ? `<span class="badge badge-green">VIN: ${car.vin}</span>` : `<span class="badge badge-silver" style="opacity: 0.8;">VIN: Optional / N/A</span>`}
           </div>
           <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem;">${car.year} ${car.make} ${car.model}</h2>
           <div style="font-size: 1rem; color: var(--silver-400);">${car.trim}</div>
@@ -781,7 +980,7 @@ function openVehicleModal(carId) {
 
         <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--silver-400); margin-bottom: 0.75rem; letter-spacing: 0.05em;">Key Specifications</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; font-size: 0.85rem; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-          <div><strong style="color: var(--silver-300);">Mileage:</strong> ${formatNumber(car.mileage)} mi</div>
+          <div><strong style="color: var(--silver-300);">Mileage:</strong> ${formatNumber(car.mileage)} km</div>
           <div><strong style="color: var(--silver-300);">Drivetrain:</strong> ${car.drivetrain}</div>
           <div><strong style="color: var(--silver-300);">Engine:</strong> ${car.engine}</div>
           <div><strong style="color: var(--silver-300);">Transmission:</strong> ${car.transmission}</div>

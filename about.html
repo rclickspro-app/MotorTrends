@@ -3,18 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Us & Certified Standards | Silver Motors Dealership</title>
-  <meta name="description" content="Discover why thousands of everyday drivers trust Silver Motors for quality inspected pre-owned cars, transparent pricing, and guaranteed peace of mind.">
-  
+  <title>About Us & In-House Financing Dealership | Motor Trends Auto Group Richmond BC</title>
+  <meta name="description" content="Discover why drivers across BC trust Motor Trends Auto Group in Richmond for quality inspected pre-owned cars, Buy Here Pay Here in-house financing, and upfront pricing. Call 604-270-7662.">
+  <link rel="icon" type="image/png" href="images/logo.png">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- Motor Trends Page Preloader -->
+  <div id="mt-page-preloader" class="mt-page-preloader">
+    <div class="mt-preloader-content">
+      <div class="mt-preloader-gif-wrap">
+        <img src="images/vw leo.gif" alt="Motor Trends Loading" class="mt-preloader-gif">
+      </div>
+      <div class="mt-preloader-brand">MOTOR TRENDS <span>AUTO GROUP</span></div>
+      <div class="mt-preloader-subtext">VANCOUVER &amp; RICHMOND, BC • BUY HERE PAY HERE</div>
+      <div class="mt-preloader-bar">
+        <div class="mt-preloader-bar-fill"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Top Bar -->
   <div class="top-bar">
@@ -22,16 +37,26 @@
       <div class="top-bar-left">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <span>10850 Motorway Blvd, Auto Mall Center</span>
+          <span>10740 Cambie Road, Richmond, BC V6X 1K8</span>
         </div>
         <div class="top-bar-item">
-          <span class="top-bar-badge">● Open Today 9:00 AM - 8:00 PM</span>
+          <span class="top-bar-badge">● Open Mon - Sat 9:00 AM - 7:00 PM</span>
         </div>
       </div>
       <div class="top-bar-right">
         <div class="top-bar-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          <span>Sales Hotline: <strong>(555) 839-2000</strong></span>
+          <span>Sales Hotline: <a href="tel:6042707662" style="color: #fff; font-weight: 700;">604-270-7662</a></span>
+        </div>
+        <div class="top-bar-item lang-selector-container">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <select class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">🇨🇦 English</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+          </select>
         </div>
       </div>
     </div>
@@ -41,23 +66,19 @@
   <header class="site-header">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="index.html" class="brand-logo">
-          <div class="logo-symbol">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
-          </div>
-          <div class="logo-text">
-            <span class="logo-title">SILVER MOTORS</span>
-            <span class="logo-subtitle">Auto Marketplace</span>
+        <a href="index.html" class="brand-logo" title="Motor Trends Auto Group">
+          <div class="brand-logo-badge">
+            <img src="images/logo.png" alt="Motor Trends Auto Group" class="brand-logo-img">
           </div>
         </a>
 
         <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="inventory.html" class="nav-link">Inventory</a></li>
-          <li><a href="sell-trade.html" class="nav-link">Sell / Trade</a></li>
-          <li><a href="financing.html" class="nav-link">Financing</a></li>
-          <li><a href="about.html" class="nav-link active">Why Choose Us</a></li>
-          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
+          <li><a href="inventory.html" class="nav-link" data-i18n="nav_inventory">Inventory</a></li>
+          <li><a href="financing.html" class="nav-link" data-i18n="nav_financing">In-House Financing</a></li>
+          <li><a href="sell-trade.html" class="nav-link" data-i18n="nav_sell_trade">Sell / Trade</a></li>
+          <li><a href="about.html" class="nav-link active" data-i18n="nav_why_us">Why Choose Us</a></li>
+          <li><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
         </ul>
 
         <div class="nav-actions">
@@ -65,8 +86,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             <span class="fav-counter" style="display: none;">0</span>
           </a>
-          <a href="inventory.html" class="btn btn-silver btn-sm">
-            Browse All Cars
+          <a href="financing.html" class="btn btn-blue btn-sm">
+            In-House Financing
           </a>
           <button class="mobile-toggle" aria-label="Toggle navigation">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -81,110 +102,76 @@
     
     <!-- Hero Story -->
     <div class="page-hero">
-      <span class="badge badge-silver" style="margin-bottom: 0.75rem;">Established 2012 • 10,000+ Happy Drivers</span>
+      <span class="slide-pill" style="margin-bottom: 0.75rem;">SPECIALISTS IN QUALITY USED VEHICLES VANCOUVER & RICHMOND BC</span>
       <h1 class="page-title">
-        A Normal, Honest Car Dealership<br>
-        <span class="text-gradient-silver">Built for Real Life Driving.</span>
+        Pre-Owned Vehicle Sales, Leasing,<br>
+        <span style="color: var(--brand-blue);">Financing, Rentals and Service in Richmond, BC.</span>
       </h1>
       <p class="page-subtitle">
-        We started Silver Motors with a simple mission: take the games, haggling, and anxiety out of buying a pre-owned vehicle. Whether you need a fuel-saving daily commuter, a spacious family SUV, or a work-ready 4x4, you get vetted reliability and transparent market pricing from start to finish.
+        At Motor Trends Auto Group, our goal is simple: offer quality pre-owned vehicles with honest service and in-house financing accessible to every Canadian, regardless of credit history.
       </p>
-    </div>
-
-    <!-- Core Pillars Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 4.5rem;">
-      <div class="trust-card" style="text-align: left;">
-        <div class="trust-icon-box" style="margin: 0 0 1rem 0;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <h3 class="trust-title">150-Point Certification</h3>
-        <p class="trust-desc">Every car is test driven, put on a mechanical lift, scanned for computer codes, and checked for brakes, tires, suspension, fluids, and AC components.</p>
-      </div>
-
-      <div class="trust-card" style="text-align: left;">
-        <div class="trust-icon-box" style="margin: 0 0 1rem 0;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        </div>
-        <h3 class="trust-title">Zero Hidden Dealer Fees</h3>
-        <p class="trust-desc">We never tack on surprise administration charges, mandatory security etch fees, or prep fees when you sit down in finance.</p>
-      </div>
-
-      <div class="trust-card" style="text-align: left;">
-        <div class="trust-icon-box" style="margin: 0 0 1rem 0;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        <h3 class="trust-title">Real-Time Market Pricing</h3>
-        <p class="trust-desc">We continuously update our prices using live regional algorithms so you always get a fair, competitive deal from day one.</p>
-      </div>
-
-      <div class="trust-card" style="text-align: left;">
-        <div class="trust-icon-box" style="margin: 0 0 1rem 0;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-        </div>
-        <h3 class="trust-title">30-Day Exchange Promise</h3>
-        <p class="trust-desc">Your satisfaction is guaranteed. If your vehicle doesn't fit into your garage or lifestyle, exchange it for another car from our lot with zero hassle.</p>
+      <div class="slide-dealer-info" style="margin: 1.5rem auto 0; width: fit-content;">
+        <span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span>
+        <span>•</span>
+        <span>📞 <a href="tel:6042707662">604-270-7662</a></span>
       </div>
     </div>
 
-    <!-- 150 Point Inspection Section Breakdown -->
-    <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 3rem 2rem; margin-bottom: 4rem;">
-      <div style="text-align: center; max-width: 650px; margin: 0 auto 2.5rem;">
-        <span class="badge badge-green" style="margin-bottom: 0.5rem;">Mechanical Rigor</span>
-        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Our 150-Point Inspection Standard</h2>
-        <p style="color: var(--silver-500); font-size: 0.95rem;">Before any car joins our showroom floor, it must pass these strict benchmarks:</p>
+    <!-- 4 Core Pillars -->
+    <div class="trust-grid" style="margin-bottom: 4.5rem;">
+      <div class="trust-card">
+        <div class="trust-icon-box" style="color: var(--brand-blue);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+        </div>
+        <h3 class="trust-title">Buy Here Pay Here Dealership</h3>
+        <p class="trust-desc">We operate our own in-house financing facility right here in Richmond. You make payments directly to us with flexible terms tailored to your real cashflow.</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
-        <div>
-          <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
-            1. Powertrain & Engine
-          </h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; color: var(--silver-400);">
-            <li>✓ Cylinder compression & diagnostic error scan</li>
-            <li>✓ Transmission shifting smoothness & fluid level</li>
-            <li>✓ Radiator cooling & water pump pressure</li>
-            <li>✓ Battery health & alternator charging rate</li>
-            <li>✓ Exhaust emissions & catalytic converter integrity</li>
-          </ul>
+      <div class="trust-card">
+        <div class="trust-icon-box" style="color: var(--brand-blue);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
         </div>
+        <h3 class="trust-title">We Approve All Canadians</h3>
+        <p class="trust-desc">Regardless of your credit! New immigrants, students, bankruptcies, consumer proposals, or low scores — we believe in second chances and financial mobility.</p>
+      </div>
 
-        <div>
-          <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
-            2. Safety, Brakes & Tires
-          </h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; color: var(--silver-400);">
-            <li>✓ Brake pads with minimum 50% life remaining</li>
-            <li>✓ Brake rotors, lines, and ABS sensor verification</li>
-            <li>✓ Tires with minimum 4/32" tread depth (or brand new)</li>
-            <li>✓ Wheel alignment & balance test drive</li>
-            <li>✓ Steering rack, tie rods, and suspension ball joints</li>
-          </ul>
+      <div class="trust-card">
+        <div class="trust-icon-box" style="color: var(--brand-blue);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         </div>
+        <h3 class="trust-title">150-Point Safety Certification</h3>
+        <p class="trust-desc">Every vehicle on our lot undergoes comprehensive mechanical, electronic, brake, and powertrain inspections before being offered for sale.</p>
+      </div>
 
-        <div>
-          <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
-            3. Electronics, Cabin & Body
-          </h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; color: var(--silver-400);">
-            <li>✓ Air conditioning & dual climate heating performance</li>
-            <li>✓ Infotainment, backup camera & radar safety sensors</li>
-            <li>✓ Power windows, door locks, and keyless fobs</li>
-            <li>✓ Complete interior sanitization & odor neutralization</li>
-            <li>✓ Paint depth scan to confirm no frame structural damage</li>
-          </ul>
+      <div class="trust-card">
+        <div class="trust-icon-box" style="color: var(--brand-blue);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
         </div>
+        <h3 class="trust-title">Full Automotive Services</h3>
+        <p class="trust-desc">Pre-owned sales, leasing, in-house financing, rental cars, and ongoing maintenance service under one convenient roof in Richmond, BC.</p>
       </div>
     </div>
 
-    <!-- Call to action -->
-    <div style="text-align: center; background: linear-gradient(135deg, rgba(203, 213, 225, 0.1) 0%, rgba(10, 10, 13, 0.9) 100%); border: 1px solid var(--silver-400); border-radius: var(--radius-lg); padding: 3rem 1.5rem;">
-      <h2 style="font-size: 2rem; margin-bottom: 0.75rem;">Experience the Silver Motors Difference</h2>
-      <p style="color: var(--silver-400); max-width: 550px; margin: 0 auto 1.75rem; font-size: 1rem;">
-        Visit our clean, climate-controlled showroom or browse our live marketplace inventory from the comfort of home.
-      </p>
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="inventory.html" class="btn btn-silver btn-lg">Explore Available Inventory</a>
-        <a href="contact.html" class="btn btn-outline btn-lg">Contact Our Team</a>
+    <!-- Dealership Story & Facility -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 3rem; margin-bottom: 4rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; align-items: center;">
+        <div>
+          <span class="badge badge-blue" style="margin-bottom: 0.75rem;">Welcome to Richmond Showroom</span>
+          <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #fff;">Visit Motor Trends Auto Group</h2>
+          <p style="color: var(--silver-300); line-height: 1.7; margin-bottom: 1.25rem;">
+            Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.
+          </p>
+          <p style="color: var(--silver-400); line-height: 1.7; margin-bottom: 1.75rem;">
+            Whether you want to drive home today with zero credit check stress, lease a vehicle for business, or trade in your older car for top dollar, our experienced team provides transparent support from start to finish.
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="inventory.html" class="btn btn-blue">Browse Vehicles</a>
+            <a href="contact.html" class="btn btn-outline">Showroom Directions →</a>
+          </div>
+        </div>
+        <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-blue); box-shadow: var(--shadow-blue);">
+          <img src="images/slide2.jpg" alt="Motor Trends Auto Group Showroom" style="width: 100%; height: 320px; object-fit: cover;">
+        </div>
       </div>
     </div>
 
@@ -195,66 +182,71 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <div class="brand-logo" style="margin-bottom: 1rem;">
-            <div class="logo-symbol">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0a0d" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+          <a href="index.html" class="brand-logo" style="margin-bottom: 1rem; display: inline-block;">
+            <div class="footer-logo-badge">
+              <img src="images/logo.png" alt="Motor Trends Auto Group" class="footer-brand-logo-img">
             </div>
-            <div class="logo-text">
-              <span class="logo-title">SILVER MOTORS</span>
-              <span class="logo-subtitle">Auto Marketplace</span>
-            </div>
-          </div>
-          <p style="font-size: 0.875rem; color: var(--silver-500); line-height: 1.6; margin-bottom: 1.25rem; max-width: 320px;">
-            Your trusted marketplace for certified pre-owned cars, reliable family SUVs, trucks, and low-rate auto financing.
+          </a>
+          <p style="font-size: 0.875rem; color: var(--silver-400); line-height: 1.6; margin-bottom: 1.25rem; max-width: 340px;">
+            Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC. We approve car loans for all Canadians regardless of credit!
           </p>
-          <div style="font-size: 0.875rem; color: var(--silver-400);">
-            <strong>Address:</strong> 10850 Motorway Blvd, Auto Center<br>
-            <strong>Phone:</strong> (555) 839-2000
+          <div style="font-size: 0.875rem; color: var(--silver-300); line-height: 1.7;">
+            <strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br>
+            <strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br>
+            <strong>Email:</strong> sales@motortrendsautogroup.com
           </div>
         </div>
 
         <div>
-          <div class="footer-col-title">Inventory</div>
+          <div class="footer-col-title">Inventory & Makes</div>
           <ul class="footer-links">
             <li><a href="inventory.html">All Vehicles In Stock</a></li>
             <li><a href="inventory.html?bodyType=SUV">SUVs & Crossovers</a></li>
             <li><a href="inventory.html?bodyType=Sedan">Sedans & Hatchbacks</a></li>
             <li><a href="inventory.html?bodyType=Truck">Trucks & 4x4</a></li>
+            <li><a href="inventory.html?fuelType=Hybrid">Hybrids & Electric</a></li>
+            <li><a href="inventory.html?maxPrice=25000">Vehicles Under $25,000</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Services</div>
+          <div class="footer-col-title" data-i18n="footer_services">Financing & Services</div>
           <ul class="footer-links">
-            <li><a href="sell-trade.html">Trade-In Appraisal</a></li>
-            <li><a href="financing.html">Auto Loan Calculator</a></li>
-            <li><a href="about.html">150-Point Inspection</a></li>
+            <li><a href="financing.html">Buy Here Pay Here Financing</a></li>
+            <li><a href="financing.html">In-House Financing BC</a></li>
+            <li><a href="sell-trade.html">Instant Trade-In Appraisal</a></li>
+            <li><a href="about.html">150-Point Safety Check</a></li>
             <li><a href="contact.html">Schedule Test Drive</a></li>
           </ul>
         </div>
 
         <div>
-          <div class="footer-col-title">Dealership Hours</div>
+          <div class="footer-col-title" data-i18n="footer_hours">Dealership Hours</div>
           <ul class="footer-hours-list">
-            <li class="footer-hours-item"><span>Monday - Thursday:</span> <span>9:00 AM - 8:00 PM</span></li>
-            <li class="footer-hours-item"><span>Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
+            <li class="footer-hours-item"><span>Monday - Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
             <li class="footer-hours-item"><span>Saturday:</span> <span>9:00 AM - 6:00 PM</span></li>
-            <li class="footer-hours-item"><span>Sunday:</span> <span>10:00 AM - 5:00 PM</span></li>
+            <li class="footer-hours-item"><span>Sunday:</span> <span>11:00 AM - 5:00 PM</span></li>
           </ul>
+          <div style="margin-top: 1rem;">
+            <a href="tel:6042707662" class="btn btn-blue btn-sm" style="width: 100%;">
+              📞 Call 604-270-7662
+            </a>
+          </div>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <div>© 2026 Silver Motors Auto Marketplace Ltd. All rights reserved. Licensed Motor Vehicle Dealer #64821. • Designed & Developed by <a href="https://rightclicks.lk/" target="_blank" rel="noopener noreferrer" style="color: #cbd5e1; text-decoration: underline;">RightClicks.lk</a></div>
+        <div data-i18n="footer_rights">© 2026 Motor Trends Auto Group. All rights reserved. Richmond, BC Licensed Motor Dealer.</div>
         <div style="display: flex; gap: 1.5rem;">
-          <a href="#" class="text-silver">Privacy Policy</a>
-          <a href="#" class="text-silver">Terms of Service</a>
+          <a href="#" class="text-silver" data-i18n="footer_privacy">Privacy Policy</a>
+          <a href="#" class="text-silver" data-i18n="footer_terms">Terms of Service</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Multi-Language Pack & Core Scripts -->
+  <script src="js/i18n.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
 </body>
