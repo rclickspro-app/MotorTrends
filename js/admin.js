@@ -85,6 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminSystem();
 });
 
+// Fallback formatNumber helper if not loaded from data.js
+if (typeof formatNumber !== 'function') {
+  window.formatNumber = function(val) {
+    if (val === undefined || val === null || val === '') return '0';
+    const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/,/g, '')) || 0;
+    return num.toLocaleString('en-CA');
+  };
+}
+
 function initAdminSystem() {
   initAdminUsersDB();
   checkAuthSession();
@@ -92,6 +101,25 @@ function initAdminSystem() {
   setupDashboardEventListeners();
   setupVehicleModalEvents();
   setupUserModalEvents();
+
+  // Real-time synchronization with cloud database
+  if (typeof subscribeToMarketplaceVehicles === 'function') {
+    subscribeToMarketplaceVehicles(() => {
+      loadMarketplaceDashboard();
+    });
+  }
+
+  // Cross-tab sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db') {
+      const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
+      if (updated && updated.length > 0) {
+        VEHICLES_DATA.length = 0;
+        VEHICLES_DATA.push(...updated);
+        loadMarketplaceDashboard();
+      }
+    }
+  });
 }
 
 /* ----------------------------------------------------
@@ -562,7 +590,7 @@ function renderVehiclesTable(query = '') {
   const filtered = VEHICLES_DATA.filter(car => {
     // Search query
     if (query) {
-      const haystack = `${car.year} ${car.make} ${car.model} ${car.trim} ${car.vin} ${car.stockNumber}`.toLowerCase();
+      const haystack = `${car.year || ''} ${car.make || ''} ${car.model || ''} ${car.trim || ''} ${car.vin || ''} ${car.stockNumber || ''} ${car.id || ''}`.toLowerCase();
       if (!haystack.includes(query)) return false;
     }
     // Body category
@@ -589,7 +617,7 @@ function renderVehiclesTable(query = '') {
   tbody.innerHTML = filtered.map(car => `
     <tr>
       <td style="width: 80px;">
-        <img src="${car.images[0] || 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${car.model}" style="width: 70px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-medium);">
+        <img src="${(Array.isArray(car.images) && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${car.model || 'Vehicle'}" style="width: 70px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-medium);">
       </td>
       <td>
         <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${car.year} ${car.make} ${car.model}</div>
@@ -604,7 +632,7 @@ function renderVehiclesTable(query = '') {
       </td>
       <td>
         <div style="font-size: 0.85rem; color: #fff;">${car.bodyType} • ${car.fuelType}</div>
-        <div style="font-size: 0.8rem; color: var(--silver-400);">${formatNumber(car.mileage)} km • ${car.drivetrain}</div>
+        <div style="font-size: 0.8rem; color: var(--silver-400);">${formatNumber(car.mileage || 0)} km • ${car.drivetrain || 'AWD'}</div>
       </td>
       <td>
         <div style="font-weight: 800; font-size: 1rem; color: #fff;">${formatPrice(car.price)}</div>
@@ -693,7 +721,9 @@ function attachTableActionEvents() {
   document.querySelectorAll('.btn-view-live-car').forEach(btn => {
     btn.addEventListener('click', () => {
       const carId = btn.dataset.id;
-      window.open(`inventory.html?q=${encodeURIComponent(carId)}`, '_blank');
+      const car = getVehicleById(carId);
+      const queryParam = (car && car.stockNumber) ? car.stockNumber : carId;
+      window.open(`inventory.html?q=${encodeURIComponent(queryParam)}`, '_blank');
     });
   });
 }
@@ -963,31 +993,31 @@ async function saveVehicleFromForm() {
   }
   try {
     const id = document.getElementById('form-car-id').value.trim() || `veh-${Date.now()}`;
-    const year = parseInt(document.getElementById('form-car-year').value);
+    const year = parseInt(document.getElementById('form-car-year').value) || new Date().getFullYear();
     const make = document.getElementById('form-car-make').value.trim();
     const model = document.getElementById('form-car-model').value.trim();
     const trim = document.getElementById('form-car-trim').value.trim();
     const rawPrice = document.getElementById('form-car-price').value.trim();
-    const price = rawPrice !== '' ? (isNaN(Number(rawPrice)) ? rawPrice : Number(rawPrice)) : 0;
+    const price = parseFloat(rawPrice) || 0;
     const rawMonthly = document.getElementById('form-car-monthly').value.trim();
-    const monthlyEst = rawMonthly !== '' ? (isNaN(Number(rawMonthly)) ? rawMonthly : Number(rawMonthly)) : (typeof price === 'number' ? +(price / 72).toFixed(2) : 0);
+    const monthlyEst = rawMonthly !== '' ? (parseFloat(rawMonthly) || 0) : (typeof price === 'number' ? +(price / 72).toFixed(2) : 0);
     const mileage = parseInt(document.getElementById('form-car-mileage').value) || 0;
-    const bodyType = document.getElementById('form-car-body').value;
-    const fuelType = document.getElementById('form-car-fuel').value;
-    const transmission = document.getElementById('form-car-trans').value;
-    const drivetrain = document.getElementById('form-car-drivetrain').value;
+    const bodyType = document.getElementById('form-car-body').value || 'SUV';
+    const fuelType = document.getElementById('form-car-fuel').value || 'Gasoline';
+    const transmission = document.getElementById('form-car-trans').value || 'Automatic';
+    const drivetrain = document.getElementById('form-car-drivetrain').value || 'AWD';
     const engine = document.getElementById('form-car-engine').value.trim();
     const exteriorColor = document.getElementById('form-car-ext-color').value.trim();
     const interiorColor = document.getElementById('form-car-int-color').value.trim();
     const vin = document.getElementById('form-car-vin').value.trim() || 'N/A'; // Optional VIN
-    const stockNumber = document.getElementById('form-car-stock').value.trim();
-    const condition = document.getElementById('form-car-condition').value;
+    const stockNumber = document.getElementById('form-car-stock').value.trim() || `MT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const condition = document.getElementById('form-car-condition').value || 'Pre-Owned';
     const featured = document.getElementById('form-car-featured').checked;
     const video = document.getElementById('form-car-video').value.trim();
 
     const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, 10) : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
 
-    const features = document.getElementById('form-car-features').value.trim().split('\n').filter(Boolean);
+    const features = document.getElementById('form-car-features').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
     const badges = document.getElementById('form-car-badges').value.trim().split(',').map(b => b.trim()).filter(Boolean);
     const overview = document.getElementById('form-car-overview').value.trim();
 

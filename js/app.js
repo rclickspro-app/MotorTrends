@@ -61,6 +61,15 @@ window.hideActionLoader = function() {
   }
 };
 
+// Fallback formatNumber helper if not loaded from data.js
+if (typeof formatNumber !== 'function') {
+  window.formatNumber = function(val) {
+    if (val === undefined || val === null || val === '') return '0';
+    const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/,/g, '')) || 0;
+    return num.toLocaleString('en-CA');
+  };
+}
+
 // Start preloader as early as possible
 if (document.readyState === 'complete') {
   initPreloader();
@@ -130,6 +139,24 @@ function initApp() {
     } else if (isHomePage) {
       populateHomeDropdowns();
       renderFeaturedVehicles();
+    }
+  });
+
+  // Cross-tab real-time storage sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db') {
+      const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
+      if (updated && updated.length > 0) {
+        VEHICLES_DATA.length = 0;
+        VEHICLES_DATA.push(...updated);
+        if (isInventoryPage) {
+          populateFilterDropdowns();
+          renderInventory();
+        } else if (isHomePage) {
+          populateHomeDropdowns();
+          renderFeaturedVehicles();
+        }
+      }
     }
   });
 
@@ -356,24 +383,28 @@ function parseUrlParams() {
 function populateFilterDropdowns() {
   const makeFilter = document.getElementById('filter-make');
   if (makeFilter) {
+    const prevMake = currentFilters.make;
+    makeFilter.innerHTML = '<option value="all" data-i18n="filter_all_makes">All Makes</option>';
     const makes = getAllMakes();
     makes.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m;
       opt.textContent = m;
-      if (m === currentFilters.make) opt.selected = true;
+      if (m === prevMake) opt.selected = true;
       makeFilter.appendChild(opt);
     });
   }
 
   const bodyFilter = document.getElementById('filter-body');
   if (bodyFilter) {
+    const prevBody = currentFilters.bodyType;
+    bodyFilter.innerHTML = '<option value="all" data-i18n="filter_all_body_types">All Body Types</option>';
     const types = getAllBodyTypes();
     types.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t;
       opt.textContent = t;
-      if (t === currentFilters.bodyType) opt.selected = true;
+      if (t === prevBody) opt.selected = true;
       bodyFilter.appendChild(opt);
     });
   }
@@ -562,9 +593,11 @@ function setupInventoryFilters() {
 
 function getFilteredVehicles() {
   return VEHICLES_DATA.filter(car => {
-    // Keyword
+    // Keyword search matching id, stockNumber, vin, year, make, model, trim, engine, colors, body, fuel, features, badges
     if (currentFilters.keyword) {
-      const searchStr = `${car.year} ${car.make} ${car.model} ${car.trim} ${car.engine} ${car.features.join(' ')}`.toLowerCase();
+      const featuresStr = Array.isArray(car.features) ? car.features.join(' ') : '';
+      const badgesStr = Array.isArray(car.badges) ? car.badges.join(' ') : '';
+      const searchStr = `${car.id || ''} ${car.stockNumber || ''} ${car.vin || ''} ${car.year || ''} ${car.make || ''} ${car.model || ''} ${car.trim || ''} ${car.engine || ''} ${car.exteriorColor || ''} ${car.interiorColor || ''} ${car.bodyType || ''} ${car.fuelType || ''} ${featuresStr} ${badgesStr}`.toLowerCase();
       if (!searchStr.includes(currentFilters.keyword)) return false;
     }
 
@@ -581,15 +614,23 @@ function getFilteredVehicles() {
     if (currentFilters.fuelType !== 'all' && car.fuelType !== currentFilters.fuelType) return false;
 
     // Max Price
-    if (car.price > currentFilters.maxPrice) return false;
+    const carPriceNum = (typeof car.price === 'number') ? car.price : (parseFloat(car.price) || 0);
+    if (carPriceNum > currentFilters.maxPrice) return false;
 
     return true;
   }).sort((a, b) => {
+    const priceA = (typeof a.price === 'number') ? a.price : (parseFloat(a.price) || 0);
+    const priceB = (typeof b.price === 'number') ? b.price : (parseFloat(b.price) || 0);
+    const mileageA = (typeof a.mileage === 'number') ? a.mileage : (parseInt(a.mileage) || 0);
+    const mileageB = (typeof b.mileage === 'number') ? b.mileage : (parseInt(b.mileage) || 0);
+    const yearA = (typeof a.year === 'number') ? a.year : (parseInt(a.year) || 0);
+    const yearB = (typeof b.year === 'number') ? b.year : (parseInt(b.year) || 0);
+
     switch (currentFilters.sortBy) {
-      case 'price-asc': return a.price - b.price;
-      case 'price-desc': return b.price - a.price;
-      case 'mileage-asc': return a.mileage - b.mileage;
-      case 'year-desc': return b.year - a.year;
+      case 'price-asc': return priceA - priceB;
+      case 'price-desc': return priceB - priceA;
+      case 'mileage-asc': return mileageA - mileageB;
+      case 'year-desc': return yearB - yearA;
       default: return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
     }
   });
@@ -633,7 +674,7 @@ function renderInventory() {
 function createVehicleCardHtml(car) {
   const isWishlisted = wishlist.includes(car.id);
   const isCompared = compareList.includes(car.id);
-  const mainImage = (car.images && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80';
+  const mainImage = (Array.isArray(car.images) && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80';
   const badgesList = Array.isArray(car.badges) ? car.badges : [];
   const transmissionShort = car.transmission ? car.transmission.split(' ')[0] : 'Auto';
 
@@ -818,7 +859,7 @@ function updateCompareDrawer() {
     <div class="compare-thumbs">
       ${comparedCars.map(c => `
         <div class="compare-thumb-item" title="${c.year} ${c.make} ${c.model}">
-          <img src="${c.images[0]}" alt="${c.model}">
+          <img src="${(Array.isArray(c.images) && c.images[0]) ? c.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${c.model}">
         </div>
       `).join('')}
     </div>
@@ -866,7 +907,7 @@ function openCompareModal() {
               <th style="text-align: left; padding: 1rem; color: var(--silver-500); width: 140px;">Vehicle</th>
               ${cars.map(c => `
                 <th style="padding: 1rem; text-align: left; vertical-align: top;">
-                  <img src="${c.images[0]}" alt="${c.model}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
+                  <img src="${(Array.isArray(c.images) && c.images[0]) ? c.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${c.model}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
                   <div style="font-size: 1rem; font-weight: 700; color: #fff;">${c.year} ${c.make} ${c.model}</div>
                   <div style="color: var(--silver-400); font-size: 0.8rem;">${c.trim}</div>
                   <div style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 0.5rem;">${formatPrice(c.price)}</div>
@@ -936,12 +977,15 @@ function openVehicleModal(carId) {
 
   let activeImgIndex = 0;
 
+  const carImages = Array.isArray(car.images) && car.images.length > 0 ? car.images : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+  const carFeatures = Array.isArray(car.features) ? car.features : [];
+
   modalContainer.innerHTML = `
     <button class="modal-close-btn" id="modal-close">✕</button>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;" class="vehicle-modal-grid">
       <div>
         <div style="aspect-ratio: 16/10; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative;" id="modal-media-container">
-          <img id="modal-main-img" src="${car.images[0]}" alt="${car.model}" style="width: 100%; height: 100%; object-fit: cover;">
+          <img id="modal-main-img" src="${carImages[0]}" alt="${car.model}" style="width: 100%; height: 100%; object-fit: cover;">
           ${car.video ? `
             <button id="btn-play-walkaround-video" style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -950,7 +994,7 @@ function openVehicleModal(carId) {
           ` : ''}
         </div>
         <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px;">
-          ${car.images.map((img, idx) => `
+          ${carImages.map((img, idx) => `
             <img src="${img}" class="modal-thumb ${idx === 0 ? 'active' : ''}" data-idx="${idx}" style="width: 65px; height: 46px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? '#fff' : 'transparent'}; opacity: ${idx === 0 ? '1' : '0.6'}; flex-shrink: 0;">
           `).join('')}
         </div>
@@ -958,7 +1002,7 @@ function openVehicleModal(carId) {
         <div style="margin-top: 1.5rem; background: var(--bg-input); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
           <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #fff;">Estimated Monthly Payment</h4>
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-            <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">$${car.monthlyEst} CAD</span>
+            <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">${formatMonthly(car.monthlyEst)}</span>
             <span style="font-size: 0.8rem; color: var(--silver-500);">/month for 72 mos @ 5.9% APR</span>
           </div>
           <p style="font-size: 0.775rem; color: var(--silver-500);">*Based on $2,500 down payment. Terms subject to credit approval.</p>
@@ -990,7 +1034,7 @@ function openVehicleModal(carId) {
 
         <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--silver-400); margin-bottom: 0.75rem; letter-spacing: 0.05em;">Top Features</h4>
         <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.8rem; color: var(--silver-300); margin-bottom: 1.5rem;">
-          ${car.features.map(f => `
+          ${carFeatures.map(f => `
             <li style="display: flex; align-items: center; gap: 0.35rem;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
               ${f}

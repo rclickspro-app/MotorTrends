@@ -781,11 +781,12 @@ const DEFAULT_VEHICLES_DATA = [
 
 // LocalStorage Key for persistent marketplace edits (v3 contains real MT Inventory Jeep, Outlander, RAV4)
 const STORAGE_KEY_VEHICLES = 'motortrends_vehicles_db_v3';
+const STORAGE_KEY_VEHICLES_LEGACY = 'motortrends_vehicles_db';
 
 // Initialize VEHICLES_DATA from LocalStorage if available, otherwise use initial default catalog
 function getStoredVehicles() {
   if (typeof localStorage !== 'undefined') {
-    const localData = localStorage.getItem(STORAGE_KEY_VEHICLES);
+    const localData = localStorage.getItem(STORAGE_KEY_VEHICLES) || localStorage.getItem(STORAGE_KEY_VEHICLES_LEGACY);
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
@@ -795,6 +796,7 @@ function getStoredVehicles() {
           if (!hasMTVehicles) {
             const merged = [DEFAULT_VEHICLES_DATA[0], DEFAULT_VEHICLES_DATA[1], DEFAULT_VEHICLES_DATA[2], ...parsed];
             localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(merged));
+            localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(merged));
             return merged;
           }
           return parsed;
@@ -805,16 +807,21 @@ function getStoredVehicles() {
     }
     // Store default copy
     localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(DEFAULT_VEHICLES_DATA));
+    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(DEFAULT_VEHICLES_DATA));
   }
   return DEFAULT_VEHICLES_DATA;
 }
 
 function saveVehiclesData(data) {
+  const items = Array.isArray(data) ? [...data] : [];
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(items));
+    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(items));
   }
-  VEHICLES_DATA.length = 0;
-  VEHICLES_DATA.push(...data);
+  if (data !== VEHICLES_DATA) {
+    VEHICLES_DATA.length = 0;
+    VEHICLES_DATA.push(...items);
+  }
 }
 
 // Active working array
@@ -822,17 +829,24 @@ const VEHICLES_DATA = [...getStoredVehicles()];
 
 // Helper functions for easy filtering and querying
 function getAllMakes() {
-  const makes = [...new Set(VEHICLES_DATA.map(v => v.make))];
+  const makes = [...new Set(VEHICLES_DATA.map(v => v.make).filter(Boolean))];
   return makes.sort();
 }
 
 function getAllBodyTypes() {
-  const types = [...new Set(VEHICLES_DATA.map(v => v.bodyType))];
+  const types = [...new Set(VEHICLES_DATA.map(v => v.bodyType).filter(Boolean))];
   return types.sort();
 }
 
 function getVehicleById(id) {
   return VEHICLES_DATA.find(v => v.id === id);
+}
+
+// Generic number formatter for mileage, counts, and measurements
+function formatNumber(val) {
+  if (val === undefined || val === null || val === '') return '0';
+  const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/,/g, '')) || 0;
+  return num.toLocaleString('en-CA');
 }
 
 // Strictly format currency in CAD across all display views without restriction or rounding
@@ -869,6 +883,16 @@ function formatMileageKm(val) {
   return `${num.toLocaleString('en-CA')} km`;
 }
 
+// Attach globally if in browser
+if (typeof window !== 'undefined') {
+  window.formatNumber = formatNumber;
+  window.formatPrice = formatPrice;
+  window.formatMonthly = formatMonthly;
+  window.formatMileageKm = formatMileageKm;
+  window.saveVehiclesData = saveVehiclesData;
+  window.getStoredVehicles = getStoredVehicles;
+}
+
 // Export for module systems if needed
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -879,6 +903,7 @@ if (typeof module !== 'undefined' && module.exports) {
     getAllMakes,
     getAllBodyTypes,
     getVehicleById,
+    formatNumber,
     formatPrice,
     formatMonthly,
     formatMileageKm
