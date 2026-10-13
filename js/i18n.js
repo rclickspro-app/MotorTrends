@@ -15,7 +15,7 @@ const I18N_TRANSLATIONS = {
     // Navigation
     nav_home: "Home",
     nav_inventory: "Inventory",
-    nav_financing: "In-House Financing",
+    nav_financing: "Financing",
     nav_sell_trade: "Sell / Trade",
     nav_why_us: "Why Choose Us",
     nav_contact: "Contact",
@@ -25,7 +25,7 @@ const I18N_TRANSLATIONS = {
     slide1_pill: "Richmond & Vancouver, BC",
     slide1_title: "BUY HERE PAY HERE DEALERSHIP",
     slide1_subtitle: "USED CAR FINANCING IN BC",
-    slide1_highlight: "IN-HOUSE FINANCING AVAILABLE!",
+    slide1_highlight: "FINANCING AVAILABLE!",
     slide1_desc: "Regardless of your past credit history, we approve car loans for all Canadians right here in Richmond, BC.",
     slide1_btn_primary: "Browse Richmond Inventory",
     slide1_btn_secondary: "Apply For Financing",
@@ -33,7 +33,7 @@ const I18N_TRANSLATIONS = {
     slide2_pill: "Quality Certified Pre-Owned",
     slide2_title: "SPECIALISTS IN QUALITY USED VEHICLES VANCOUVER BC",
     slide2_subtitle: "USED CAR FINANCING IN BC",
-    slide2_highlight: "IN-HOUSE FINANCING AVAILABLE!",
+    slide2_highlight: "FINANCING AVAILABLE!",
     slide2_desc: "150-point mechanically inspected cars, trucks, and SUVs with comprehensive powertrain warranty coverage.",
     slide2_btn_primary: "Explore Vehicles Under $10k CAD",
     slide2_btn_secondary: "Value My Trade",
@@ -42,7 +42,7 @@ const I18N_TRANSLATIONS = {
     slide3_title: "FINANCING AND LEASING FOR ALL TYPES OF CREDIT",
     slide3_subtitle: "WE APPROVE CAR LOANS FOR ALL CANADIANS",
     slide3_highlight: "REGARDLESS OF YOUR CREDIT!",
-    slide3_desc: "Bankruptcy, consumer proposal, new to Canada, or bad credit — our in-house finance team gets you behind the wheel today.",
+    slide3_desc: "Bankruptcy, consumer proposal, new to Canada, or bad credit — our finance team gets you behind the wheel today.",
     slide3_btn_primary: "Get Instant Pre-Approval",
     slide3_btn_secondary: "Contact Richmond Office",
 
@@ -82,7 +82,7 @@ const I18N_TRANSLATIONS = {
 
     // Features & Value Proposition
     value_prop_title: "Why Motor Trends Auto Group Richmond?",
-    value_inhouse_title: "100% In-House Financing",
+    value_inhouse_title: "100% Financing",
     value_inhouse_desc: "We lend our own funds. 0% credit check barrier, flexible bi-weekly or monthly payments.",
     value_certified_title: "150-Point BC Safety Inspection",
     value_certified_desc: "Every vehicle is inspected by certified technicians, detailed, and certified for BC roads.",

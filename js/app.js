@@ -31,7 +31,7 @@ function initPreloader() {
 }
 
 // Global action loader for dynamic operations (filtering, forms, saves)
-window.showActionLoader = function(msg) {
+window.showActionLoader = function (msg) {
   let loader = document.getElementById('mt-action-loader');
   if (!loader) {
     loader = document.createElement('div');
@@ -54,7 +54,7 @@ window.showActionLoader = function(msg) {
   requestAnimationFrame(() => loader.classList.add('active'));
 };
 
-window.hideActionLoader = function() {
+window.hideActionLoader = function () {
   const loader = document.getElementById('mt-action-loader');
   if (loader) {
     loader.classList.remove('active');
@@ -63,7 +63,7 @@ window.hideActionLoader = function() {
 
 // Fallback formatNumber helper if not loaded from data.js
 if (typeof formatNumber !== 'function') {
-  window.formatNumber = function(val) {
+  window.formatNumber = function (val) {
     if (val === undefined || val === null || val === '') return '0';
     const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/,/g, '')) || 0;
     return num.toLocaleString('en-CA');
@@ -103,7 +103,8 @@ function initApp() {
   initMobileMenu();
   updateWishlistCount();
   updateCompareDrawer();
-  
+  initDealerAddressAlternator();
+
   // Detect if on homepage or marketplace page
   const isInventoryPage = document.getElementById('inventory-grid') !== null;
   const isHomePage = document.getElementById('featured-vehicles-grid') !== null;
@@ -113,7 +114,7 @@ function initApp() {
     populateFilterDropdowns();
     setupInventoryFilters();
     renderInventory();
-    
+
     // Auto-open quick view modal if vehicle id or preview is specified in URL
     const urlParams = new URLSearchParams(window.location.search);
     const previewId = urlParams.get('id') || urlParams.get('preview');
@@ -202,6 +203,187 @@ function initMobileMenu() {
 }
 
 /* ----------------------------------------------------
+   Synchronized Dealer Address & Contact Alternator
+   Cycles between Richmond & Vancouver locations indefinitely
+   every 4-5 seconds with smooth fade transition.
+----------------------------------------------------- */
+const DEALER_LOCATIONS = [
+  {
+    id: 'richmond',
+    city: 'Richmond, BC',
+    address: '10740 Cambie Road, Richmond, BC V6X 1K8',
+    phone: '604-270-7662',
+    phoneRaw: '6042707662',
+    dealerNumber: '',
+    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8',
+    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Email:</strong> sales@motortrendsautogroup.com',
+    footerCallBtnHtml: '📞 Call 604-270-7662',
+    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Email:</strong> sales@motortrendsautogroup.com</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC.</em></div>',
+    contactMapAddr: '10740 Cambie Road, Richmond, BC V6X 1K8',
+    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver',
+    contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=10740+Cambie+Road,+Richmond,+BC+V6X+1K8',
+    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Pre-owned vehicle sales, leasing, financing, rentals and service under one roof at 10740 Cambie Road, Richmond, BC.'
+  },
+  {
+    id: 'vancouver',
+    city: 'Vancouver, BC',
+    address: '1410 SW Marine Drive, Vancouver, British Columbia',
+    phone: '604-243-9001',
+    phoneRaw: '6042439001',
+    dealerNumber: '40788',
+    topAddressHtml: '1410 SW Marine Drive, Vancouver, British Columbia <span class="dealer-tag">Dealer #40788</span>',
+    slideInfoHtml: '<span>📍 1410 SW Marine Drive, Vancouver, British Columbia</span><span>•</span><span>📞 <a href="tel:6042439001">604-243-9001</a></span><span>•</span><span class="dealer-tag">Dealer #40788</span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 1410 SW Marine Drive, Vancouver, British Columbia<br><strong>Phone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a><br><strong>Dealer #:</strong> 40788<br><strong>Email:</strong> sales@motortrendsautogroup.com',
+    footerCallBtnHtml: '📞 Call 604-243-9001',
+    contactPillText: 'VANCOUVER, BC DEALERSHIP • 604-243-9001 • DEALER #40788',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 1410 SW Marine Drive, Vancouver, British Columbia</div><div><strong>Telephone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a></div><div><strong>Dealer #:</strong> 40788</div><div><strong>Email:</strong> sales@motortrendsautogroup.com</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Pre-owned vehicle sales, leasing, financing, rentals and service in Vancouver, BC.</em></div>',
+    contactMapAddr: '1410 SW Marine Drive, Vancouver, British Columbia',
+    contactMapSubtext: 'Conveniently situated on SW Marine Drive, Vancouver • Dealer #40788',
+    contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=1410+SW+Marine+Drive,+Vancouver,+British+Columbia',
+    aboutStoryHtml: 'Conveniently located at <strong>1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Pre-owned vehicle sales, leasing, financing, rentals and service under one roof at 1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788).'
+  }
+];
+
+let currentDealerIndex = 0;
+try {
+  const savedIdx = parseInt(sessionStorage.getItem('mt_dealer_idx'), 10);
+  if (!isNaN(savedIdx) && savedIdx >= 0 && savedIdx < DEALER_LOCATIONS.length) {
+    currentDealerIndex = savedIdx;
+  }
+} catch (e) { }
+
+let dealerAlternatorTimer = null;
+const DEALER_DISPLAY_DURATION = 4500; // 4.5 seconds per address
+const DEALER_FADE_DURATION = 350;    // 350ms smooth fade transition
+
+function updateDealerElements(loc) {
+  // 1. Top Bar Address
+  document.querySelectorAll('.dealer-top-address').forEach(el => {
+    el.innerHTML = loc.topAddressHtml;
+  });
+
+  // 2. Top Bar Phone Links
+  document.querySelectorAll('.dealer-top-phone').forEach(el => {
+    el.href = `tel:${loc.phoneRaw}`;
+    el.textContent = loc.phone;
+  });
+
+  // 3. Hero Slide Dealer Info
+  document.querySelectorAll('.dealer-slide-info').forEach(el => {
+    el.innerHTML = loc.slideInfoHtml;
+  });
+
+  // 4. Footer Showroom Block
+  document.querySelectorAll('.dealer-footer-showroom').forEach(el => {
+    el.innerHTML = loc.footerShowroomHtml;
+  });
+
+  // 5. Footer Call Button
+  document.querySelectorAll('.dealer-footer-phone-btn').forEach(el => {
+    el.href = `tel:${loc.phoneRaw}`;
+    el.innerHTML = loc.footerCallBtnHtml;
+  });
+
+  // 6. Contact Page Hero Pill
+  document.querySelectorAll('.dealer-contact-pill').forEach(el => {
+    el.textContent = loc.contactPillText;
+  });
+
+  // 7. Contact Page Showroom Card
+  document.querySelectorAll('.dealer-contact-card').forEach(el => {
+    el.innerHTML = loc.contactCardHtml;
+  });
+
+  // 8. Contact Page Map Box
+  document.querySelectorAll('.dealer-contact-map-addr').forEach(el => {
+    el.textContent = loc.contactMapAddr;
+  });
+  document.querySelectorAll('.dealer-contact-map-sub').forEach(el => {
+    el.textContent = loc.contactMapSubtext;
+  });
+  document.querySelectorAll('.dealer-contact-map-btn').forEach(el => {
+    el.href = loc.contactMapUrl;
+  });
+
+  // 9. About Page Showroom Story
+  document.querySelectorAll('.dealer-about-story').forEach(el => {
+    el.innerHTML = loc.aboutStoryHtml;
+  });
+
+  // 10. Index Page Trust Section
+  document.querySelectorAll('.dealer-trust-desc').forEach(el => {
+    el.innerHTML = loc.trustDescHtml;
+  });
+}
+
+function switchDealerLocation(nextIndex) {
+  if (typeof nextIndex === 'number') {
+    currentDealerIndex = nextIndex % DEALER_LOCATIONS.length;
+  } else {
+    currentDealerIndex = (currentDealerIndex + 1) % DEALER_LOCATIONS.length;
+  }
+
+  try {
+    sessionStorage.setItem('mt_dealer_idx', currentDealerIndex);
+  } catch (e) { }
+
+  const fadingElements = document.querySelectorAll('.dealer-transition');
+  fadingElements.forEach(el => el.classList.add('dealer-fading'));
+
+  setTimeout(() => {
+    const loc = DEALER_LOCATIONS[currentDealerIndex];
+    updateDealerElements(loc);
+
+    fadingElements.forEach(el => el.classList.remove('dealer-fading'));
+  }, DEALER_FADE_DURATION);
+}
+
+function startDealerAlternator() {
+  if (dealerAlternatorTimer) clearInterval(dealerAlternatorTimer);
+  dealerAlternatorTimer = setInterval(() => {
+    switchDealerLocation();
+  }, DEALER_DISPLAY_DURATION);
+}
+
+function stopDealerAlternator() {
+  if (dealerAlternatorTimer) {
+    clearInterval(dealerAlternatorTimer);
+    dealerAlternatorTimer = null;
+  }
+}
+
+function initDealerAddressAlternator() {
+  const loc = DEALER_LOCATIONS[currentDealerIndex];
+  updateDealerElements(loc);
+
+  startDealerAlternator();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopDealerAlternator();
+    } else {
+      startDealerAlternator();
+    }
+  });
+
+  window.addEventListener('motortrends:languageChanged', () => {
+    updateDealerElements(DEALER_LOCATIONS[currentDealerIndex]);
+  });
+
+  window.DealerAddressAlternator = {
+    locations: DEALER_LOCATIONS,
+    getCurrentIndex: () => currentDealerIndex,
+    switchTo: switchDealerLocation,
+    start: startDealerAlternator,
+    stop: stopDealerAlternator
+  };
+}
+
+/* ----------------------------------------------------
    Hero Banner Slideshow & Poster Animation
 ----------------------------------------------------- */
 function initHeroSlideshow() {
@@ -225,11 +407,11 @@ function initHeroSlideshow() {
   if (newestVehicle && (newestVehicle.isNewVehicle || newestVehicle.createdAt)) {
     const slide1Card = slider.querySelector('.hero-slide:first-child .hero-vehicle-card');
     const slide1Pill = document.querySelector('.hero-vehicle-switcher-bar .switcher-pill:first-child');
-    
+
     if (slide1Card) {
       const img = (Array.isArray(newestVehicle.images) && newestVehicle.images[0]) ? newestVehicle.images[0] : 'images/vehicles/jeep/main.jpg';
       const mainBadge = newestVehicle.isNewVehicle ? '<span class="v-badge v-badge-new">🔥 New Vehicle</span>' : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
-      
+
       slide1Card.innerHTML = `
         <div class="vehicle-card-badge-row">
           ${mainBadge}
@@ -429,7 +611,7 @@ function populateHomeDropdowns() {
       const make = document.getElementById('home-filter-make')?.value || 'all';
       const body = document.getElementById('home-filter-body')?.value || 'all';
       const maxPrice = document.getElementById('home-filter-price')?.value || '';
-      
+
       const queryParams = new URLSearchParams();
       if (make !== 'all') queryParams.set('make', make);
       if (body !== 'all') queryParams.set('bodyType', body);
@@ -630,7 +812,7 @@ function setupInventoryFilters() {
       if (bodyFilter) bodyFilter.value = 'all';
       if (priceSlider) priceSlider.value = 250000;
       if (priceValText) priceValText.textContent = formatPrice(250000);
-      
+
       const allConditionRadio = document.querySelector('input[name="filter-condition"][value="all"]');
       if (allConditionRadio) allConditionRadio.checked = true;
       const allFuelRadio = document.querySelector('input[name="filter-fuel"][value="all"]');
@@ -945,7 +1127,7 @@ function toggleCompare(carId) {
   }
   localStorage.setItem('silver_compare', JSON.stringify(compareList));
   updateCompareDrawer();
-  
+
   // Re-render inventory buttons state
   const isInventoryPage = document.getElementById('inventory-grid') !== null;
   if (isInventoryPage) renderInventory();
@@ -1152,7 +1334,7 @@ function openVehicleModal(carId) {
             <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">${formatMonthly(car.monthlyEst)}</span>
             <span style="font-size: 0.8rem; color: var(--silver-500);">/month for 72 mos @ 5.9% APR</span>
           </div>
-          <p style="font-size: 0.75rem; color: var(--silver-500);">*Based on $2,500 down payment. In-house financing available.</p>
+          <p style="font-size: 0.75rem; color: var(--silver-500);">*Based on $2,500 down payment. Financing available.</p>
         </div>
       </div>
 
@@ -1408,7 +1590,7 @@ function showToast(message, type = 'info') {
 
   const toast = document.createElement('div');
   toast.className = 'toast';
-  
+
   let icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
   if (type === 'success') {
     icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;

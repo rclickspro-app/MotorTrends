@@ -50,9 +50,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Touchscreen Navigation & Backup Camera",
       "Off-road Capable & Trail Rated",
       "Clean Inside & Out - Runs and Drives Great",
-      "DL#40212 - In-House Approval"
+      "DL#40212 - Approval"
     ],
-    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#40212. In-house Buy Here Pay Here financing available."
+    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#40212. Buy Here Pay Here financing available."
   },
   {
     id: "veh-mt-02",
@@ -97,9 +97,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Great on Gas - Fuel Efficient Commuter",
       "Touchscreen Infotainment & Backup Camera",
       "Clean Inside and Out - Runs and Drives Great",
-      "DL#40212 - In-House Approval"
+      "DL#40212 - Approval"
     ],
-    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#40212. In-house financing available!"
+    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#40212. Financing available!"
   },
   {
     id: "veh-mt-03",
@@ -143,9 +143,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Reliable Toyota Durability",
       "Clean Inside and Out",
       "Runs and Drives Great",
-      "DL#40212 - In-House Approval"
+      "DL#40212 - Approval"
     ],
-    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#40212 (Richmond, BC). In-house financing available!"
+    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#40212 (Richmond, BC). Financing available!"
   },
   {
     id: "veh-001",
@@ -167,7 +167,7 @@ const DEFAULT_VEHICLES_DATA = [
     stockNumber: "MT-1001",
     condition: "Certified Pre-Owned",
     featured: true,
-    badges: ["Under $10k CAD", "BC Local", "In-House Financed"],
+    badges: ["Under $10k CAD", "BC Local", "Financed"],
     images: [
       "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1000&q=80",
       "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=1000&q=80"
@@ -182,7 +182,7 @@ const DEFAULT_VEHICLES_DATA = [
       "Air Conditioning",
       "Cruise Control"
     ],
-    overview: "Real Vancouver commuter favorite. BC local car with zero major insurance claims. Clean title, thoroughly inspected and eligible for 100% in-house approval regardless of credit."
+    overview: "Real Vancouver commuter favorite. BC local car with zero major insurance claims. Clean title, thoroughly inspected and eligible for 100% approval regardless of credit."
   },
   {
     id: "veh-002",
@@ -323,7 +323,7 @@ const DEFAULT_VEHICLES_DATA = [
       "Cruise Control",
       "AM/FM/CD Audio with Aux Input"
     ],
-    overview: "Reliable point-A to point-B transport with spacious cabin and trunk. Easy approval with our Richmond in-house financing regardless of past credit."
+    overview: "Reliable point-A to point-B transport with spacious cabin and trunk. Easy approval with our Richmond financing regardless of past credit."
   },
   {
     id: "veh-006",

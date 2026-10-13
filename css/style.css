@@ -69,7 +69,9 @@
 }
 
 /* Reset & Base Styles */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -92,7 +94,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   color: var(--silver-100);
   font-weight: 700;
@@ -112,7 +119,10 @@ img {
   display: block;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
@@ -192,15 +202,18 @@ button, input, select, textarea {
   border: 1px solid rgba(255, 255, 255, 0.6);
   font-weight: 800;
   box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   animation: pulseNewBadge 2s infinite;
 }
 
 @keyframes pulseNewBadge {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 20px rgba(249, 115, 22, 0.9);
     transform: scale(1.04);
@@ -261,14 +274,16 @@ button, input, select, textarea {
   color: #fff;
 }
 
-.btn-blue, .btn-primary {
+.btn-blue,
+.btn-primary {
   background: var(--brand-blue);
   color: #fff;
   font-weight: 700;
   box-shadow: 0 4px 14px rgba(0, 123, 255, 0.35);
 }
 
-.btn-blue:hover, .btn-primary:hover {
+.btn-blue:hover,
+.btn-primary:hover {
   background: var(--brand-blue-hover);
   box-shadow: 0 6px 22px rgba(0, 123, 255, 0.55);
   transform: translateY(-2px);
@@ -314,7 +329,8 @@ button, input, select, textarea {
   gap: 0.75rem;
 }
 
-.top-bar-left, .top-bar-right {
+.top-bar-left,
+.top-bar-right {
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -326,7 +342,8 @@ button, input, select, textarea {
   gap: 0.4rem;
 }
 
-.top-bar-item i, .top-bar-item svg {
+.top-bar-item i,
+.top-bar-item svg {
   color: var(--silver-400);
 }
 
@@ -337,6 +354,51 @@ button, input, select, textarea {
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+/* Alternating Dealer Address Component */
+.dealer-transition {
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+.dealer-transition.dealer-fading {
+  opacity: 0 !important;
+}
+
+.dealer-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 123, 255, 0.22);
+  color: #60a5fa;
+  border: 1px solid rgba(0, 123, 255, 0.45);
+  font-size: 0.72rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  margin-left: 0.35rem;
+  white-space: nowrap;
+}
+
+.top-bar-item .dealer-tag {
+  font-size: 0.68rem;
+  padding: 0.05rem 0.35rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.slide-dealer-info .dealer-tag {
+  font-size: 0.74rem;
+  background: rgba(0, 123, 255, 0.25);
+  border-color: rgba(96, 165, 250, 0.55);
+  color: #93c5fd;
+}
+
+.dealer-footer-showroom {
+  min-height: 98px;
 }
 
 /* Header & Navigation */
@@ -432,7 +494,8 @@ button, input, select, textarea {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.lang-select:hover, .lang-select:focus {
+.lang-select:hover,
+.lang-select:focus {
   border-color: #007BFF;
   background: #181824;
 }
@@ -494,7 +557,8 @@ button, input, select, textarea {
   display: inline-block;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover,
+.nav-link.active {
   color: #fff;
 }
 
@@ -577,7 +641,7 @@ button, input, select, textarea {
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 75% 50%, rgba(0, 123, 255, 0.12) 0%, rgba(10, 10, 10, 0.4) 45%, rgba(10, 10, 10, 0.92) 85%, #0A0A0A 100%),
-              linear-gradient(90deg, rgba(10, 10, 10, 0.96) 0%, rgba(10, 10, 10, 0.85) 45%, rgba(10, 10, 10, 0.45) 80%, rgba(10, 10, 10, 0.7) 100%);
+    linear-gradient(90deg, rgba(10, 10, 10, 0.96) 0%, rgba(10, 10, 10, 0.85) 45%, rgba(10, 10, 10, 0.45) 80%, rgba(10, 10, 10, 0.7) 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -668,6 +732,7 @@ button, input, select, textarea {
     opacity: 0;
     transform: translateY(35px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -763,7 +828,7 @@ button, input, select, textarea {
 .vehicle-image-shine {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 60%);
   pointer-events: none;
 }
 
@@ -924,6 +989,7 @@ button, input, select, textarea {
     opacity: 0;
     transform: translateY(28px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -1088,7 +1154,7 @@ button, input, select, textarea {
   position: relative;
   padding: 4.5rem 0 3.5rem;
   background: radial-gradient(circle at 50% -20%, rgba(0, 123, 255, 0.15) 0%, transparent 70%),
-              linear-gradient(180deg, #0A0A0A 0%, #141416 100%);
+    linear-gradient(180deg, #0A0A0A 0%, #141416 100%);
   border-bottom: 1px solid var(--border-subtle);
   overflow: hidden;
 }
@@ -1295,7 +1361,8 @@ select.form-control option {
   gap: 0.5rem;
 }
 
-.body-type-card:hover, .body-type-card.active {
+.body-type-card:hover,
+.body-type-card.active {
   background: var(--bg-card-hover);
   border-color: var(--silver-400);
   transform: translateY(-4px);
@@ -1338,9 +1405,11 @@ select.form-control option {
   .inventory-layout {
     grid-template-columns: 1fr;
   }
+
   .filter-sidebar {
     display: none;
   }
+
   .filter-sidebar.active-mobile {
     display: block;
     position: fixed;
@@ -1511,7 +1580,8 @@ select.form-control option {
   cursor: pointer;
 }
 
-.view-btn.active, .view-btn:hover {
+.view-btn.active,
+.view-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
@@ -1655,7 +1725,8 @@ select.form-control option {
   color: var(--silver-400);
 }
 
-.spec-item svg, .spec-item i {
+.spec-item svg,
+.spec-item i {
   color: var(--silver-500);
   flex-shrink: 0;
 }
@@ -1702,6 +1773,7 @@ select.form-control option {
   .vehicles-list .vehicle-card {
     flex-direction: column;
   }
+
   .vehicles-list .vehicle-thumb-wrap {
     width: 100%;
     aspect-ratio: 16/10;
@@ -1867,7 +1939,7 @@ select.form-control option {
   padding: 2rem;
 }
 
-.vehicle-modal-grid > * {
+.vehicle-modal-grid>* {
   min-width: 0;
   max-width: 100%;
 }
@@ -1925,8 +1997,13 @@ select.form-control option {
   transform: translateY(-50%) scale(1.1);
 }
 
-.modal-nav-prev { left: 10px; }
-.modal-nav-next { right: 10px; }
+.modal-nav-prev {
+  left: 10px;
+}
+
+.modal-nav-next {
+  right: 10px;
+}
 
 .modal-image-counter {
   position: absolute;
@@ -2138,6 +2215,7 @@ select.form-control option {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -2314,20 +2392,30 @@ select.form-control option {
 
   .top-bar {
     padding: 0.35rem 0;
-    font-size: 0.775rem;
-  }
-
-  .top-bar-left {
-    display: none;
+    font-size: 0.76rem;
   }
 
   .top-bar .container {
     justify-content: center;
     text-align: center;
+    gap: 0.35rem;
+  }
+
+  .top-bar-left {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.1rem;
+  }
+
+  .top-bar-left .top-bar-item:nth-child(2) {
+    display: none;
   }
 
   .top-bar-right {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   /* Header adjustments for mobile */
@@ -2494,6 +2582,7 @@ select.form-control option {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2504,6 +2593,7 @@ select.form-control option {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -2564,8 +2654,15 @@ select.form-control option {
 }
 
 @keyframes pulseLoader {
-  0%, 100% { transform: scale(1.6); }
-  50% { transform: scale(1.72); }
+
+  0%,
+  100% {
+    transform: scale(1.6);
+  }
+
+  50% {
+    transform: scale(1.72);
+  }
 }
 
 .mt-preloader-brand {
@@ -2612,9 +2709,20 @@ select.form-control option {
 }
 
 @keyframes preloaderTrack {
-  0% { left: -40%; width: 40%; }
-  50% { left: 30%; width: 60%; }
-  100% { left: 100%; width: 30%; }
+  0% {
+    left: -40%;
+    width: 40%;
+  }
+
+  50% {
+    left: 30%;
+    width: 60%;
+  }
+
+  100% {
+    left: 100%;
+    width: 30%;
+  }
 }
 
 /* Dynamic Inline / Action Loader Overlay */
@@ -2641,4 +2749,3 @@ select.form-control option {
   visibility: visible;
   pointer-events: all;
 }
-
