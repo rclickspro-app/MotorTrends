@@ -101,6 +101,7 @@ let compareList = JSON.parse(localStorage.getItem('silver_compare') || '[]');
 function initApp() {
   setupGlobalModals();
   initMobileMenu();
+  setupHeroQuickSearch();
   updateWishlistCount();
   updateCompareDrawer();
   initDealerAddressAlternator();
@@ -424,7 +425,7 @@ function initHeroSlideshow() {
       desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment, all ICBC paperwork handled.',
       b1: {h:'sell-trade.html', l:'Start Trade-In Valuation'}, b2: {h:'inventory.html', l:'Browse Inventory →'} },
     { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE',                  hl: '',
-      desc: 'Every vehicle on our lot comes with a full CarFax history report.',
+      desc: 'Every vehicle on our lot comes with a full CarFax history report. Serving entire Lower Mainland.',
       b1: {h:'inventory.html', l:'View Available Cars →'}, b2: {h:'about.html', l:'About Motor Trends'} },
     { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: '',
       desc: 'Visit us at 10740 Cambie Road in Richmond or browse online. Lease, finance, or buy outright — we have a payment plan that fits your budget.',
@@ -469,6 +470,21 @@ function initHeroSlideshow() {
 
       /* RIGHT - vehicle card */
       '<div class="hero-vehicle-stage">' +
+      '<a href="#home-inventory-search" class="hero-quick-search-trigger" aria-label="Search Our Inventory" data-action="scroll-to-search">' +
+        '<div class="hqs-left">' +
+          '<div class="hqs-icon-box">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>' +
+          '</div>' +
+          '<div class="hqs-text">' +
+            '<span class="hqs-main">Search Our Inventory</span>' +
+            '<span class="hqs-sub">Make • Body Style • Budget</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="hqs-badge">' +
+          '<span>Find Cars</span>' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+        '</div>' +
+      '</a>' +
       '<div class="hero-vehicle-card">' +
         '<div class="vehicle-card-badge-row">' + mainBadge +
           '<span class="v-badge v-badge-success">Stock #' + (vehicle.stockNumber || 'MT-NEW') + '</span>' +
@@ -610,6 +626,52 @@ function initHeroSlideshow() {
 
   startAuto();
 }
+/* ----------------------------------------------------
+   Hero Quick Search Trigger -> Scroll to Search Section
+----------------------------------------------------- */
+function setupHeroQuickSearch() {
+  document.addEventListener('click', function(e) {
+    var trigger = e.target.closest('.hero-quick-search-trigger, [data-action="scroll-to-search"]');
+    if (!trigger) return;
+
+    var target = document.getElementById('home-inventory-search');
+    if (!target) {
+      window.location.href = 'index.html#home-inventory-search';
+      return;
+    }
+
+    e.preventDefault();
+
+    var header = document.querySelector('.site-header') || document.querySelector('header');
+    var headerHeight = header ? header.offsetHeight : 76;
+    var targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 16;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth'
+    });
+
+    var card = target.querySelector('.search-filter-card');
+    if (card) {
+      card.classList.remove('search-card-focused');
+      void card.offsetWidth;
+      card.classList.add('search-card-focused');
+      setTimeout(function() {
+        card.classList.remove('search-card-focused');
+      }, 2200);
+    }
+
+    var makeSelect = document.getElementById('home-filter-make');
+    if (makeSelect) {
+      setTimeout(function() {
+        try {
+          makeSelect.focus({ preventScroll: true });
+        } catch (err) {}
+      }, 450);
+    }
+  });
+}
+
 /* ----------------------------------------------------
    Home Page Search & Featured Vehicles
 ----------------------------------------------------- */

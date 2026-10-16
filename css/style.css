@@ -711,6 +711,143 @@ textarea {
   perspective: 1000px;
 }
 
+/* Quick Search Trigger inside Hero Showcase (Navigates to Search Our Inventory section) */
+.hero-quick-search-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(15, 20, 32, 0.92) 0%, rgba(9, 13, 22, 0.96) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 123, 255, 0.45);
+  border-radius: 9999px;
+  padding: 0.6rem 1.15rem;
+  margin-bottom: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 123, 255, 0.2);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+  z-index: 5;
+}
+
+.hero-slide.active .hero-quick-search-trigger {
+  animation: heroQuickSearchEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+@keyframes heroQuickSearchEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-quick-search-trigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.75s ease;
+  pointer-events: none;
+}
+
+.hero-quick-search-trigger:hover::before {
+  left: 140%;
+}
+
+.hero-quick-search-trigger:hover {
+  transform: translateY(-3px);
+  border-color: #007BFF;
+  background: linear-gradient(135deg, rgba(20, 28, 46, 0.96) 0%, rgba(13, 18, 30, 0.98) 100%);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75), 0 0 30px rgba(0, 123, 255, 0.45);
+}
+
+.hero-quick-search-trigger:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.hqs-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.hqs-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(0, 123, 255, 0.55);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-quick-search-trigger:hover .hqs-icon-box {
+  transform: scale(1.08) rotate(-8deg);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.85);
+}
+
+.hqs-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.hqs-main {
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.hqs-sub {
+  color: #94a3b8;
+  font-size: 0.74rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.hqs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 123, 255, 0.16);
+  border: 1px solid rgba(0, 123, 255, 0.45);
+  color: #60a5fa;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.hero-quick-search-trigger:hover .hqs-badge {
+  background: rgba(0, 123, 255, 0.32);
+  color: #93c5fd;
+  border-color: #007BFF;
+  transform: translateX(3px);
+}
+
 .hero-vehicle-card {
   background: rgba(14, 16, 22, 0.88);
   backdrop-filter: blur(20px);
@@ -1206,6 +1343,11 @@ textarea {
 }
 
 /* Quick Search Box (Marketplace style) */
+.hero-search-wrapper,
+#home-inventory-search {
+  scroll-margin-top: calc(var(--header-height, 76px) + 20px);
+}
+
 .search-filter-card {
   background: var(--bg-card);
   border: 1px solid var(--border-medium);
@@ -1216,6 +1358,30 @@ textarea {
   z-index: 10;
   max-width: 1100px;
   margin: 0 auto;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.search-filter-card.search-card-focused {
+  animation: searchCardHighlightPulse 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes searchCardHighlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.85), 0 20px 50px rgba(0, 0, 0, 0.75);
+    border-color: #007BFF;
+  }
+  30% {
+    box-shadow: 0 0 0 8px rgba(0, 123, 255, 0.45), 0 0 45px rgba(0, 123, 255, 0.65);
+    border-color: #38bdf8;
+  }
+  65% {
+    box-shadow: 0 0 0 14px rgba(0, 123, 255, 0), 0 0 35px rgba(0, 123, 255, 0.4);
+    border-color: #007BFF;
+  }
+  100% {
+    box-shadow: var(--shadow-lg), var(--shadow-silver);
+    border-color: var(--border-medium);
+  }
 }
 
 .search-filter-card-header {
@@ -3054,6 +3220,19 @@ select.form-control option {
 
   .hero-search-wrapper {
     margin-top: -1.5rem;
+  }
+
+  .hero-quick-search-trigger {
+    padding: 0.55rem 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hqs-main {
+    font-size: 0.86rem;
+  }
+
+  .hqs-sub {
+    font-size: 0.7rem;
   }
 
   .slide-title {
