@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Motor Trends Auto Group Main Application Logic
  * Interactive marketplace, filtering, quick view, test drive booking & favorites
  * Features animated loader (vw leo.gif) on every page load & action
@@ -418,18 +418,18 @@ function initHeroSlideshow() {
       desc: 'Motor Trends Auto Group is Richmond\'s destination for quality pre-owned vehicles — CarFax verified, professionally inspected, and ready to drive.',
       b1: {h:'inventory.html', l:'Browse Full Inventory →'}, b2: {h:'financing.html', l:'Apply Financing'} },
     { pill: '🏦 BUY HERE PAY HERE DEALERSHIP',    title: 'FINANCING FOR ALL CANADIANS',          hl: 'ALL CREDIT APPROVED!',
-      desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome. Fast 15-minute approval — confidential and obligation-free.',
+      desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome. Fast approval.',
       b1: {h:'financing.html', l:'Get Pre-Approved Today'}, b2: {h:'contact.html', l:'Talk to a Specialist →'} },
     { pill: '🔄 TRADE-IN & SELL YOUR CAR',        title: 'WE BUY VEHICLES IN ANY CONDITION',     hl: 'TOP DOLLAR PAID!',
       desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment, all ICBC paperwork handled.',
       b1: {h:'sell-trade.html', l:'Start Trade-In Valuation'}, b2: {h:'inventory.html', l:'Browse Inventory →'} },
-    { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE IN BC',            hl: 'EVERY VEHICLE INSPECTED!',
+    { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE IN BC',            hl: '',
       desc: 'Every vehicle on our lot comes with a full CarFax history report. Serving Richmond, Vancouver, Surrey, Delta, Burnaby and the entire Lower Mainland.',
       b1: {h:'inventory.html', l:'View Available Cars →'}, b2: {h:'about.html', l:'About Motor Trends'} },
     { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: 'DEALER #40212',
       desc: 'Visit us at 10740 Cambie Road in Richmond or browse online. Lease, finance, or buy outright — we have a payment plan that fits your budget.',
       b1: {h:'contact.html', l:'Visit Our Showroom →'}, b2: {h:'financing.html', l:'Lease & Finance Options'} },
-    { pill: '💰 VEHICLES UNDER $10,000 CAD',      title: 'BUDGET-FRIENDLY OPTIONS AVAILABLE',    hl: 'STARTING FROM $8,888!',
+    { pill: '💰 VEHICLES UNDER $10,000 CAD',      title: 'BUDGET-FRIENDLY OPTIONS AVAILABLE',    hl: '',
       desc: 'From vehicles under $10,000 to late-model family SUVs — every vehicle professionally inspected and priced below BC market value.',
       b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Monthly Payment Calculator'} }
   ];
@@ -442,7 +442,7 @@ function initHeroSlideshow() {
       ? '<span class="v-badge v-badge-new">🔥 New Arrival</span>'
       : vehicle.featured
         ? '<span class="v-badge v-badge-blue">⭐ Featured Vehicle</span>'
-        : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
+        : '';
     var priceBadge = (vehicle.price && vehicle.price < 15000)
       ? '<span class="v-badge v-badge-warning">Great Value</span>'
       : '<span class="v-badge v-badge-dark">' + (vehicle.condition || 'Clean Title') + '</span>';
@@ -455,7 +455,7 @@ function initHeroSlideshow() {
       '<div class="hero-slide-content">' +
       '<div class="slide-pill">' + p.pill + '</div>' +
       '<div class="slide-title">' + p.title + '</div>' +
-      '<div class="slide-highlight">' + p.hl + '</div>' +
+      (p.hl ? '<div class="slide-highlight">' + p.hl + '</div>' : '') +
       '<p class="slide-desc">' + p.desc + '</p>' +
       '<div class="slide-dealer-info dealer-slide-info dealer-transition">' +
         '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
