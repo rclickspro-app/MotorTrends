@@ -50,9 +50,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Touchscreen Navigation & Backup Camera",
       "Off-road Capable & Trail Rated",
       "Clean Inside & Out - Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#40212. Buy Here Pay Here financing available."
+    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#30859. Buy Here Pay Here financing available."
   },
   {
     id: "veh-mt-02",
@@ -97,9 +97,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Great on Gas - Fuel Efficient Commuter",
       "Touchscreen Infotainment & Backup Camera",
       "Clean Inside and Out - Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#40212. Financing available!"
+    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#30859. Financing available!"
   },
   {
     id: "veh-mt-03",
@@ -143,9 +143,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Reliable Toyota Durability",
       "Clean Inside and Out",
       "Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#40212 (Richmond, BC). Financing available!"
+    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#30859 (Richmond, BC). Financing available!"
   },
   {
     id: "veh-001",

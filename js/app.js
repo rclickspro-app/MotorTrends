@@ -215,18 +215,18 @@ const DEALER_LOCATIONS = [
     address: '10740 Cambie Road, Richmond, BC V6X 1K8',
     phone: '604-270-7662',
     phoneRaw: '6042707662',
-    dealerNumber: '40212',
-    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8 <span class="dealer-tag">Dealer #40212</span>',
-    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span><span class="dealer-tag">Dealer #40212</span>',
-    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Dealer #:</strong> 40212<br><strong>Email:</strong> sales@motortrends.ca',
+    dealerNumber: '30859',
+    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8 <span class="dealer-tag">Dealer #30859</span>',
+    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span><span class="dealer-tag">Dealer #30859</span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Dealer #:</strong> 30859<br><strong>Email:</strong> sales@motortrends.ca',
     footerCallBtnHtml: '📞 Call 604-270-7662',
-    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662 • DEALER #40212',
-    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Dealer #:</strong> 40212</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Richmond, BC.</em></div>',
+    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662 • DEALER #30859',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Dealer #:</strong> 30859</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Richmond, BC.</em></div>',
     contactMapAddr: '10740 Cambie Road, Richmond, BC V6X 1K8',
-    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver • Dealer #40212',
+    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver • Dealer #30859',
     contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=10740+Cambie+Road,+Richmond,+BC+V6X+1K8',
-    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8 (Dealer #40212)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
-    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 10740 Cambie Road, Richmond, BC. (Dealer #40212)'
+    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8 (Dealer #30859)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 10740 Cambie Road, Richmond, BC. (Dealer #30859)'
   },
   {
     id: 'vancouver',
@@ -234,18 +234,18 @@ const DEALER_LOCATIONS = [
     address: '1410 SW Marine Drive, Vancouver, British Columbia',
     phone: '604-243-9001',
     phoneRaw: '6042439001',
-    dealerNumber: '40788',
-    topAddressHtml: '1410 SW Marine Drive, Vancouver, British Columbia <span class="dealer-tag">Dealer #40788</span>',
-    slideInfoHtml: '<span>📍 1410 SW Marine Drive, Vancouver, British Columbia</span><span>•</span><span>📞 <a href="tel:6042439001">604-243-9001</a></span><span>•</span><span class="dealer-tag">Dealer #40788</span>',
-    footerShowroomHtml: '<strong>Showroom:</strong> 1410 SW Marine Drive, Vancouver, British Columbia<br><strong>Phone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a><br><strong>Dealer #:</strong> 40788<br><strong>Email:</strong> sales@motortrends.ca',
+    dealerNumber: '30859',
+    topAddressHtml: '1410 SW Marine Drive, Vancouver, British Columbia <span class="dealer-tag">Dealer #30859</span>',
+    slideInfoHtml: '<span>📍 1410 SW Marine Drive, Vancouver, British Columbia</span><span>•</span><span>📞 <a href="tel:6042439001">604-243-9001</a></span><span>•</span><span class="dealer-tag">Dealer #30859</span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 1410 SW Marine Drive, Vancouver, British Columbia<br><strong>Phone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a><br><strong>Dealer #:</strong> 30859<br><strong>Email:</strong> sales@motortrends.ca',
     footerCallBtnHtml: '📞 Call 604-243-9001',
-    contactPillText: 'VANCOUVER, BC DEALERSHIP • 604-243-9001 • DEALER #40788',
-    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 1410 SW Marine Drive, Vancouver, British Columbia</div><div><strong>Telephone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a></div><div><strong>Dealer #:</strong> 40788</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Vancouver, BC.</em></div>',
+    contactPillText: 'VANCOUVER, BC DEALERSHIP • 604-243-9001 • DEALER #30859',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 1410 SW Marine Drive, Vancouver, British Columbia</div><div><strong>Telephone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a></div><div><strong>Dealer #:</strong> 30859</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Vancouver, BC.</em></div>',
     contactMapAddr: '1410 SW Marine Drive, Vancouver, British Columbia',
-    contactMapSubtext: 'Conveniently situated on SW Marine Drive, Vancouver • Dealer #40788',
+    contactMapSubtext: 'Conveniently situated on SW Marine Drive, Vancouver • Dealer #30859',
     contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=1410+SW+Marine+Drive,+Vancouver,+British+Columbia',
-    aboutStoryHtml: 'Conveniently located at <strong>1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
-    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788).'
+    aboutStoryHtml: 'Conveniently located at <strong>1410 SW Marine Drive, Vancouver, British Columbia (Dealer #30859)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 1410 SW Marine Drive, Vancouver, British Columbia (Dealer #30859).'
   }
 ];
 
@@ -461,7 +461,7 @@ function initHeroSlideshow() {
       '<div class="slide-dealer-info dealer-slide-info dealer-transition">' +
         '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
         '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
-        '<span class="dealer-tag">Dealer #40212</span>' +
+        '<span class="dealer-tag">Dealer #30859</span>' +
       '</div>' +
       '<div class="slide-actions">' +
         '<a href="' + p.b1.h + '" class="btn btn-blue btn-lg">' + p.b1.l + '</a>' +
