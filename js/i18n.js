@@ -19,6 +19,7 @@ const I18N_TRANSLATIONS = {
     nav_sell_trade: "Sell / Trade",
     nav_why_us: "Why Choose Us",
     nav_contact: "Contact",
+    nav_about: "About Us",
     nav_get_preapproved: "Get Pre-Approved",
     
     // Slideshow Banner Posters
@@ -125,6 +126,7 @@ const I18N_TRANSLATIONS = {
     nav_sell_trade: "Vendre / Échanger",
     nav_why_us: "Pourquoi Nous Choisir",
     nav_contact: "Contact",
+    nav_about: "À Propos",
     nav_get_preapproved: "Obtenir une Pré-approbation",
 
     slide1_pill: "Richmond & Vancouver, C.-B.",
@@ -222,8 +224,9 @@ const I18N_TRANSLATIONS = {
     nav_inventory: "车源库存",
     nav_financing: "车行直贷",
     nav_sell_trade: "置换 / 卖车",
-    nav_why_us: "关于我们",
+    nav_why_us: "选择我们",
     nav_contact: "联系我们",
+    nav_about: "关于我们",
     nav_get_preapproved: "申请预审贷款",
 
     slide1_pill: "列治文与大温哥华地区",
@@ -321,8 +324,9 @@ const I18N_TRANSLATIONS = {
     nav_inventory: "कार इन्वेंटरी",
     nav_financing: "इन-हाउस फाइनेंसिंग",
     nav_sell_trade: "कार बेचें / बदलें",
-    nav_why_us: "हमारे बारे में",
+    nav_why_us: "हमें क्यों चुनें",
     nav_contact: "संपर्क करें",
+    nav_about: "हमारे बारे में",
     nav_get_preapproved: "प्री-अप्रूवल प्राप्त करें",
 
     slide1_pill: "रिचमंड और वैंकूवर, बीसी",
@@ -420,8 +424,9 @@ const I18N_TRANSLATIONS = {
     nav_inventory: "ਗੱਡੀਆਂ ਦਾ ਸਟਾਕ",
     nav_financing: "ਇਨ-ਹਾਊਸ ਫਾਈਨਾਂਸਿੰਗ",
     nav_sell_trade: "ਗੱਡੀ ਵੇਚੋ / ਬਦਲੋ",
-    nav_why_us: "ਸਾਡੇ ਬਾਰੇ",
+    nav_why_us: "ਸਾਨੂੰ ਕਿਉਂ ਚੁਣੋ",
     nav_contact: "ਸੰਪਰਕ ਕਰੋ",
+    nav_about: "ਸਾਡੇ ਬਾਰੇ",
     nav_get_preapproved: "ਪ੍ਰੀ-ਅਪਰੂਵਲ ਲਵੋ",
 
     slide1_pill: "ਰਿਚਮੰਡ ਅਤੇ ਵੈਨਕੂਵਰ, ਬੀਸੀ",
