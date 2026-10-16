@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* Motor Trends Auto Group Brand Palette */
   /* 🔵 Electric Blue: #007BFF | ⚫ Near Black: #0A0A0A | Charcoal: #333333 | Silver White: #E5E7EB */
   --brand-blue: #007BFF;
@@ -447,9 +447,9 @@ textarea {
 }
 
 .brand-logo-img {
-  height: 46px;
+  height: 60px;
   width: auto;
-  max-width: 210px;
+  max-width: 260px;
   object-fit: contain;
   display: block;
 }
@@ -669,7 +669,7 @@ textarea {
   inset: 0;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.85s;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.7s;
   display: flex;
   align-items: center;
   z-index: 1;
@@ -959,6 +959,18 @@ textarea {
   font-weight: 600;
 }
 
+/* Reset elements on inactive slides so animation replays each time */
+.hero-slide .slide-pill,
+.hero-slide .slide-title,
+.hero-slide .slide-highlight,
+.hero-slide .slide-desc,
+.hero-slide .slide-dealer-info,
+.hero-slide .slide-actions {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: none;
+}
+
 /* Animated keyframe entrances on active slide */
 .hero-slide.active .slide-pill {
   animation: slideInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -1143,10 +1155,11 @@ textarea {
 
 /* Quick Search Container below hero */
 .hero-search-wrapper {
-  margin-top: -3.5rem;
+  margin-top: 0;
   position: relative;
   z-index: 20;
-  padding-bottom: 3rem;
+  padding: 2rem 0 3rem;
+  background: var(--bg-primary);
 }
 
 /* Legacy Hero Section Fallback */
@@ -1205,6 +1218,15 @@ textarea {
   margin: 0 auto;
 }
 
+.search-filter-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
 .search-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1212,6 +1234,12 @@ textarea {
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 0.75rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.search-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .search-tab {
@@ -1239,9 +1267,13 @@ textarea {
 
 .search-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr 170px;
   gap: 1rem;
   align-items: end;
+}
+
+.search-grid .form-group:last-child {
+  min-width: 160px;
 }
 
 .form-group {
@@ -2494,8 +2526,13 @@ select.form-control option {
   }
 
   .search-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 0.85rem;
+  }
+
+  .search-grid .form-group:last-child {
+    grid-column: 1 / -1;
+    min-width: unset;
   }
 
   .form-row-2 {
@@ -2575,6 +2612,64 @@ select.form-control option {
     text-align: center;
     gap: 0.75rem;
   }
+
+  /* Mobile search grid - single column */
+  .search-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .search-filter-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-filter-card-header h2 {
+    font-size: 1.05rem !important;
+  }
+
+  /* Hero slider mobile */
+  .hero-slider {
+    min-height: 620px !important;
+  }
+
+  .hero-search-wrapper {
+    margin-top: -1.5rem;
+  }
+
+  .slide-title {
+    font-size: clamp(1.5rem, 7vw, 2rem) !important;
+  }
+
+  .slide-desc {
+    font-size: 0.9rem !important;
+  }
+
+  .slide-actions {
+    flex-direction: column;
+  }
+
+  .slide-actions .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Vehicle card mobile fixes */
+  .v-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .v-card-actions .btn {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  /* Section header mobile */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @keyframes slideDown {
@@ -2632,8 +2727,8 @@ select.form-control option {
 
 .mt-preloader-gif-wrap {
   position: relative;
-  width: 320px;
-  height: 120px;
+  width: 380px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2644,12 +2739,13 @@ select.form-control option {
 }
 
 .mt-preloader-gif {
-  width: 290px;
+  width: 340px;
   height: auto;
-  max-width: 95vw;
+  max-width: 90vw;
   object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
   filter: drop-shadow(0 0 18px rgba(0, 123, 255, 0.65)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
-  transform: scale(1.6);
   animation: pulseLoader 2.2s infinite ease-in-out;
 }
 
@@ -2657,11 +2753,11 @@ select.form-control option {
 
   0%,
   100% {
-    transform: scale(1.6);
+    transform: scale(1.0);
   }
 
   50% {
-    transform: scale(1.72);
+    transform: scale(1.06);
   }
 }
 
@@ -2748,4 +2844,210 @@ select.form-control option {
   opacity: 1;
   visibility: visible;
   pointer-events: all;
+}
+/* ====================================================
+   Scroll-Reveal Animations (Intersection Observer)
+   ==================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Stagger delay helpers */
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ====================================================
+   Section Slideshow / Auto-Scroll Banner Strip
+   ==================================================== */
+.mt-marquee-section {
+  overflow: hidden;
+  background: linear-gradient(90deg, #050508 0%, #0a0a10 50%, #050508 100%);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.9rem 0;
+}
+
+.mt-marquee-track {
+  display: flex;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: marqueeScroll 28s linear infinite;
+  width: max-content;
+}
+
+.mt-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.mt-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--silver-400);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.mt-marquee-item .marquee-icon {
+  color: #007BFF;
+  font-size: 1rem;
+}
+
+.mt-marquee-dot {
+  color: var(--border-medium);
+  margin: 0 0.5rem;
+}
+
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ====================================================
+   Trust Banner - Horizontal Animated Highlight Strip
+   ==================================================== */
+.trust-highlight-strip {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 1.25rem 0;
+}
+
+.trust-highlight-strip::-webkit-scrollbar { display: none; }
+
+.trust-pill-animated {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(0,123,255,0.08);
+  border: 1px solid rgba(0,123,255,0.25);
+  border-radius: var(--radius-full);
+  padding: 0.55rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #93c5fd;
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: pillPulse 3.5s ease-in-out infinite;
+}
+
+.trust-pill-animated:nth-child(2) { animation-delay: 0.5s; }
+.trust-pill-animated:nth-child(3) { animation-delay: 1.0s; }
+.trust-pill-animated:nth-child(4) { animation-delay: 1.5s; }
+.trust-pill-animated:nth-child(5) { animation-delay: 2.0s; }
+
+@keyframes pillPulse {
+  0%, 100% { border-color: rgba(0,123,255,0.25); box-shadow: none; }
+  50%       { border-color: rgba(0,123,255,0.7);  box-shadow: 0 0 12px rgba(0,123,255,0.3); }
+}
+
+/* Vehicle card hover lift effect */
+.vehicle-card {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.3s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.6), 0 0 24px rgba(0,123,255,0.18);
+}
+
+/* ====================================================
+   Hero Slideshow — Directional Enter / Exit Animations
+   ==================================================== */
+
+/* Slide exits to the left (going forward) */
+.hero-slide.slide-exit-left {
+  animation: slideExitLeft 0.55s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* Slide exits to the right (going backward) */
+.hero-slide.slide-exit-right {
+  animation: slideExitRight 0.55s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* New slide enters from the right (going forward) */
+.hero-slide.slide-enter-right {
+  animation: slideEnterRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 4;
+}
+
+/* New slide enters from the left (going backward) */
+.hero-slide.slide-enter-left {
+  animation: slideEnterLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 4;
+}
+
+@keyframes slideExitLeft {
+  0%   { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-6%) scale(0.97); }
+}
+
+@keyframes slideExitRight {
+  0%   { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(6%) scale(0.97); }
+}
+
+@keyframes slideEnterRight {
+  0%   { opacity: 0; transform: translateX(6%) scale(0.97); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes slideEnterLeft {
+  0%   { opacity: 0; transform: translateX(-6%) scale(0.97); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Vehicle card image — smooth Ken Burns pan effect */
+.hero-slide.active .hero-card-img {
+  animation: kenBurnsPan 6s ease-in-out forwards;
+}
+
+@keyframes kenBurnsPan {
+  0%   { transform: scale(1.04) translateX(0px); }
+  100% { transform: scale(1.0)  translateX(-8px); }
 }

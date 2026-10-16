@@ -7,7 +7,7 @@
 const I18N_TRANSLATIONS = {
   en: {
     // Top Bar & Meta
-    top_dealership_tagline: "Pre-owned vehicle sales, leasing, financing, rentals & service in Richmond, BC",
+    top_dealership_tagline: "Quality pre-owned vehicle sales, leasing & financing in Richmond, BC",
     top_address: "10740 Cambie Road, Richmond, BC V6X 1K8",
     top_sales_phone: "Sales & Financing:",
     top_hours: "Mon-Sat: 9AM-7PM | Sun: 11AM-5PM",
@@ -96,7 +96,7 @@ const I18N_TRANSLATIONS = {
     testi_subtitle: "See how we help Vancouver & Richmond drivers get reliable cars with stress-free financing.",
 
     // Footer
-    footer_about: "Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC. We approve car loans for all Canadians regardless of credit.",
+    footer_about: "Motor Trends Auto Group is Richmond's destination for quality pre-owned cars, trucks and SUVs — priced to sell and ready to drive. We approve car loans for all Canadians regardless of credit.",
     footer_quick_links: "Quick Links",
     footer_services: "Financing & Services",
     footer_hours: "Dealership Hours",

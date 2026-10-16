@@ -24,7 +24,7 @@ const DEFAULT_USERS = [
     id: 'usr-sales-01',
     name: 'Jason Wong (Senior Sales Agent)',
     username: 'sales',
-    email: 'sales@motortrendsautogroup.com',
+    email: 'sales@motortrends.ca',
     password: 'sales',
     role: 'Sales Agent',
     department: 'Sales',
@@ -1074,8 +1074,8 @@ async function saveVehicleFromForm() {
     } else {
       vehicleObject.isNewVehicle = true;
       vehicleObject.createdAt = new Date().toISOString();
-      if (!vehicleObject.badges.includes('New Vehicle')) {
-        vehicleObject.badges.unshift('New Vehicle');
+      if (!vehicleObject.badges.includes('New Arrival')) {
+        vehicleObject.badges.unshift('New Arrival');
       }
       VEHICLES_DATA.unshift(vehicleObject);
       showToast(`New vehicle "${make} ${model}" added to marketplace with top priority!`, 'success');

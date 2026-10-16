@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Motor Trends Auto Group Main Application Logic
  * Interactive marketplace, filtering, quick view, test drive booking & favorites
  * Features animated loader (vw leo.gif) on every page load & action
@@ -214,18 +214,18 @@ const DEALER_LOCATIONS = [
     address: '10740 Cambie Road, Richmond, BC V6X 1K8',
     phone: '604-270-7662',
     phoneRaw: '6042707662',
-    dealerNumber: '',
-    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8',
-    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span>',
-    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Email:</strong> sales@motortrendsautogroup.com',
+    dealerNumber: '40212',
+    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8 <span class="dealer-tag">Dealer #40212</span>',
+    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span><span class="dealer-tag">Dealer #40212</span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Dealer #:</strong> 40212<br><strong>Email:</strong> sales@motortrends.ca',
     footerCallBtnHtml: '📞 Call 604-270-7662',
-    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662',
-    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Email:</strong> sales@motortrendsautogroup.com</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Pre-owned vehicle sales, leasing, financing, rentals and service in Richmond, BC.</em></div>',
+    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662 • DEALER #40212',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Dealer #:</strong> 40212</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Richmond, BC.</em></div>',
     contactMapAddr: '10740 Cambie Road, Richmond, BC V6X 1K8',
-    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver',
+    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver • Dealer #40212',
     contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=10740+Cambie+Road,+Richmond,+BC+V6X+1K8',
-    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
-    trustDescHtml: 'Pre-owned vehicle sales, leasing, financing, rentals and service under one roof at 10740 Cambie Road, Richmond, BC.'
+    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8 (Dealer #40212)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 10740 Cambie Road, Richmond, BC. (Dealer #40212)'
   },
   {
     id: 'vancouver',
@@ -236,15 +236,15 @@ const DEALER_LOCATIONS = [
     dealerNumber: '40788',
     topAddressHtml: '1410 SW Marine Drive, Vancouver, British Columbia <span class="dealer-tag">Dealer #40788</span>',
     slideInfoHtml: '<span>📍 1410 SW Marine Drive, Vancouver, British Columbia</span><span>•</span><span>📞 <a href="tel:6042439001">604-243-9001</a></span><span>•</span><span class="dealer-tag">Dealer #40788</span>',
-    footerShowroomHtml: '<strong>Showroom:</strong> 1410 SW Marine Drive, Vancouver, British Columbia<br><strong>Phone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a><br><strong>Dealer #:</strong> 40788<br><strong>Email:</strong> sales@motortrendsautogroup.com',
+    footerShowroomHtml: '<strong>Showroom:</strong> 1410 SW Marine Drive, Vancouver, British Columbia<br><strong>Phone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a><br><strong>Dealer #:</strong> 40788<br><strong>Email:</strong> sales@motortrends.ca',
     footerCallBtnHtml: '📞 Call 604-243-9001',
     contactPillText: 'VANCOUVER, BC DEALERSHIP • 604-243-9001 • DEALER #40788',
-    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 1410 SW Marine Drive, Vancouver, British Columbia</div><div><strong>Telephone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a></div><div><strong>Dealer #:</strong> 40788</div><div><strong>Email:</strong> sales@motortrendsautogroup.com</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Pre-owned vehicle sales, leasing, financing, rentals and service in Vancouver, BC.</em></div>',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 1410 SW Marine Drive, Vancouver, British Columbia</div><div><strong>Telephone:</strong> <a href="tel:6042439001" style="color: #60a5fa; font-weight: 700;">604-243-9001</a></div><div><strong>Dealer #:</strong> 40788</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Vancouver, BC.</em></div>',
     contactMapAddr: '1410 SW Marine Drive, Vancouver, British Columbia',
     contactMapSubtext: 'Conveniently situated on SW Marine Drive, Vancouver • Dealer #40788',
     contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=1410+SW+Marine+Drive,+Vancouver,+British+Columbia',
     aboutStoryHtml: 'Conveniently located at <strong>1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
-    trustDescHtml: 'Pre-owned vehicle sales, leasing, financing, rentals and service under one roof at 1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788).'
+    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 1410 SW Marine Drive, Vancouver, British Columbia (Dealer #40788).'
   }
 ];
 
@@ -384,199 +384,232 @@ function initDealerAddressAlternator() {
 }
 
 /* ----------------------------------------------------
-   Hero Banner Slideshow & Poster Animation
+   Hero Banner Slideshow - Dynamic from Inventory
+   Each visit: vehicles are randomly shuffled
+   Left panel: rotating promo text
+   Right panel: real vehicle from inventory (random)
 ----------------------------------------------------- */
 function initHeroSlideshow() {
-  const slider = document.getElementById('hero-banner-slider');
+  var slider       = document.getElementById('hero-banner-slider');
+  var dotsContainer= document.getElementById('slider-dots');
+  var prevBtn      = document.getElementById('prev-slide');
+  var nextBtn      = document.getElementById('next-slide');
   if (!slider) return;
 
-  // Check if there is a newly added vehicle or top priority vehicle to dynamically populate into Hero Slide 1
-  const sortedInventory = [...VEHICLES_DATA].sort((a, b) => {
-    const newA = a.isNewVehicle ? 1 : 0;
-    const newB = b.isNewVehicle ? 1 : 0;
-    if (newB !== newA) return newB - newA;
-    if (a.createdAt || b.createdAt) {
-      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      if (timeB !== timeA) return timeB - timeA;
+  /* --- Fisher-Yates shuffle for true randomness each visit --- */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
     }
-    return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
-  });
-
-  const newestVehicle = sortedInventory[0];
-  if (newestVehicle && (newestVehicle.isNewVehicle || newestVehicle.createdAt)) {
-    const slide1Card = slider.querySelector('.hero-slide:first-child .hero-vehicle-card');
-    const slide1Pill = document.querySelector('.hero-vehicle-switcher-bar .switcher-pill:first-child');
-
-    if (slide1Card) {
-      const img = (Array.isArray(newestVehicle.images) && newestVehicle.images[0]) ? newestVehicle.images[0] : 'images/vehicles/jeep/main.jpg';
-      const mainBadge = newestVehicle.isNewVehicle ? '<span class="v-badge v-badge-new">🔥 New Vehicle</span>' : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
-
-      slide1Card.innerHTML = `
-        <div class="vehicle-card-badge-row">
-          ${mainBadge}
-          <span class="v-badge v-badge-success">Stock #${newestVehicle.stockNumber || 'MT-NEW'}</span>
-          <span class="v-badge v-badge-dark">${newestVehicle.condition || 'Clean Title'}</span>
-        </div>
-        <div class="vehicle-card-image-wrapper">
-          <img src="${img}" alt="${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}" class="hero-card-img" onerror="this.src='images/vehicles/jeep/main.jpg'">
-          <div class="vehicle-image-shine"></div>
-        </div>
-        <div class="vehicle-card-details">
-          <div class="vehicle-card-header">
-            <div>
-              <div class="vehicle-card-year-make">${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}</div>
-              <div class="vehicle-card-trim">${newestVehicle.trim || ''}</div>
-            </div>
-            <div class="vehicle-card-price-block">
-              <div class="vehicle-card-price">${formatPrice(newestVehicle.price)}</div>
-              <div class="vehicle-card-monthly">Est. ${formatMonthly(newestVehicle.monthlyEst)}</div>
-            </div>
-          </div>
-          <div class="vehicle-card-specs-row">
-            <span class="v-spec-pill">🛣️ ${formatNumber(newestVehicle.mileage || 0)} KM</span>
-            <span class="v-spec-pill">⚡ ${newestVehicle.fuelType || 'Gasoline'}</span>
-            <span class="v-spec-pill">🛡️ ${newestVehicle.drivetrain || 'AWD'}</span>
-            <span class="v-spec-pill">✨ ${newestVehicle.transmission ? newestVehicle.transmission.split(' ')[0] : 'Auto'}</span>
-          </div>
-          <div class="vehicle-card-actions">
-            <a href="inventory.html?q=${encodeURIComponent(newestVehicle.stockNumber || newestVehicle.model)}" class="btn btn-blue btn-sm" style="flex: 1; justify-content: center;">
-              View This Car In Stock
-            </a>
-            <a href="financing.html?stock=${encodeURIComponent(newestVehicle.stockNumber || '')}" class="btn btn-silver btn-sm" style="justify-content: center;">
-              Finance This Car
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    if (slide1Pill) {
-      slide1Pill.innerHTML = `
-        <span class="switcher-icon">${newestVehicle.isNewVehicle ? '🔥' : '🚙'}</span>
-        <div class="switcher-text">
-          <div class="switcher-title">${newestVehicle.isNewVehicle ? '[NEW] ' : ''}${newestVehicle.year} ${newestVehicle.make} ${newestVehicle.model}</div>
-          <div class="switcher-sub">${formatNumber(newestVehicle.mileage || 0)} KM • ${formatPrice(newestVehicle.price)}</div>
-        </div>
-      `;
-    }
+    return a;
   }
 
-  const slides = slider.querySelectorAll('.hero-slide');
-  const dots = slider.querySelectorAll('.slider-dot');
-  const prevBtn = document.getElementById('prev-slide');
-  const nextBtn = document.getElementById('next-slide');
+  /* --- Pick up to 6 vehicles: new arrivals first, rest random --- */
+  var newArrivals = VEHICLES_DATA.filter(function(v) { return v.isNewVehicle; });
+  var rest        = shuffle(VEHICLES_DATA.filter(function(v) { return !v.isNewVehicle; }));
+  var pool        = newArrivals.concat(rest).slice(0, 6);
+  if (!pool.length) pool = shuffle(VEHICLES_DATA).slice(0, 6);
 
-  if (slides.length === 0) return;
+  /* --- 6 rotating promo messages for left text panel --- */
+  var promos = [
+    { pill: '🔥 QUALITY PRE-OWNED VEHICLES',     title: 'USED CARS, TRUCKS & SUVs',            hl: 'PRICED TO SELL!',
+      desc: 'Motor Trends Auto Group is Richmond\'s destination for quality pre-owned vehicles — CarFax verified, professionally inspected, and ready to drive.',
+      b1: {h:'inventory.html', l:'Browse Full Inventory →'}, b2: {h:'financing.html', l:'Apply Financing'} },
+    { pill: '🏦 BUY HERE PAY HERE DEALERSHIP',    title: 'FINANCING FOR ALL CANADIANS',          hl: 'ALL CREDIT APPROVED!',
+      desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome. Fast 15-minute approval — confidential and obligation-free.',
+      b1: {h:'financing.html', l:'Get Pre-Approved Today'}, b2: {h:'contact.html', l:'Talk to a Specialist →'} },
+    { pill: '🔄 TRADE-IN & SELL YOUR CAR',        title: 'WE BUY VEHICLES IN ANY CONDITION',     hl: 'TOP DOLLAR PAID!',
+      desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment, all ICBC paperwork handled.',
+      b1: {h:'sell-trade.html', l:'Start Trade-In Valuation'}, b2: {h:'inventory.html', l:'Browse Inventory →'} },
+    { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE IN BC',            hl: 'EVERY VEHICLE INSPECTED!',
+      desc: 'Every vehicle on our lot comes with a full CarFax history report. Serving Richmond, Vancouver, Surrey, Delta, Burnaby and the entire Lower Mainland.',
+      b1: {h:'inventory.html', l:'View Available Cars →'}, b2: {h:'about.html', l:'About Motor Trends'} },
+    { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: 'DEALER #40212',
+      desc: 'Visit us at 10740 Cambie Road in Richmond or browse online. Lease, finance, or buy outright — we have a payment plan that fits your budget.',
+      b1: {h:'contact.html', l:'Visit Our Showroom →'}, b2: {h:'financing.html', l:'Lease & Finance Options'} },
+    { pill: '💰 VEHICLES UNDER $10,000 CAD',      title: 'BUDGET-FRIENDLY OPTIONS AVAILABLE',    hl: 'STARTING FROM $8,888!',
+      desc: 'From vehicles under $10,000 to late-model family SUVs — every vehicle professionally inspected and priced below BC market value.',
+      b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Monthly Payment Calculator'} }
+  ];
 
-  let currentIndex = 0;
-  let slideInterval = null;
-  const autoPlayDelay = 5500;
+  /* --- Build HTML for ONE slide --- */
+  function makeSlideHTML(vehicle, promoIdx, isFirst) {
+    var p   = promos[promoIdx % promos.length];
+    var img = (Array.isArray(vehicle.images) && vehicle.images[0]) ? vehicle.images[0] : 'images/vehicles/jeep/main.jpg';
+    var mainBadge = vehicle.isNewVehicle
+      ? '<span class="v-badge v-badge-new">🔥 New Arrival</span>'
+      : vehicle.featured
+        ? '<span class="v-badge v-badge-blue">⭐ Featured Vehicle</span>'
+        : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
+    var priceBadge = (vehicle.price && vehicle.price < 15000)
+      ? '<span class="v-badge v-badge-warning">Great Value</span>'
+      : '<span class="v-badge v-badge-dark">' + (vehicle.condition || 'Clean Title') + '</span>';
 
-  const switcherPills = document.querySelectorAll('.switcher-pill');
+    return '<div class="hero-slide' + (isFirst ? ' active' : '') + '" data-vid="' + (vehicle.id || '') + '">' +
+      '<div class="container" style="position:relative;z-index:3;">' +
+      '<div class="hero-slide-grid">' +
 
-  function goToSlide(index) {
-    slides[currentIndex].classList.remove('active');
-    if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
-    if (switcherPills[currentIndex]) switcherPills[currentIndex].classList.remove('active');
+      /* LEFT - promo text */
+      '<div class="hero-slide-content">' +
+      '<div class="slide-pill">' + p.pill + '</div>' +
+      '<div class="slide-title">' + p.title + '</div>' +
+      '<div class="slide-highlight">' + p.hl + '</div>' +
+      '<p class="slide-desc">' + p.desc + '</p>' +
+      '<div class="slide-dealer-info dealer-slide-info dealer-transition">' +
+        '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
+        '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
+        '<span class="dealer-tag">Dealer #40212</span>' +
+      '</div>' +
+      '<div class="slide-actions">' +
+        '<a href="' + p.b1.h + '" class="btn btn-blue btn-lg">' + p.b1.l + '</a>' +
+        '<a href="' + p.b2.h + '" class="btn btn-outline btn-lg">' + p.b2.l + '</a>' +
+      '</div></div>' +
 
-    currentIndex = (index + slides.length) % slides.length;
+      /* RIGHT - vehicle card */
+      '<div class="hero-vehicle-stage">' +
+      '<div class="hero-vehicle-card">' +
+        '<div class="vehicle-card-badge-row">' + mainBadge +
+          '<span class="v-badge v-badge-success">Stock #' + (vehicle.stockNumber || 'MT-NEW') + '</span>' +
+          priceBadge +
+        '</div>' +
+        '<div class="vehicle-card-image-wrapper">' +
+          '<img src="' + img + '" alt="' + vehicle.year + ' ' + vehicle.make + ' ' + vehicle.model + '" class="hero-card-img"' +
+          ' loading="lazy" onerror="this.src=\'images/vehicles/jeep/main.jpg\'">' +
+          '<div class="vehicle-image-shine"></div>' +
+        '</div>' +
+        '<div class="vehicle-card-details">' +
+          '<div class="vehicle-card-header">' +
+            '<div>' +
+              '<div class="vehicle-card-year-make">' + vehicle.year + ' ' + vehicle.make + ' ' + vehicle.model + '</div>' +
+              '<div class="vehicle-card-trim">' + (vehicle.trim || '') + '</div>' +
+            '</div>' +
+            '<div class="vehicle-card-price-block">' +
+              '<div class="vehicle-card-price">' + formatPrice(vehicle.price) + '</div>' +
+              '<div class="vehicle-card-monthly">Est. ' + formatMonthly(vehicle.monthlyEst) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="vehicle-card-specs-row">' +
+            '<span class="v-spec-pill">🛣️ ' + formatNumber(vehicle.mileage || 0) + ' KM</span>' +
+            '<span class="v-spec-pill">⚡ ' + (vehicle.fuelType || 'Gasoline') + '</span>' +
+            '<span class="v-spec-pill">🛡️ ' + (vehicle.drivetrain || 'FWD') + '</span>' +
+            '<span class="v-spec-pill">✨ ' + (vehicle.transmission ? vehicle.transmission.split(' ')[0] : 'Auto') + '</span>' +
+          '</div>' +
+          '<div class="vehicle-card-actions">' +
+            '<a href="inventory.html?q=' + encodeURIComponent(vehicle.stockNumber || vehicle.model || '') + '" class="btn btn-blue btn-sm" style="flex:1;justify-content:center;">View In Stock</a>' +
+            '<a href="financing.html?stock=' + encodeURIComponent(vehicle.stockNumber || '') + '" class="btn btn-silver btn-sm" style="justify-content:center;">Finance This Car</a>' +
+          '</div>' +
+        '</div>' +
+      '</div></div>' +
 
-    slides[currentIndex].classList.add('active');
+      '</div></div></div>';
+  }
+
+  /* --- Inject all slides --- */
+  slider.innerHTML = pool.map(function(v, i) { return makeSlideHTML(v, i, i === 0); }).join('');
+
+  /* --- Rebuild dots --- */
+  if (dotsContainer) {
+    dotsContainer.innerHTML = pool.map(function(_, i) {
+      return '<button class="slider-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '" aria-label="Slide ' + (i+1) + '"></button>';
+    }).join('');
+  }
+
+  /* --- Slideshow controller with directional animation --- */
+  var currentIndex = 0;
+  var slideInterval = null;
+  var DELAY = 5500;
+  var isAnimating = false;
+
+  function goToSlide(idx, dir) {
+    if (isAnimating) return;
+    var slides = slider.querySelectorAll('.hero-slide');
+    var dots   = dotsContainer ? dotsContainer.querySelectorAll('.slider-dot') : [];
+    if (!slides.length) return;
+
+    var direction = (typeof dir !== 'undefined') ? dir : (idx > currentIndex ? 1 : -1);
+    var outClass  = direction > 0 ? 'slide-exit-left'  : 'slide-exit-right';
+    var inClass   = direction > 0 ? 'slide-enter-right' : 'slide-enter-left';
+
+    isAnimating = true;
+    var outSlide = slides[currentIndex];
+    outSlide.classList.add(outClass);
+
+    currentIndex = ((idx % slides.length) + slides.length) % slides.length;
+
+    // Update dots
+    for (var d = 0; d < dots.length; d++) dots[d].classList.remove('active');
     if (dots[currentIndex]) dots[currentIndex].classList.add('active');
-    if (switcherPills[currentIndex]) switcherPills[currentIndex].classList.add('active');
-  }
 
-  switcherPills.forEach((pill, idx) => {
-    pill.addEventListener('click', () => {
-      goToSlide(idx);
-      startAutoplay();
-    });
-  });
+    // Enter new slide
+    var inSlide = slides[currentIndex];
+    inSlide.classList.add(inClass, 'active');
 
-  function nextSlide() {
-    goToSlide(currentIndex + 1);
-  }
-
-  function prevSlide() {
-    goToSlide(currentIndex - 1);
-  }
-
-  function startAutoplay() {
-    stopAutoplay();
-    slideInterval = setInterval(nextSlide, autoPlayDelay);
-  }
-
-  function stopAutoplay() {
-    if (slideInterval) {
-      clearInterval(slideInterval);
-      slideInterval = null;
+    function onOutEnd() {
+      outSlide.classList.remove('active', outClass);
+      outSlide.removeEventListener('animationend', onOutEnd);
     }
+    function onInEnd() {
+      inSlide.classList.remove(inClass);
+      inSlide.removeEventListener('animationend', onInEnd);
+      isAnimating = false;
+    }
+    outSlide.addEventListener('animationend', onOutEnd);
+    inSlide.addEventListener('animationend', onInEnd);
+
+    // Safety fallback in case animationend doesn't fire
+    setTimeout(function() {
+      outSlide.classList.remove('active', outClass);
+      inSlide.classList.remove(inClass);
+      isAnimating = false;
+    }, 750);
   }
 
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      nextSlide();
-      startAutoplay();
-    });
-  }
+  function next() { goToSlide(currentIndex + 1, 1); }
+  function prev() { goToSlide(currentIndex - 1, -1); }
+  function startAuto() { stopAuto(); slideInterval = setInterval(next, DELAY); }
+  function stopAuto()  { if (slideInterval) { clearInterval(slideInterval); slideInterval = null; } }
 
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      prevSlide();
-      startAutoplay();
-    });
-  }
+  if (nextBtn) nextBtn.addEventListener('click', function() { next(); startAuto(); });
+  if (prevBtn) prevBtn.addEventListener('click', function() { prev(); startAuto(); });
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', (e) => {
-      const idx = parseInt(e.target.dataset.index, 10);
-      if (!isNaN(idx)) {
-        goToSlide(idx);
-        startAutoplay();
+  if (dotsContainer) {
+    dotsContainer.addEventListener('click', function(e) {
+      var dot = e.target.closest ? e.target.closest('.slider-dot') : e.target;
+      if (dot && dot.dataset && dot.dataset.index !== undefined) {
+        var i = parseInt(dot.dataset.index, 10);
+        if (!isNaN(i)) { goToSlide(i); startAuto(); }
       }
     });
+  }
+
+  slider.addEventListener('mouseenter', stopAuto);
+  slider.addEventListener('mouseleave', startAuto);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') { next(); startAuto(); }
+    else if (e.key === 'ArrowLeft') { prev(); startAuto(); }
   });
 
-  // Pause on hover
-  slider.addEventListener('mouseenter', stopAutoplay);
-  slider.addEventListener('mouseleave', startAutoplay);
-
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') {
-      nextSlide();
-      startAutoplay();
-    } else if (e.key === 'ArrowLeft') {
-      prevSlide();
-      startAutoplay();
-    }
-  });
-
-  // Touch swipe support
-  let touchStartX = 0;
-  slider.addEventListener('touchstart', (e) => {
-    if (e.changedTouches && e.changedTouches[0]) {
-      touchStartX = e.changedTouches[0].screenX;
+  var touchX = 0;
+  slider.addEventListener('touchstart', function(e) {
+    if (e.changedTouches[0]) touchX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  slider.addEventListener('touchend', function(e) {
+    if (e.changedTouches[0]) {
+      var dx = e.changedTouches[0].screenX - touchX;
+      if (dx < -45) { next(); startAuto(); }
+      else if (dx > 45) { prev(); startAuto(); }
     }
   }, { passive: true });
 
-  slider.addEventListener('touchend', (e) => {
-    if (e.changedTouches && e.changedTouches[0]) {
-      const touchEndX = e.changedTouches[0].screenX;
-      if (touchStartX - touchEndX > 45) {
-        nextSlide();
-        startAutoplay();
-      } else if (touchEndX - touchStartX > 45) {
-        prevSlide();
-        startAutoplay();
-      }
-    }
-  }, { passive: true });
+  document.addEventListener('visibilitychange', function() {
+    document.hidden ? stopAuto() : startAuto();
+  });
 
-  startAutoplay();
+  startAuto();
 }
-
 /* ----------------------------------------------------
    Home Page Search & Featured Vehicles
 ----------------------------------------------------- */
@@ -980,9 +1013,9 @@ function createVehicleCardHtml(car) {
         <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         
         <div class="vehicle-badge-overlay">
-          ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Vehicle</span>` : ''}
+          ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Arrival</span>` : ''}
           <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition || 'Pre-Owned'}</span>
-          ${badgesList.filter(b => b !== 'New Vehicle').slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
+          ${badgesList.filter(b => b !== 'New Arrival').slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
         </div>
 
         <button class="btn-wishlist ${isWishlisted ? 'active' : ''}" title="Save to Wishlist" data-id="${car.id}" aria-label="Save to Wishlist">
@@ -1341,7 +1374,7 @@ function openVehicleModal(carId) {
       <div>
         <div style="margin-bottom: 1.25rem;">
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-            ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Vehicle</span>` : ''}
+            ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Arrival</span>` : ''}
             <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
             ${car.vin && car.vin !== 'N/A' ? `<span class="badge badge-green">VIN: ${car.vin}</span>` : `<span class="badge badge-silver" style="opacity: 0.8;">VIN: Optional / N/A</span>`}
           </div>
