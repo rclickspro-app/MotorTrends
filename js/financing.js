@@ -60,46 +60,83 @@ function initFinancingCalculator() {
     if (totalCostDisplay) totalCostDisplay.textContent = formatPrice((totalPayment + downPayment + tradeValue).toFixed(2));
   }
 
-  // Bind input listeners
-  const inputs = [priceInput, downPaymentInput, termSelect, interestInput, tradeInInput];
-  inputs.forEach(input => {
-    if (input) {
-      input.addEventListener('input', calculatePayment);
-      input.addEventListener('change', calculatePayment);
-    }
-  });
-
-  calculatePayment();
-
-  // Credit tier buttons
-  const creditButtons = document.querySelectorAll('.credit-tier-btn');
-  creditButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      creditButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const rate = btn.dataset.rate;
-      if (interestInput) {
-        interestInput.value = rate;
-        calculatePayment();
+  // Bind input listeners only if calculator exists
+  if (priceInput && monthlyDisplay) {
+    const inputs = [priceInput, downPaymentInput, termSelect, interestInput, tradeInInput];
+    inputs.forEach(input => {
+      if (input) {
+        input.addEventListener('input', calculatePayment);
+        input.addEventListener('change', calculatePayment);
       }
     });
-  });
+
+    calculatePayment();
+
+    // Credit tier buttons
+    const creditButtons = document.querySelectorAll('.credit-tier-btn');
+    creditButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        creditButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const rate = btn.dataset.rate;
+        if (interestInput) {
+          interestInput.value = rate;
+          calculatePayment();
+        }
+      });
+    });
+  }
 
   // Finance Pre-approval form handler
   const financeForm = document.getElementById('finance-preapproval-form');
   if (financeForm) {
-    financeForm.addEventListener('submit', (e) => {
+    financeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (typeof window.showActionLoader === 'function') {
-        window.showActionLoader('Processing Canadian Pre-Approval Application...');
+      const btn = document.getElementById('fin-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Submitting Application...';
       }
-      setTimeout(() => {
-        if (typeof window.hideActionLoader === 'function') {
-          window.hideActionLoader();
-        }
-        showToast('🎉 Pre-Approval Application Submitted! A finance specialist will contact you with CAD loan terms.', 'success');
-        financeForm.reset();
-      }, 500);
+
+      const firstName = document.getElementById('fin-first-name')?.value || '';
+      const lastName = document.getElementById('fin-last-name')?.value || '';
+      const email = document.getElementById('fin-email')?.value || '';
+      const phone = document.getElementById('fin-phone')?.value || '';
+      const employment = document.getElementById('fin-emp')?.value || '';
+      const income = document.getElementById('fin-income')?.value || '';
+      const credit = document.getElementById('fin-credit')?.value || '';
+      const vehicle = document.getElementById('fin-vehicle')?.value || 'Not specified';
+
+      const payload = {
+        LeadType: 'Financing Pre-Approval Application',
+        ApplicantName: `${firstName} ${lastName}`.trim(),
+        Email: email,
+        Phone: phone,
+        EmploymentStatus: employment,
+        MonthlyGrossIncome: `$${income} CAD`,
+        CreditSituation: credit,
+        VehiclePreference: vehicle,
+        EstimatedMonthlyPayment: document.getElementById('calc-monthly-payment')?.textContent || '',
+        EstimatedLoanAmount: document.getElementById('calc-total-loan')?.textContent || '',
+        Terms: 'We provide financing, leasing, subprime and in house leasing options OAC',
+        DealershipLocation: '10740 Cambie Road, Richmond, BC (Dealer #30859)'
+      };
+
+      if (window.sendEmailSubmission) {
+        await window.sendEmailSubmission(payload, `Financing Application: ${payload.ApplicantName} (${payload.MonthlyGrossIncome}/mo)`);
+      }
+
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Application for Instant Review';
+      }
+      financeForm.reset();
+
+      if (typeof showToast === 'function') {
+        showToast('🎉 Pre-Approval Application Submitted! A finance specialist will contact you with CAD loan terms shortly.', 'success');
+      } else {
+        alert('Application submitted! A finance specialist will contact you shortly.');
+      }
     });
   }
 }

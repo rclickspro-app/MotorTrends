@@ -3,16 +3,65 @@
  * Authentication, Registration, Email Verification Simulation & Full Marketplace Management
  */
 
-const ADMIN_STORAGE_KEY_USERS = 'motortrends_admin_users_v4';
+const ADMIN_STORAGE_KEY_USERS = 'motortrends_admin_users_v5';
 const ADMIN_STORAGE_KEY_SESSION = 'motortrends_admin_session';
+const SYSTEM_SETTINGS_KEY = 'motortrends_system_settings_v1';
+
+const DEFAULT_SYSTEM_SETTINGS = {
+  maxUploadSlots: 12,
+  maxInventoryLimit: 25,
+  salesPassword: '^^0ToRTre&d$',
+  superAdminEmail: 'rclickspro@gmail.com'
+};
+
+function getSystemSettings() {
+  try {
+    const raw = localStorage.getItem(SYSTEM_SETTINGS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...DEFAULT_SYSTEM_SETTINGS, ...parsed };
+    }
+  } catch (e) {
+    console.warn('Error reading system settings:', e);
+  }
+  return { ...DEFAULT_SYSTEM_SETTINGS };
+}
+
+function saveSystemSettings(newSettings) {
+  const current = getSystemSettings();
+  const merged = { ...current, ...newSettings };
+  localStorage.setItem(SYSTEM_SETTINGS_KEY, JSON.stringify(merged));
+  if (typeof firebase !== 'undefined' && typeof fbDb !== 'undefined' && fbDb) {
+    fbDb.ref('system/settings').set(merged).catch(err => console.warn('Firebase settings sync error:', err));
+  }
+  return merged;
+}
+
+function isSuperAdminUser() {
+  if (!currentAdminUser) return false;
+  const role = (currentAdminUser.role || '').toLowerCase();
+  const email = (currentAdminUser.email || '').toLowerCase();
+  const username = (currentAdminUser.username || '').toLowerCase();
+  const settings = getSystemSettings();
+  const superEmail = (settings.superAdminEmail || 'rclickspro@gmail.com').toLowerCase();
+  return email === superEmail || username === 'superadmin' || role === 'super admin' || (currentAdminUser.permissions && currentAdminUser.permissions.includes('settings'));
+}
+
+function isSalesUser() {
+  if (typeof window !== 'undefined' && window.location.pathname.includes('sales')) return true;
+  if (!currentAdminUser) return false;
+  const role = (currentAdminUser.role || '').toLowerCase();
+  const username = (currentAdminUser.username || '').toLowerCase();
+  return role === 'sales agent' || role.includes('sales') || username === 'sales';
+}
 
 const DEFAULT_USERS = [
   {
-    id: 'usr-admin-01',
-    name: 'Motor Trends Dealership Manager',
-    username: 'admin',
-    email: 'admin@motortrendsautogroup.com',
-    password: 'admin',
+    id: 'usr-superadmin-01',
+    name: 'Executive Super Admin',
+    username: 'superadmin',
+    email: 'superadmin@motortrendsautogroup.com',
+    password: '!@uto#@u$',
     role: 'Dealership Admin',
     department: 'Management',
     permissions: ['inventory', 'inquiries', 'users', 'analytics', 'hr', 'settings'],
@@ -25,10 +74,23 @@ const DEFAULT_USERS = [
     name: 'Jason Wong (Senior Sales Agent)',
     username: 'sales',
     email: 'sales@motortrends.ca',
-    password: 'sales',
+    password: '^^0ToRTre&d$',
     role: 'Sales Agent',
     department: 'Sales',
     permissions: ['inventory', 'inquiries'],
+    status: 'Active',
+    verified: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'usr-admin-01',
+    name: 'Motor Trends Dealership Manager',
+    username: 'admin',
+    email: 'admin@motortrendsautogroup.com',
+    password: '!@uto#@u$',
+    role: 'Dealership Admin',
+    department: 'Management',
+    permissions: ['inventory', 'inquiries', 'users', 'analytics', 'hr', 'settings'],
     status: 'Active',
     verified: true,
     createdAt: new Date().toISOString()
@@ -111,13 +173,11 @@ function initAdminSystem() {
 
   // Cross-tab sync
   window.addEventListener('storage', (e) => {
-    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db') {
+    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db' || e.key === 'motortrends_deleted_vehicles_ids') {
       const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
-      if (updated && updated.length > 0) {
-        VEHICLES_DATA.length = 0;
-        VEHICLES_DATA.push(...updated);
-        loadMarketplaceDashboard();
-      }
+      VEHICLES_DATA.length = 0;
+      VEHICLES_DATA.push(...updated);
+      loadMarketplaceDashboard();
     }
   });
 }
@@ -216,6 +276,33 @@ function showDashboardView() {
     }
   }
 
+  const isSales = isSalesUser();
+  const isSuper = isSuperAdminUser();
+
+  // Navigation visibility based on role
+  if (isSales) {
+    document.querySelectorAll('.admin-nav-item[data-tab]').forEach(i => {
+      if (i.dataset.tab !== 'vehicles') {
+        const li = i.closest('li');
+        if (li) li.style.display = 'none';
+        else i.style.display = 'none';
+      }
+    });
+    currentTab = 'vehicles';
+  } else {
+    document.querySelectorAll('.admin-nav-item[data-tab]').forEach(i => {
+      const li = i.closest('li');
+      if (li) li.style.display = 'block';
+      else i.style.display = 'flex';
+    });
+    const settingsNav = document.getElementById('nav-item-settings');
+    if (settingsNav) {
+      const li = settingsNav.closest('li');
+      if (li) li.style.display = isSuper ? 'block' : 'none';
+      else settingsNav.style.display = isSuper ? 'flex' : 'none';
+    }
+  }
+
   // Ensure active tab state is synchronized
   currentTab = currentTab || 'vehicles';
   document.querySelectorAll('.admin-nav-item[data-tab]').forEach(i => {
@@ -234,21 +321,56 @@ function showDashboardView() {
    Auth Event Listeners (Login, Register, OTP Verify)
 ----------------------------------------------------- */
 function setupAuthEventListeners() {
-  // Quick Role Fill Buttons (Admin, Sales, HR, Tech, Service)
-  document.querySelectorAll('.quick-role-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Google Sign-In (Super Admin: rclickspro@gmail.com)
+  const googleBtn = document.getElementById('btn-google-signin');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      const u = btn.dataset.user;
-      const p = btn.dataset.pass;
-      const userEl = document.getElementById('login-username');
-      const passEl = document.getElementById('login-password');
-      const hintEl = document.getElementById('role-pass-hint');
-      if (userEl) userEl.value = u;
-      if (passEl) passEl.value = p;
-      if (hintEl) hintEl.innerHTML = `Preset: <strong>${u}</strong> / <strong>${p}</strong>`;
-      showToast(`Selected ${btn.textContent.trim()} preset. Click 'Sign In' or hit Enter!`, 'info');
+      try {
+        if (typeof window.showActionLoader === 'function') {
+          window.showActionLoader('Initiating Google Authentication for Super Admin...');
+        }
+        if (typeof firebase === 'undefined' || !fbAuth) {
+          throw new Error('Firebase Auth service is not ready. Please try again.');
+        }
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        const result = await fbAuth.signInWithPopup(provider);
+        const fbUser = result.user;
+        const userEmail = (fbUser.email || '').toLowerCase();
+        const settings = getSystemSettings();
+        const targetSuperEmail = (settings.superAdminEmail || 'rclickspro@gmail.com').toLowerCase();
+
+        if (userEmail === targetSuperEmail || userEmail === 'rclickspro@gmail.com') {
+          const superUser = {
+            id: fbUser.uid,
+            name: fbUser.displayName || 'Super Admin (Google)',
+            username: 'superadmin',
+            email: fbUser.email,
+            role: 'Super Admin',
+            department: 'Executive Management',
+            permissions: ['inventory', 'inquiries', 'users', 'analytics', 'hr', 'settings'],
+            verified: true,
+            authProvider: 'google',
+            avatar: fbUser.photoURL || ''
+          };
+          currentAdminUser = superUser;
+          localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(superUser));
+          showToast(`👑 Welcome, Super Admin (${fbUser.email})! Signed in via Google.`, 'success');
+          showDashboardView();
+        } else {
+          await fbAuth.signOut().catch(() => {});
+          if (typeof window.hideActionLoader === 'function') window.hideActionLoader();
+          showAuthAlert(`Access Denied: ${fbUser.email} is not authorized for Super Admin sign-in. Required email: ${targetSuperEmail}`, 'error');
+          alert(`Access Denied: Only ${targetSuperEmail} is authorized to sign in as Super Admin via Google.`);
+        }
+      } catch (err) {
+        console.error('Google Sign-In Error:', err);
+        if (typeof window.hideActionLoader === 'function') window.hideActionLoader();
+        showAuthAlert(`Google Sign-In: ${err.message || 'Operation failed or popup closed.'}`, 'error');
+      }
     });
-  });
+  }
 
   // Switch to Register
   document.getElementById('btn-show-register')?.addEventListener('click', (e) => {
@@ -277,7 +399,7 @@ function setupAuthEventListeners() {
       const password = document.getElementById('login-password') ? document.getElementById('login-password').value : '';
       const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-      // 1. Check Default / Demo Accounts & Local Staff Database
+      // 1. Check Default Accounts & Local Staff Database
       const localUsers = getAdminUsers();
       const allStaff = [...DEFAULT_USERS];
       localUsers.forEach(u => {
@@ -286,13 +408,20 @@ function setupAuthEventListeners() {
         }
       });
 
+      const sysSettings = getSystemSettings();
+      const dynamicSalesPassword = sysSettings.salesPassword || '^^0ToRTre&d$';
+
       const matchedUser = allStaff.find(u => {
         const uName = (u.username || '').toLowerCase();
         const uEmail = (u.email || '').toLowerCase();
         const isUserMatch = (uName === userInput || uEmail === userInput);
         if (!isUserMatch) return false;
-        // Accept exact password or with 123
-        return (u.password === password || password === u.password + '123' || (uName === 'admin' && (password === 'admin' || password === 'admin123')));
+        // Verify superadmin, sales, and admin designated credentials
+        if (uName === 'superadmin' && password === '!@uto#@u$') return true;
+        if (uName === 'sales' && (password === dynamicSalesPassword || password === '^^0ToRTre&d$')) return true;
+        if (uName === 'admin' && (password === '!@uto#@u$' || password === 'admin' || password === 'admin123')) return true;
+        // Accept exact password
+        return (u.password === password || password === u.password + '123');
       });
 
       if (matchedUser) {
@@ -331,13 +460,12 @@ function setupAuthEventListeners() {
           return;
         } catch (error) {
           console.warn('Firebase Login Error:', error);
-          // Show helpful error message without locking out
-          showAuthAlert(`Firebase Auth Note: ${error.message}. You can also use Quick Roles above (admin / admin).`, 'error');
+          showAuthAlert(`Login Note: ${error.message}`, 'error');
           return;
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Sign In to Admin Portal';
+            submitBtn.innerHTML = 'Sign In to Portal';
           }
         }
       }
@@ -346,7 +474,7 @@ function setupAuthEventListeners() {
       if (typeof window.hideActionLoader === 'function') {
         window.hideActionLoader();
       }
-      showAuthAlert('Invalid credentials. Please click one of the Quick Role presets above (Admin, Sales, HR, Tech) or use: Username: admin | Password: admin', 'error');
+      showAuthAlert('Invalid credentials. Please verify your username/email and password, or sign in via Google.', 'error');
     });
   }
 
@@ -514,8 +642,15 @@ function setupDashboardEventListeners() {
     });
   });
 
-  // Add New Vehicle Button
+  // Add New Vehicle Button (Max capacity check: 25)
   document.getElementById('btn-add-vehicle')?.addEventListener('click', () => {
+    const settings = getSystemSettings();
+    const maxInv = settings.maxInventoryLimit || 25;
+    if (VEHICLES_DATA.length >= maxInv) {
+      showToast('Inventory full, contact support', 'error');
+      alert('Inventory full, contact support');
+      return;
+    }
     openVehicleEditorModal(null);
   });
 
@@ -555,6 +690,11 @@ function setupDashboardEventListeners() {
 }
 
 function switchAdminTab(tabName) {
+  // Sales agents only have access to vehicles tab
+  if (isSalesUser() && tabName !== 'vehicles') {
+    tabName = 'vehicles';
+  }
+
   document.getElementById('tab-view-vehicles').style.display = tabName === 'vehicles' ? 'block' : 'none';
   document.getElementById('tab-view-analytics').style.display = tabName === 'analytics' ? 'block' : 'none';
   document.getElementById('tab-view-inquiries').style.display = tabName === 'inquiries' ? 'block' : 'none';
@@ -568,6 +708,7 @@ function switchAdminTab(tabName) {
   if (tabName === 'analytics') renderAnalyticsView();
   if (tabName === 'inquiries') renderInquiriesView();
   if (tabName === 'users') renderUsersView();
+  if (tabName === 'settings') renderSettingsView();
   if (tabName === 'firebase') renderFirebaseView();
 }
 
@@ -580,14 +721,22 @@ function updateDashboardKpis() {
   const totalVehicles = VEHICLES_DATA.length;
   const certifiedCount = VEHICLES_DATA.filter(v => v.condition === 'Certified Pre-Owned').length;
   const totalValue = VEHICLES_DATA.reduce((sum, v) => sum + (v.price || 0), 0);
-  const avgPrice = totalVehicles > 0 ? Math.round(totalValue / totalVehicles) : 0;
   const featuredCount = VEHICLES_DATA.filter(v => v.featured).length;
+  const newCount = VEHICLES_DATA.filter(v => v.isNewVehicle).length;
+  const slideshowCount = VEHICLES_DATA.filter(v => v.heroSlide || v.isSlideshow).length;
 
-  document.getElementById('kpi-total-inventory').textContent = totalVehicles;
-  document.getElementById('kpi-certified-count').textContent = certifiedCount;
-  document.getElementById('kpi-total-value').textContent = formatPrice(totalValue);
-  document.getElementById('kpi-avg-price').textContent = formatPrice(avgPrice);
-  document.getElementById('kpi-featured-count').textContent = featuredCount;
+  const totalEl = document.getElementById('kpi-total-inventory');
+  if (totalEl) totalEl.textContent = totalVehicles;
+  const certEl = document.getElementById('kpi-certified-count');
+  if (certEl) certEl.textContent = certifiedCount;
+  const valEl = document.getElementById('kpi-total-value');
+  if (valEl) valEl.textContent = formatPrice(totalValue);
+  const featEl = document.getElementById('kpi-featured-count');
+  if (featEl) featEl.textContent = featuredCount;
+  const newEl = document.getElementById('kpi-new-count');
+  if (newEl) newEl.textContent = newCount;
+  const slideEl = document.getElementById('kpi-slideshow-count');
+  if (slideEl) slideEl.textContent = slideshowCount;
 }
 
 function renderVehiclesTable(query = '') {
@@ -607,6 +756,8 @@ function renderVehiclesTable(query = '') {
     if (categoryFilter !== 'all' && car.bodyType !== categoryFilter) return false;
     // Status / condition
     if (statusFilter === 'featured' && !car.featured) return false;
+    if (statusFilter === 'new' && !car.isNewVehicle) return false;
+    if (statusFilter === 'slideshow' && !(car.heroSlide || car.isSlideshow)) return false;
     if (statusFilter === 'certified' && car.condition !== 'Certified Pre-Owned') return false;
     if (statusFilter === 'preowned' && car.condition !== 'Pre-Owned') return false;
 
@@ -616,7 +767,7 @@ function renderVehiclesTable(query = '') {
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; padding: 3rem; color: var(--silver-500);">
+        <td colspan="7" style="text-align: center; padding: 3rem; color: #64748B;">
           No vehicles found matching your criteria. Try adjusting your search query or filters.
         </td>
       </tr>
@@ -626,48 +777,73 @@ function renderVehiclesTable(query = '') {
 
   tbody.innerHTML = filtered.map(car => `
     <tr>
-      <td style="width: 80px;">
-        <img src="${(Array.isArray(car.images) && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${car.model || 'Vehicle'}" style="width: 70px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-medium);">
+      <td style="width: 75px;">
+        <img src="${(Array.isArray(car.images) && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=400&q=80'}" alt="${car.model || 'Vehicle'}" style="width: 70px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #CBD5E1;">
       </td>
       <td>
-        <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">${car.year} ${car.make} ${car.model}</div>
-        <div style="font-size: 0.8rem; color: var(--silver-400);">${car.trim}</div>
-        <div style="font-size: 0.75rem; color: var(--silver-500); font-family: monospace;">VIN: ${car.vin && car.vin !== 'N/A' ? car.vin : '<span style="font-style: italic; color: #64748b;">(Optional / N/A)</span>'}</div>
+        <div style="font-weight: 700; color: #0F172A; font-size: 0.95rem;">${car.year} ${car.make} ${car.model}</div>
+        <div style="font-size: 0.8rem; color: #475569;">${car.trim || ''}</div>
+        <div style="font-size: 0.75rem; color: #64748B; font-family: monospace;">VIN: ${car.vin && car.vin !== 'N/A' ? car.vin : '<span style="font-style: italic; color: #94A3B8;">(Optional)</span>'}</div>
       </td>
       <td>
-        <div style="font-size: 0.85rem; font-weight: 600; color: #cbd5e1;">${car.stockNumber}</div>
-        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px;">
-          ${car.isNewVehicle ? `<span class="badge badge-new" style="font-size: 0.65rem; padding: 2px 5px;">🔥 New</span>` : ''}
-          <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}" style="font-size: 0.7rem; padding: 2px 6px;">
-            ${car.condition}
+        <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">${car.stockNumber || 'MT-NEW'}</div>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px;">
+          ${car.isNewVehicle ? `<span class="badge" style="background:#FEE2E2; color:#B91C1C; border:1px solid #FCA5A5; font-size:0.68rem; padding:2px 5px;">🔥 New</span>` : ''}
+          ${(car.heroSlide || car.isSlideshow) ? `<span class="badge" style="background:#E0E7FF; color:#3730A3; border:1px solid #C7D2FE; font-size:0.68rem; padding:2px 5px;">🎬 Slide</span>` : ''}
+          <span class="badge" style="background:#F1F5F9; color:#334155; border:1px solid #CBD5E1; font-size:0.68rem; padding:2px 5px;">
+            ${car.condition || 'Pre-Owned'}
           </span>
         </div>
       </td>
       <td>
-        <div style="font-size: 0.85rem; color: #fff;">${car.bodyType} • ${car.fuelType}</div>
-        <div style="font-size: 0.8rem; color: var(--silver-400);">${formatNumber(car.mileage || 0)} km • ${car.drivetrain || 'AWD'}</div>
+        <div style="font-size: 0.85rem; color: #1E293B; font-weight: 600;">${car.bodyType || 'SUV'} • ${car.fuelType || 'Gasoline'}</div>
+        <div style="font-size: 0.8rem; color: #64748B;">${formatNumber(car.mileage || 0)} km • ${car.drivetrain || 'AWD'}</div>
       </td>
       <td>
-        <div style="font-weight: 800; font-size: 1rem; color: #fff;">${formatPrice(car.price)}</div>
-        <div style="font-size: 0.8rem; color: #60a5fa;">Est. ${formatMonthly(car.monthlyEst)}</div>
+        <div style="font-weight: 800; font-size: 1.05rem; color: #1B3A6B;">${formatPrice(car.price)}</div>
+        <div style="font-size: 0.78rem; color: #64748B; font-weight: 500;">Stock #${car.stockNumber || car.id}</div>
       </td>
-      <td>
-        <button class="btn-toggle-featured ${car.featured ? 'active' : ''}" data-id="${car.id}" title="Toggle Featured Deal on Homepage">
-          ${car.featured ? '⭐ Featured' : '☆ Standard'}
-        </button>
+      <td style="text-align: center;">
+        ${isSalesUser() ? `
+          <div style="font-size: 0.75rem; color: #64748B; font-weight: 600;">
+            ${car.featured ? '<span class="badge" style="background:#FEF3C7; color:#92400E; margin-bottom:2px; display:inline-block;">⭐ Featured</span><br>' : ''}
+            ${car.isNewVehicle ? '<span class="badge" style="background:#FEE2E2; color:#B91C1C; margin-bottom:2px; display:inline-block;">🔥 New</span><br>' : ''}
+            ${(car.heroSlide || car.isSlideshow) ? '<span class="badge" style="background:#E0E7FF; color:#3730A3; display:inline-block;">🎬 Slide</span>' : '<span style="color:#94a3b8; font-size:0.75rem;">Standard</span>'}
+          </div>
+        ` : `
+          <div style="display: inline-flex; flex-direction: column; gap: 4px; width: 145px;">
+            <button class="btn-toggle-featured ${car.featured ? 'active' : ''}" data-id="${car.id}" title="Toggle Featured on Homepage">
+              ${car.featured ? '⭐ Featured: ON' : '☆ Featured: OFF'}
+            </button>
+            <button class="btn-toggle-new ${car.isNewVehicle ? 'active' : ''}" data-id="${car.id}" title="Toggle New Arrival Badge">
+              ${car.isNewVehicle ? '🔥 New Arrival: ON' : '⚪ New Arrival: OFF'}
+            </button>
+            <button class="btn-toggle-slideshow ${(car.heroSlide || car.isSlideshow) ? 'active' : ''}" data-id="${car.id}" title="Toggle Homepage Hero Slideshow">
+              ${(car.heroSlide || car.isSlideshow) ? '🎬 Slideshow: ON' : '⚪ Slideshow: OFF'}
+            </button>
+          </div>
+        `}
       </td>
       <td style="text-align: right;">
-        <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
-          <button class="btn btn-silver btn-sm btn-edit-car" data-id="${car.id}" title="Edit Vehicle Details & Pricing">
-            ✏️ Edit
-          </button>
-          <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.45rem 0.65rem;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          </button>
-          <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Delete Vehicle from Inventory" style="color: #ef4444;">
-            🗑️
-          </button>
-        </div>
+        ${isSalesUser() ? `
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Remove Vehicle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 0.45rem 0.85rem; font-weight: 700;">
+              🗑️ Remove
+            </button>
+          </div>
+        ` : `
+          <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+            <button class="btn btn-silver btn-sm btn-edit-car" data-id="${car.id}" title="Edit Vehicle Details &amp; Options" style="font-size: 0.78rem; padding: 0.4rem 0.65rem;">
+              ✏️ Edit
+            </button>
+            <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.4rem 0.55rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+            <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Delete Vehicle from Inventory" style="color: #ef4444; padding: 0.4rem 0.55rem;">
+              🗑️
+            </button>
+          </div>
+        `}
       </td>
     </tr>
   `).join('');
@@ -684,26 +860,37 @@ function attachTableActionEvents() {
     });
   });
 
-  // Delete vehicle
+  // Delete vehicle permanently from inventory
   document.querySelectorAll('.btn-delete-car').forEach(btn => {
     btn.addEventListener('click', async () => {
       const carId = btn.dataset.id;
-      const car = getVehicleById(carId);
-      if (car && confirm(`Are you sure you want to permanently delete "${car.year} ${car.make} ${car.model}" (Stock #${car.stockNumber}) from the marketplace?`)) {
+      const car = getVehicleById(carId) || VEHICLES_DATA.find(v => String(v.id) === String(carId));
+      const carTitle = car ? `"${car.year} ${car.make} ${car.model}" (Stock #${car.stockNumber || car.id})` : `Vehicle #${carId}`;
+      if (confirm(`Are you sure you want to permanently delete ${carTitle} from the marketplace?`)) {
         if (typeof window.showActionLoader === 'function') {
           window.showActionLoader('Removing Vehicle from CAD Inventory...');
         }
         try {
-          const updated = VEHICLES_DATA.filter(v => v.id !== carId);
-          saveVehiclesData(updated);
+          // 1. Mark permanently deleted in tombstone storage so it never resurrects
+          if (typeof addDeletedVehicleId === 'function') {
+            addDeletedVehicleId(carId);
+          }
+
+          // 2. Remove immediately from local working array and storage
+          if (typeof deleteVehicleLocally === 'function') {
+            deleteVehicleLocally(carId);
+          } else {
+            const updated = VEHICLES_DATA.filter(v => String(v.id) !== String(carId));
+            saveVehiclesData(updated);
+          }
           
-          // Permanently remove from Firebase Cloud Database
+          // 3. Permanently remove from Firebase Cloud Database and record cloud tombstone
           if (typeof deleteVehicleFromFirebase === 'function') {
             await deleteVehicleFromFirebase(carId);
           }
 
           loadMarketplaceDashboard();
-          showToast(`Vehicle #${car.stockNumber} permanently deleted.`, 'info');
+          showToast(`Vehicle permanently deleted and will not reappear.`, 'info');
         } finally {
           if (typeof window.hideActionLoader === 'function') {
             setTimeout(() => window.hideActionLoader(), 250);
@@ -725,7 +912,49 @@ function attachTableActionEvents() {
           await saveVehicleToFirebase(car);
         }
         loadMarketplaceDashboard();
-        showToast(`${car.make} ${car.model} featured status updated.`, 'success');
+        showToast(`${car.year} ${car.make} ${car.model} featured status: ${car.featured ? 'ON (Featured Deal)' : 'OFF'}`, 'success');
+      }
+    });
+  });
+
+  // Toggle New Arrival
+  document.querySelectorAll('.btn-toggle-new').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const carId = btn.dataset.id;
+      const car = getVehicleById(carId);
+      if (car) {
+        car.isNewVehicle = !car.isNewVehicle;
+        if (!Array.isArray(car.badges)) car.badges = [];
+        if (car.isNewVehicle) {
+          if (!car.badges.includes('New Arrival')) car.badges.unshift('New Arrival');
+        } else {
+          car.badges = car.badges.filter(b => b.toLowerCase() !== 'new arrival');
+        }
+        saveVehiclesData(VEHICLES_DATA);
+        if (typeof saveVehicleToFirebase === 'function') {
+          await saveVehicleToFirebase(car);
+        }
+        loadMarketplaceDashboard();
+        showToast(`${car.year} ${car.make} ${car.model} New Arrival status: ${car.isNewVehicle ? 'ON (Marked New)' : 'OFF'}`, 'success');
+      }
+    });
+  });
+
+  // Toggle Slideshow
+  document.querySelectorAll('.btn-toggle-slideshow').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const carId = btn.dataset.id;
+      const car = getVehicleById(carId);
+      if (car) {
+        const nextState = !(car.heroSlide || car.isSlideshow);
+        car.heroSlide = nextState;
+        car.isSlideshow = nextState;
+        saveVehiclesData(VEHICLES_DATA);
+        if (typeof saveVehicleToFirebase === 'function') {
+          await saveVehicleToFirebase(car);
+        }
+        loadMarketplaceDashboard();
+        showToast(`${car.year} ${car.make} ${car.model} Slideshow status: ${nextState ? 'ON (Will appear in homepage slideshow)' : 'OFF'}`, 'success');
       }
     });
   });
@@ -773,40 +1002,55 @@ function renderImageSlots() {
   const grid = document.getElementById('image-slots-grid');
   if (!grid) return;
 
+  const maxSlots = getSystemSettings().maxUploadSlots || 12;
   grid.innerHTML = '';
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < maxSlots; i++) {
     const imgUrl = currentEditingImages[i];
     const slot = document.createElement('div');
     slot.style.cssText = `
       aspect-ratio: 16/10;
-      border: 1px dashed ${imgUrl ? 'var(--border-medium)' : 'var(--border-subtle)'};
+      border: 1.5px dashed ${imgUrl ? '#94A3B8' : '#CBD5E1'};
       border-radius: 8px;
       overflow: hidden;
       position: relative;
-      background: ${imgUrl ? '#000' : 'rgba(255,255,255,0.02)'};
+      background: ${imgUrl ? '#0F172A' : '#FFFFFF'};
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      ${imgUrl ? '' : 'cursor: pointer; transition: all 0.2s ease;'}
     `;
 
     if (imgUrl) {
       slot.innerHTML = `
         <img src="${imgUrl}" alt="Slot ${i+1}" style="width: 100%; height: 100%; object-fit: cover;">
-        <div style="position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.7); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; color: #fff;">
-          ${i === 0 ? 'Main Photo' : `#${i+1}`}
+        <div style="position: absolute; top: 4px; left: 4px; background: rgba(15,23,42,0.85); font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; color: #fff; font-weight: 600;">
+          ${i === 0 ? '★ Cover Photo' : `#${i+1}`}
         </div>
-        <button type="button" class="btn-remove-slot-img" data-index="${i}" style="position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.85); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px;">
+        <button type="button" class="btn-remove-slot-img" data-index="${i}" title="Remove photo" style="position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.95); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px;">
           ✕
         </button>
       `;
     } else {
+      slot.title = `Click + to browse and select photos directly from your computer (select up to ${maxSlots})`;
       slot.innerHTML = `
-        <div style="text-align: center; color: var(--silver-500); font-size: 0.75rem;">
-          <div style="font-size: 1.1rem; margin-bottom: 2px;">+</div>
-          Photo ${i + 1}
+        <div style="text-align: center; color: #64748B; font-size: 0.75rem; font-weight: 600; pointer-events: none;">
+          <div style="font-size: 1.35rem; margin-bottom: 2px; color: #1B3A6B; font-weight: 800;">+</div>
+          Slot ${i + 1}
         </div>
       `;
+      slot.addEventListener('click', () => {
+        document.getElementById('bulk-image-upload')?.click();
+      });
+      slot.addEventListener('mouseenter', () => {
+        slot.style.borderColor = '#1B3A6B';
+        slot.style.background = '#F0F4FA';
+      });
+      slot.addEventListener('mouseleave', () => {
+        slot.style.borderColor = '#CBD5E1';
+        slot.style.background = '#FFFFFF';
+      });
     }
     grid.appendChild(slot);
   }
@@ -839,9 +1083,11 @@ function openVehicleEditorModal(carId = null) {
     document.getElementById('form-car-year').value = car.year;
     document.getElementById('form-car-make').value = car.make;
     document.getElementById('form-car-model').value = car.model;
-    document.getElementById('form-car-trim').value = car.trim;
+    document.getElementById('form-car-trim').value = car.trim || '';
     document.getElementById('form-car-price').value = car.price;
-    document.getElementById('form-car-monthly').value = car.monthlyEst || Math.round(car.price / 72);
+    if (document.getElementById('form-car-monthly')) {
+      document.getElementById('form-car-monthly').value = '';
+    }
     document.getElementById('form-car-mileage').value = car.mileage;
     document.getElementById('form-car-body').value = car.bodyType;
     document.getElementById('form-car-fuel').value = car.fuelType;
@@ -854,14 +1100,21 @@ function openVehicleEditorModal(carId = null) {
     document.getElementById('form-car-stock').value = car.stockNumber;
     document.getElementById('form-car-condition').value = car.condition;
     document.getElementById('form-car-featured').checked = !!car.featured;
+    if (document.getElementById('form-car-new-arrival')) {
+      document.getElementById('form-car-new-arrival').checked = !!car.isNewVehicle;
+    }
+    if (document.getElementById('form-car-slideshow')) {
+      document.getElementById('form-car-slideshow').checked = !!(car.heroSlide || car.isSlideshow);
+    }
     const videoVal = car.video || '';
     document.getElementById('form-car-video').value = videoVal;
     updateVideoPreviewUI(videoVal);
     
-    currentEditingImages = car.images ? [...car.images].slice(0, 10) : [];
-    document.getElementById('form-car-features').value = car.features.join('\n');
-    document.getElementById('form-car-badges').value = car.badges.join(', ');
-    document.getElementById('form-car-overview').value = car.overview;
+    const maxSlots = getSystemSettings().maxUploadSlots || 12;
+    currentEditingImages = car.images ? [...car.images].slice(0, maxSlots) : [];
+    document.getElementById('form-car-features').value = car.features ? car.features.join('\n') : '';
+    document.getElementById('form-car-badges').value = car.badges ? car.badges.join(', ') : '';
+    document.getElementById('form-car-overview').value = car.overview || '';
   } else {
     modalTitle.textContent = 'Add New Vehicle to Marketplace';
     form.reset();
@@ -869,22 +1122,35 @@ function openVehicleEditorModal(carId = null) {
     document.getElementById('form-car-stock').value = `MT-${Math.floor(1000 + Math.random() * 9000)}`;
     document.getElementById('form-car-video').value = '';
     updateVideoPreviewUI('');
+    if (document.getElementById('form-car-featured')) {
+      document.getElementById('form-car-featured').checked = true;
+    }
+    if (document.getElementById('form-car-new-arrival')) {
+      document.getElementById('form-car-new-arrival').checked = true;
+    }
+    if (document.getElementById('form-car-slideshow')) {
+      document.getElementById('form-car-slideshow').checked = true;
+    }
     currentEditingImages = ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
     document.getElementById('form-car-features').value = 'Apple CarPlay & Android Auto\nBlind Spot Monitoring\nRearview Backup Camera\nBluetooth Hands-free';
-    document.getElementById('form-car-badges').value = 'Clean Title, Inspected';
+    document.getElementById('form-car-badges').value = 'Clean Title, Inspected, New Arrival';
   }
+
+  // Synchronize Basic Features quick-select chips with textarea
+  syncBasicFeatureCheckboxes();
 
   renderImageSlots();
 
-  // Handle URL Add Button
+  // Handle URL Add Button (Allows up to maxSlots images)
   const addUrlBtn = document.getElementById('btn-add-image-url');
   const urlInput = document.getElementById('quick-image-url-input');
   if (addUrlBtn && urlInput) {
     addUrlBtn.onclick = () => {
       const url = urlInput.value.trim();
       if (url) {
-        if (currentEditingImages.length >= 10) {
-          showToast('Maximum 10 images allowed per vehicle.', 'warning');
+        const maxSlots = getSystemSettings().maxUploadSlots || 12;
+        if (currentEditingImages.length >= maxSlots) {
+          showToast(`Maximum ${maxSlots} images reached for this vehicle.`, 'warning');
           return;
         }
         currentEditingImages.push(url);
@@ -914,14 +1180,15 @@ function openVehicleEditorModal(carId = null) {
     };
   }
 
-  // Handle Bulk Image File Upload with automatic Canvas compression
+  // Handle Bulk Image File Upload (Select up to maxSlots images at once)
   const fileInput = document.getElementById('bulk-image-upload');
   if (fileInput) {
     fileInput.onchange = (e) => {
       const files = Array.from(e.target.files);
-      const remainingSlots = 10 - currentEditingImages.length;
+      const maxSlots = getSystemSettings().maxUploadSlots || 12;
+      const remainingSlots = maxSlots - currentEditingImages.length;
       if (remainingSlots <= 0) {
-        showToast('Maximum 10 images already reached.', 'warning');
+        showToast(`Maximum ${maxSlots} images already reached.`, 'warning');
         return;
       }
       const filesToProcess = files.slice(0, remainingSlots);
@@ -945,7 +1212,7 @@ function openVehicleEditorModal(carId = null) {
             ctx.drawImage(img, 0, 0, width, height);
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
 
-            if (currentEditingImages.length < 10) {
+            if (currentEditingImages.length < maxSlots) {
               currentEditingImages.push(compressedBase64);
               renderImageSlots();
             }
@@ -976,7 +1243,69 @@ function openVehicleEditorModal(carId = null) {
     };
   }
 
+  // Wire Basic Features & Custom Option
+  setupBasicFeaturesUI();
+
   modalBackdrop.classList.add('active');
+}
+
+function syncBasicFeatureCheckboxes() {
+  const featTextarea = document.getElementById('form-car-features');
+  if (!featTextarea) return;
+  const currentLines = featTextarea.value.split('\n').map(l => l.trim().toLowerCase()).filter(Boolean);
+  document.querySelectorAll('.basic-feature-cb').forEach(cb => {
+    const val = cb.value.trim().toLowerCase();
+    cb.checked = currentLines.some(line => line.includes(val) || val.includes(line));
+  });
+}
+
+function setupBasicFeaturesUI() {
+  const featTextarea = document.getElementById('form-car-features');
+  if (!featTextarea) return;
+
+  // Checkbox change listener
+  document.querySelectorAll('.basic-feature-cb').forEach(cb => {
+    cb.onchange = () => {
+      let lines = featTextarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+      const val = cb.value.trim();
+      if (cb.checked) {
+        if (!lines.some(l => l.toLowerCase() === val.toLowerCase())) {
+          lines.push(val);
+        }
+      } else {
+        lines = lines.filter(l => l.toLowerCase() !== val.toLowerCase());
+      }
+      featTextarea.value = lines.join('\n');
+    };
+  });
+
+  // Custom Feature Add Button
+  const customInput = document.getElementById('custom-feature-input');
+  const addCustomBtn = document.getElementById('btn-add-custom-feature');
+  if (addCustomBtn && customInput) {
+    const handleAddCustom = () => {
+      const val = customInput.value.trim();
+      if (!val) return;
+      let lines = featTextarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.some(l => l.toLowerCase() === val.toLowerCase())) {
+        lines.push(val);
+        featTextarea.value = lines.join('\n');
+        showToast(`Added feature: ${val}`, 'success');
+      } else {
+        showToast(`Feature "${val}" already added.`, 'info');
+      }
+      customInput.value = '';
+      syncBasicFeatureCheckboxes();
+    };
+
+    addCustomBtn.onclick = handleAddCustom;
+    customInput.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddCustom();
+      }
+    };
+  }
 }
 
 function updateVideoPreviewUI(videoVal) {
@@ -1012,11 +1341,10 @@ async function saveVehicleFromForm() {
     const year = parseInt(document.getElementById('form-car-year').value) || new Date().getFullYear();
     const make = document.getElementById('form-car-make').value.trim();
     const model = document.getElementById('form-car-model').value.trim();
-    const trim = document.getElementById('form-car-trim').value.trim();
+    const trim = (document.getElementById('form-car-trim')?.value || '').trim(); // Optional Trim
     const rawPrice = document.getElementById('form-car-price').value.trim();
     const price = parseFloat(rawPrice) || 0;
-    const rawMonthly = document.getElementById('form-car-monthly').value.trim();
-    const monthlyEst = rawMonthly !== '' ? (parseFloat(rawMonthly) || 0) : (typeof price === 'number' ? +(price / 72).toFixed(2) : 0);
+    const monthlyEst = 0; // Removed monthly payment display
     const mileage = parseInt(document.getElementById('form-car-mileage').value) || 0;
     const bodyType = document.getElementById('form-car-body').value || 'SUV';
     const fuelType = document.getElementById('form-car-fuel').value || 'Gasoline';
@@ -1028,14 +1356,26 @@ async function saveVehicleFromForm() {
     const vin = document.getElementById('form-car-vin').value.trim() || 'N/A'; // Optional VIN
     const stockNumber = document.getElementById('form-car-stock').value.trim() || `MT-${Math.floor(1000 + Math.random() * 9000)}`;
     const condition = document.getElementById('form-car-condition').value || 'Pre-Owned';
-    const featured = document.getElementById('form-car-featured').checked;
+    const featured = document.getElementById('form-car-featured') ? document.getElementById('form-car-featured').checked : true;
+    const isNewVehicle = document.getElementById('form-car-new-arrival') ? document.getElementById('form-car-new-arrival').checked : false;
+    const heroSlide = document.getElementById('form-car-slideshow') ? document.getElementById('form-car-slideshow').checked : false;
     const video = document.getElementById('form-car-video').value.trim();
 
-    const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, 10) : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+    const maxSlots = getSystemSettings().maxUploadSlots || 12;
+    const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, maxSlots) : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
 
     const features = document.getElementById('form-car-features').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
-    const badges = document.getElementById('form-car-badges').value.trim().split(',').map(b => b.trim()).filter(Boolean);
+    let badges = document.getElementById('form-car-badges').value.trim().split(',').map(b => b.trim()).filter(Boolean);
     const overview = document.getElementById('form-car-overview').value.trim();
+
+    // Synchronize badges with isNewVehicle
+    if (isNewVehicle) {
+      if (!badges.some(b => b.toLowerCase() === 'new arrival')) {
+        badges.unshift('New Arrival');
+      }
+    } else {
+      badges = badges.filter(b => b.toLowerCase() !== 'new arrival');
+    }
 
     const vehicleObject = {
       id,
@@ -1057,6 +1397,9 @@ async function saveVehicleFromForm() {
       stockNumber,
       condition,
       featured,
+      isNewVehicle,
+      heroSlide,
+      isSlideshow: heroSlide,
       badges,
       images,
       video,
@@ -1064,19 +1407,22 @@ async function saveVehicleFromForm() {
       overview
     };
 
-    const existingIndex = VEHICLES_DATA.findIndex(v => v.id === id);
+    const existingIndex = VEHICLES_DATA.findIndex(v => String(v.id) === String(id));
     if (existingIndex > -1) {
       const prev = VEHICLES_DATA[existingIndex];
-      vehicleObject.isNewVehicle = prev.isNewVehicle !== undefined ? prev.isNewVehicle : false;
       vehicleObject.createdAt = prev.createdAt || new Date().toISOString();
       VEHICLES_DATA[existingIndex] = vehicleObject;
       showToast(`Vehicle ${make} ${model} (#${stockNumber}) updated successfully!`, 'success');
     } else {
-      vehicleObject.isNewVehicle = true;
-      vehicleObject.createdAt = new Date().toISOString();
-      if (!vehicleObject.badges.includes('New Arrival')) {
-        vehicleObject.badges.unshift('New Arrival');
+      const sysSettings = getSystemSettings();
+      const maxLimit = sysSettings.maxInventoryLimit || 25;
+      if (VEHICLES_DATA.length >= maxLimit) {
+        if (typeof window.hideActionLoader === 'function') window.hideActionLoader();
+        showToast('Inventory full, contact support', 'error');
+        alert('Inventory full, contact support');
+        return;
       }
+      vehicleObject.createdAt = new Date().toISOString();
       VEHICLES_DATA.unshift(vehicleObject);
       showToast(`New vehicle "${make} ${model}" added to marketplace with top priority!`, 'success');
     }
@@ -1365,6 +1711,9 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
                   </td>
                   <td style="text-align: right;">
                     <div style="display: inline-flex; gap: 0.45rem;">
+                      <button class="btn btn-blue btn-sm" onclick="sendUserInvitation('${u.id}')" title="Send Invitation Email to ${u.name}" style="font-weight: 600;">
+                        ✉️ Invite
+                      </button>
                       <button class="btn btn-silver btn-sm" onclick="openUserEditorModal('${u.id}')">Edit</button>
                       ${u.username === 'admin' ? '' : `
                         <button class="btn btn-dark btn-sm" onclick="deleteAdminUser('${u.id}')" title="Delete account">✕</button>
@@ -1392,6 +1741,172 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
   }
 }
 
+// Super Admin user invitation email generator & clipboard link
+function sendUserInvitation(userId) {
+  const users = getAdminUsers();
+  const u = users.find(x => x.id === userId);
+  if (!u) {
+    showToast('User profile not found.', 'error');
+    return;
+  }
+  const isSales = (u.role === 'Sales Agent');
+  const origin = window.location.origin || 'http://localhost:3000';
+  const portalUrl = isSales ? `${origin}/sales.html` : `${origin}/admin.html`;
+  const subject = `Invitation to Motor Trends Auto Group Portal (${u.role})`;
+  const body = `Hello ${u.name},
+
+You have been invited to access the Motor Trends Auto Group Staff Portal.
+
+Portal URL: ${portalUrl}
+Assigned Role: ${u.role}
+Department: ${u.department || 'Operations'}
+Login Username / Work Email: ${u.email || u.username}
+Temporary Password: ${u.password || 'Please contact administration'}
+
+Getting Started:
+1. Open the portal URL: ${portalUrl}
+2. Enter your username or email and temporary password to sign in.
+3. For Super Admin access, use "Sign in with Google" with your authorized account.
+
+Motor Trends Auto Group
+11880 Bridgeport Rd, Richmond, BC V6X 1T2
+https://motortrendsautogroup.com`;
+
+  // 1. Open mailto client
+  const mailtoUrl = `mailto:${encodeURIComponent(u.email || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailtoUrl, '_blank');
+
+  // 2. Copy details to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`).then(() => {
+      showToast(`✉️ Invitation email opened & login details copied to clipboard for ${u.name}!`, 'success');
+    }).catch(() => {
+      showToast(`✉️ Invitation email triggered for ${u.name} (${u.email})!`, 'success');
+    });
+  } else {
+    showToast(`✉️ Invitation email triggered for ${u.name} (${u.email})!`, 'success');
+  }
+}
+
+// TAB 4 / 7: SUPERADMIN SETTINGS VIEW
+function renderSettingsView() {
+  const container = document.getElementById('tab-view-settings');
+  if (!container) return;
+
+  const isSuper = isSuperAdminUser();
+  const settings = getSystemSettings();
+
+  if (!isSuper) {
+    container.innerHTML = `
+      <div style="background: #FFFFFF; border: 1.5px solid #FCA5A5; border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; margin-top: 1rem; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size: 2.75rem; margin-bottom: 0.5rem;">🔒</div>
+        <h3 style="font-size: 1.35rem; color: #991B1B; font-weight: 800; margin-bottom: 0.5rem;">
+          Super Admin Restricted Access
+        </h3>
+        <p style="color: #64748B; font-size: 0.9rem; max-width: 520px; margin: 0 auto 1.5rem; line-height: 1.5;">
+          Only the Super Admin (<strong>${settings.superAdminEmail || 'rclickspro@gmail.com'}</strong> via Google Sign-In) is authorized to modify system quotas, photo upload limits, and sales passwords.
+        </p>
+        <button class="btn btn-outline btn-sm" onclick="switchAdminTab('vehicles')">
+          ← Return to Marketplace Vehicles
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="background: #FFFFFF; border: 1px solid var(--admin-border); border-radius: var(--radius-lg); padding: 2rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 1.25rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="badge" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; font-size: 0.75rem; font-weight: 700;">👑 SUPER ADMIN CONTROLS</span>
+            <span class="badge" style="background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; font-size: 0.75rem;">LIVE CLOUD SYNC</span>
+          </div>
+          <h2 style="font-size: 1.45rem; font-weight: 800; color: #0F172A;">
+            System Quotas &amp; Dealership Settings
+          </h2>
+          <p style="font-size: 0.85rem; color: #64748B; margin-top: 0.25rem;">
+            Adjust maximum upload slots, inventory vehicle caps, sales passwords, and super admin login email.
+          </p>
+        </div>
+      </div>
+
+      <form id="superadmin-settings-form" style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 680px;">
+        <!-- Setting 1: Max Upload Slots -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+          <label style="font-weight: 700; color: #0F172A; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            📸 Maximum Photo Upload Slots
+          </label>
+          <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">
+            Default is 12 photo slots per vehicle. Controls slot grid and bulk browse file selection.
+          </div>
+          <input type="number" id="setting-max-uploads" class="form-control" min="1" max="50" value="${settings.maxUploadSlots || 12}" required style="max-width: 200px;">
+        </div>
+
+        <!-- Setting 2: Max Inventory Capacity -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+          <label style="font-weight: 700; color: #0F172A; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            🚗 Maximum Inventory Vehicle Capacity
+          </label>
+          <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">
+            Maximum allowed vehicles in the catalog (Current: <strong>${VEHICLES_DATA.length}</strong> / <strong>${settings.maxInventoryLimit || 25}</strong>). If full, users see <em>"Inventory full, contact support"</em>.
+          </div>
+          <input type="number" id="setting-max-inventory" class="form-control" min="1" max="500" value="${settings.maxInventoryLimit || 25}" required style="max-width: 200px;">
+        </div>
+
+        <!-- Setting 3: Sales Login Password -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+          <label style="font-weight: 700; color: #0F172A; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            💼 Sales Representative Password
+          </label>
+          <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">
+            Password used by sales staff on the Sales Portal.
+          </div>
+          <input type="text" id="setting-sales-password" class="form-control" value="${settings.salesPassword || '^^0ToRTre&d$'}" required style="max-width: 320px; font-family: monospace;">
+        </div>
+
+        <!-- Setting 4: Super Admin Email -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+          <label style="font-weight: 700; color: #0F172A; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            👑 Super Admin Google Account Email
+          </label>
+          <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">
+            Only this Google account is permitted to authenticate as Super Admin via Google Sign-In.
+          </div>
+          <input type="email" id="setting-superadmin-email" class="form-control" value="${settings.superAdminEmail || 'rclickspro@gmail.com'}" required style="max-width: 360px;">
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-blue btn-lg" style="font-weight: 700; padding: 0.75rem 2rem;">
+            💾 Save &amp; Apply System Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  const form = document.getElementById('superadmin-settings-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const maxUploads = parseInt(document.getElementById('setting-max-uploads').value) || 12;
+      const maxInventory = parseInt(document.getElementById('setting-max-inventory').value) || 25;
+      const salesPass = document.getElementById('setting-sales-password').value.trim();
+      const superEmail = document.getElementById('setting-superadmin-email').value.trim().toLowerCase();
+
+      saveSystemSettings({
+        maxUploadSlots: maxUploads,
+        maxInventoryLimit: maxInventory,
+        salesPassword: salesPass,
+        superAdminEmail: superEmail
+      });
+
+      showToast('✅ Super Admin System Settings saved and synced to cloud!', 'success');
+      renderSettingsView();
+    });
+  }
+}
+
 function toggleUserStatus(userId) {
   const users = getAdminUsers();
   const u = users.find(x => x.id === userId);
@@ -1414,6 +1929,31 @@ function setupUserModalEvents() {
 
   closeBtn?.addEventListener('click', () => backdrop.classList.remove('active'));
   cancelBtn?.addEventListener('click', () => backdrop.classList.remove('active'));
+
+  // Auto-set permissions based on selected Role
+  document.getElementById('form-user-role')?.addEventListener('change', (e) => {
+    const roleVal = e.target.value;
+    const permInv = document.getElementById('perm-inventory');
+    const permLeads = document.getElementById('perm-leads');
+    const permAdmin = document.getElementById('perm-admin');
+    const permHR = document.getElementById('perm-hr');
+    if (roleVal === 'Dealership Admin') {
+      if (permInv) permInv.checked = true;
+      if (permLeads) permLeads.checked = true;
+      if (permAdmin) permAdmin.checked = true;
+      if (permHR) permHR.checked = true;
+    } else if (roleVal === 'Sales Agent') {
+      if (permInv) permInv.checked = true;
+      if (permLeads) permLeads.checked = true;
+      if (permAdmin) permAdmin.checked = false;
+      if (permHR) permHR.checked = false;
+    } else if (roleVal === 'HR Manager') {
+      if (permInv) permInv.checked = false;
+      if (permLeads) permLeads.checked = false;
+      if (permAdmin) permAdmin.checked = true;
+      if (permHR) permHR.checked = true;
+    }
+  });
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();

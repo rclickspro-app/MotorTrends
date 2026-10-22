@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Motor Trends Auto Group Main Application Logic
  * Interactive marketplace, filtering, quick view, test drive booking & favorites
  * Features animated loader (vw leo.gif) on every page load & action
@@ -89,6 +89,7 @@ let currentFilters = {
   condition: 'all',
   fuelType: 'all',
   transmission: 'all',
+  minPrice: 0,
   maxPrice: 250000,
   minYear: 2000,
   sortBy: 'featured'
@@ -127,6 +128,7 @@ function initApp() {
     initHeroSlideshow();
     populateHomeDropdowns();
     renderFeaturedVehicles();
+    setTimeout(initDynamicPulseEffects, 2000);
   }
 
   // Real-time Cloud Sync with Firebase
@@ -155,18 +157,16 @@ function initApp() {
 
   // Cross-tab real-time storage sync
   window.addEventListener('storage', (e) => {
-    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db') {
+    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db' || e.key === 'motortrends_deleted_vehicles_ids') {
       const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
-      if (updated && updated.length > 0) {
-        VEHICLES_DATA.length = 0;
-        VEHICLES_DATA.push(...updated);
-        if (isInventoryPage) {
-          populateFilterDropdowns();
-          renderInventory();
-        } else if (isHomePage) {
-          populateHomeDropdowns();
-          renderFeaturedVehicles();
-        }
+      VEHICLES_DATA.length = 0;
+      VEHICLES_DATA.push(...updated);
+      if (isInventoryPage) {
+        populateFilterDropdowns();
+        renderInventory();
+      } else if (isHomePage) {
+        populateHomeDropdowns();
+        renderFeaturedVehicles();
       }
     }
   });
@@ -214,18 +214,18 @@ const DEALER_LOCATIONS = [
     address: '10740 Cambie Road, Richmond, BC V6X 1K8',
     phone: '604-270-7662',
     phoneRaw: '6042707662',
-    dealerNumber: '40212',
-    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8 <span class="dealer-tag">Dealer #40212</span>',
-    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span><span class="dealer-tag">Dealer #40212</span>',
-    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Dealer #:</strong> 40212<br><strong>Email:</strong> sales@motortrends.ca',
+    dealerNumber: '30859',
+    topAddressHtml: '10740 Cambie Road, Richmond, BC V6X 1K8 <span class="dealer-tag">Dealer #30859</span>',
+    slideInfoHtml: '<span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span><span>•</span><span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span><span class="dealer-tag">Dealer #30859</span>',
+    footerShowroomHtml: '<strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br><strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br><strong>Dealer #:</strong> 30859<br><strong>Email:</strong> sales@motortrends.ca',
     footerCallBtnHtml: '📞 Call 604-270-7662',
-    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662 • DEALER #40212',
-    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Dealer #:</strong> 40212</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Richmond, BC.</em></div>',
+    contactPillText: 'RICHMOND, BC DEALERSHIP • 604-270-7662 • DEALER #30859',
+    contactCardHtml: '<div><strong>Dealership:</strong> Motor Trends Auto Group</div><div><strong>Address:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8</div><div><strong>Telephone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a></div><div><strong>Dealer #:</strong> 30859</div><div><strong>Email:</strong> sales@motortrends.ca</div><div style="font-size: 0.85rem; color: var(--silver-400); margin-top: 0.25rem;"><em>Quality pre-owned vehicle sales, leasing and financing in Richmond, BC.</em></div>',
     contactMapAddr: '10740 Cambie Road, Richmond, BC V6X 1K8',
-    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver • Dealer #40212',
+    contactMapSubtext: 'Conveniently situated in Richmond, minutes from Vancouver • Dealer #30859',
     contactMapUrl: 'https://www.google.com/maps/search/?api=1&query=10740+Cambie+Road,+Richmond,+BC+V6X+1K8',
-    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8 (Dealer #40212)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
-    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 10740 Cambie Road, Richmond, BC. (Dealer #40212)'
+    aboutStoryHtml: 'Conveniently located at <strong>10740 Cambie Road, Richmond, BC V6X 1K8 (Dealer #30859)</strong>, our modern showroom and inventory lot host a diverse collection of thoroughly inspected SUVs, sedans, trucks, and hybrids.',
+    trustDescHtml: 'Quality pre-owned vehicle sales, leasing and financing under one roof at 10740 Cambie Road, Richmond, BC. (Dealer #30859)'
   },
   {
     id: 'vancouver',
@@ -406,11 +406,36 @@ function initHeroSlideshow() {
     return a;
   }
 
-  /* --- Pick up to 6 vehicles: new arrivals first, rest random --- */
-  var newArrivals = VEHICLES_DATA.filter(function(v) { return v.isNewVehicle; });
-  var rest        = shuffle(VEHICLES_DATA.filter(function(v) { return !v.isNewVehicle; }));
-  var pool        = newArrivals.concat(rest).slice(0, 6);
-  if (!pool.length) pool = shuffle(VEHICLES_DATA).slice(0, 6);
+  /* --- Pick up to 6 vehicles: admin slideshow picks first, new arrivals next, rest random --- */
+  var heroVehicles= VEHICLES_DATA.filter(function(v) { return v.heroSlide || v.isSlideshow; });
+  var newArrivals = VEHICLES_DATA.filter(function(v) { return v.isNewVehicle && !(v.heroSlide || v.isSlideshow); });
+  var rest        = shuffle(VEHICLES_DATA.filter(function(v) { return !(v.heroSlide || v.isSlideshow) && !v.isNewVehicle; }));
+  var pool        = heroVehicles.concat(newArrivals).concat(rest).slice(0, 6);
+  if (!pool.length && VEHICLES_DATA.length) pool = shuffle(VEHICLES_DATA).slice(0, 6);
+
+  if (!pool.length) {
+    slider.innerHTML = '<div class="hero-slide active">' +
+      '<div class="container" style="position:relative;z-index:3;">' +
+      '<div class="hero-slide-grid" style="grid-template-columns: 1fr;">' +
+      '<div class="hero-slide-content" style="max-width: 800px; margin: 0 auto; text-align: center;">' +
+      '<div class="slide-pill">🔥 QUALITY PRE-OWNED VEHICLES</div>' +
+      '<div class="slide-title">USED CARS, TRUCKS &amp; SUVs</div>' +
+      '<div class="slide-highlight">MOTOR TRENDS AUTO GROUP</div>' +
+      '<p class="slide-desc" style="max-width: 650px; margin: 0.75rem auto 1.5rem;">' +
+        'Richmond\'s premier destination for quality pre-owned vehicles. Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome (OAC).' +
+      '</p>' +
+      '<div class="slide-dealer-info dealer-slide-info" style="justify-content: center; margin-bottom: 1.5rem;">' +
+        '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
+        '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
+        '<span class="dealer-tag">Dealer #30859</span>' +
+      '</div>' +
+      '<div class="slide-actions" style="justify-content: center;">' +
+        '<a href="inventory.html" class="btn btn-blue btn-lg">Browse Inventory</a>' +
+        '<a href="financing.html" class="btn btn-outline btn-lg">Apply for Financing (OAC)</a>' +
+      '</div></div></div></div></div>';
+    if (dotsContainer) dotsContainer.innerHTML = '';
+    return;
+  }
 
   /* --- 6 rotating promo messages for left text panel --- */
   var promos = [
@@ -418,31 +443,33 @@ function initHeroSlideshow() {
       desc: 'Motor Trends Auto Group is Richmond\'s destination for quality pre-owned vehicles — CarFax verified, professionally inspected, and ready to drive.',
       b1: {h:'inventory.html', l:'Browse Full Inventory →'}, b2: {h:'financing.html', l:'Apply Financing'} },
     { pill: '🏦 BUY HERE PAY HERE DEALERSHIP',    title: 'FINANCING FOR ALL CANADIANS',          hl: 'ALL CREDIT APPROVED!',
-      desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome. Fast 15-minute approval — confidential and obligation-free.',
+      desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome (OAC). Flexible payment options tailored to your budget.',
       b1: {h:'financing.html', l:'Get Pre-Approved Today'}, b2: {h:'contact.html', l:'Talk to a Specialist →'} },
     { pill: '🔄 TRADE-IN & SELL YOUR CAR',        title: 'WE BUY VEHICLES IN ANY CONDITION',     hl: 'TOP DOLLAR PAID!',
-      desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment, all ICBC paperwork handled.',
+      desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment.',
       b1: {h:'sell-trade.html', l:'Start Trade-In Valuation'}, b2: {h:'inventory.html', l:'Browse Inventory →'} },
     { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE IN BC',            hl: 'EVERY VEHICLE INSPECTED!',
       desc: 'Every vehicle on our lot comes with a full CarFax history report. Serving Richmond, Vancouver, Surrey, Delta, Burnaby and the entire Lower Mainland.',
       b1: {h:'inventory.html', l:'View Available Cars →'}, b2: {h:'about.html', l:'About Motor Trends'} },
-    { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: 'DEALER #40212',
+    { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: 'DEALER #30859',
       desc: 'Visit us at 10740 Cambie Road in Richmond or browse online. Lease, finance, or buy outright — we have a payment plan that fits your budget.',
       b1: {h:'contact.html', l:'Visit Our Showroom →'}, b2: {h:'financing.html', l:'Lease & Finance Options'} },
     { pill: '💰 VEHICLES UNDER $10,000 CAD',      title: 'BUDGET-FRIENDLY OPTIONS AVAILABLE',    hl: 'STARTING FROM $8,888!',
       desc: 'From vehicles under $10,000 to late-model family SUVs — every vehicle professionally inspected and priced below BC market value.',
-      b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Monthly Payment Calculator'} }
+      b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Explore Financing'} }
   ];
 
   /* --- Build HTML for ONE slide --- */
   function makeSlideHTML(vehicle, promoIdx, isFirst) {
     var p   = promos[promoIdx % promos.length];
     var img = (Array.isArray(vehicle.images) && vehicle.images[0]) ? vehicle.images[0] : 'images/vehicles/jeep/main.jpg';
-    var mainBadge = vehicle.isNewVehicle
-      ? '<span class="v-badge v-badge-new">🔥 New Arrival</span>'
-      : vehicle.featured
-        ? '<span class="v-badge v-badge-blue">⭐ Featured Vehicle</span>'
-        : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
+    var mainBadge = (vehicle.heroSlide || vehicle.isSlideshow)
+      ? '<span class="v-badge v-badge-warning">🎬 Hero Showcase</span>'
+      : vehicle.isNewVehicle
+        ? '<span class="v-badge v-badge-new">🔥 New Arrival</span>'
+        : vehicle.featured
+          ? '<span class="v-badge v-badge-blue">⭐ Featured Vehicle</span>'
+          : '<span class="v-badge v-badge-blue">Actual Inventory Stock</span>';
     var priceBadge = (vehicle.price && vehicle.price < 15000)
       ? '<span class="v-badge v-badge-warning">Great Value</span>'
       : '<span class="v-badge v-badge-dark">' + (vehicle.condition || 'Clean Title') + '</span>';
@@ -460,7 +487,7 @@ function initHeroSlideshow() {
       '<div class="slide-dealer-info dealer-slide-info dealer-transition">' +
         '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
         '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
-        '<span class="dealer-tag">Dealer #40212</span>' +
+        '<span class="dealer-tag">Dealer #30859</span>' +
       '</div>' +
       '<div class="slide-actions">' +
         '<a href="' + p.b1.h + '" class="btn btn-blue btn-lg">' + p.b1.l + '</a>' +
@@ -487,7 +514,6 @@ function initHeroSlideshow() {
             '</div>' +
             '<div class="vehicle-card-price-block">' +
               '<div class="vehicle-card-price">' + formatPrice(vehicle.price) + '</div>' +
-              '<div class="vehicle-card-monthly">Est. ' + formatMonthly(vehicle.monthlyEst) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="vehicle-card-specs-row">' +
@@ -656,6 +682,7 @@ function populateHomeDropdowns() {
 }
 
 function renderFeaturedVehicles() {
+  updateHomeLiveStockCounts();
   const container = document.getElementById('featured-vehicles-grid');
   if (!container) return;
 
@@ -675,8 +702,51 @@ function renderFeaturedVehicles() {
     })
     .slice(0, 6);
 
+  if (!sortedFeatured.length) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: #ffffff; border-radius: 12px; border: 1px dashed #CBD5E1;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🚗</div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #0F172A; margin-bottom: 0.5rem;">Live Inventory Arriving Daily</h3>
+        <p style="color: #64748B; font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.25rem;">
+          Our live inventory is currently being updated. Apply for pre-approval or contact our sales specialists to reserve your vehicle!
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <a href="contact.html" class="btn btn-blue btn-sm">Contact Sales Specialist</a>
+          <a href="financing.html" class="btn btn-outline btn-sm">Get Pre-Approved (OAC)</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = sortedFeatured.map(car => createVehicleCardHtml(car)).join('');
   attachCardEvents(container);
+}
+
+function updateHomeLiveStockCounts() {
+  const totalCount = VEHICLES_DATA.length;
+  const numEl = document.getElementById('live-stock-count-number');
+  if (numEl) numEl.textContent = totalCount;
+  const btnCountEl = document.getElementById('featured-view-all-count');
+  if (btnCountEl) btnCountEl.textContent = totalCount;
+
+  // Category counts
+  const suvCount = VEHICLES_DATA.filter(v => v.bodyType === 'SUV').length;
+  const sedanCount = VEHICLES_DATA.filter(v => v.bodyType === 'Sedan').length;
+  const truckCount = VEHICLES_DATA.filter(v => v.bodyType === 'Truck').length;
+  const hybridCount = VEHICLES_DATA.filter(v => v.fuelType === 'Hybrid' || v.fuelType === 'Electric').length;
+  const vanCount = VEHICLES_DATA.filter(v => v.bodyType === 'Van').length;
+
+  const suvEl = document.getElementById('body-count-suv');
+  if (suvEl) suvEl.textContent = `${suvCount} Available`;
+  const sedanEl = document.getElementById('body-count-sedan');
+  if (sedanEl) sedanEl.textContent = `${sedanCount} Available`;
+  const truckEl = document.getElementById('body-count-truck');
+  if (truckEl) truckEl.textContent = `${truckCount} Available`;
+  const hybridEl = document.getElementById('body-count-hybrid');
+  if (hybridEl) hybridEl.textContent = `${hybridCount} Available`;
+  const vanEl = document.getElementById('body-count-van');
+  if (vanEl) vanEl.textContent = `${vanCount} Available`;
 }
 
 /* ----------------------------------------------------
@@ -927,9 +997,9 @@ function getFilteredVehicles() {
     // Fuel Type
     if (currentFilters.fuelType !== 'all' && car.fuelType !== currentFilters.fuelType) return false;
 
-    // Max Price
+    // Price range starting at minPrice ($0 CAD) up to maxPrice
     const carPriceNum = (typeof car.price === 'number') ? car.price : (parseFloat(car.price) || 0);
-    if (carPriceNum > currentFilters.maxPrice) return false;
+    if (carPriceNum < (currentFilters.minPrice || 0) || carPriceNum > currentFilters.maxPrice) return false;
 
     return true;
   }).sort((a, b) => {
@@ -1054,7 +1124,6 @@ function createVehicleCardHtml(car) {
         <div class="vehicle-pricing">
           <div>
             <div class="price-main">${formatPrice(car.price || 0)}</div>
-            <div class="price-est">Est. ${formatMonthly(car.monthlyEst)}</div>
           </div>
           <button class="btn btn-dark btn-sm btn-compare ${isCompared ? 'active' : ''}" data-id="${car.id}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -1360,15 +1429,6 @@ function openVehicleModal(carId) {
           ` : ''}
         </div>
 
-        <!-- Monthly Payment Calculator Card -->
-        <div style="background: var(--bg-input); padding: 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-top: 0.5rem;">
-          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: #fff;">Estimated Monthly Payment</h4>
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
-            <span style="font-size: 1.5rem; font-weight: 800; color: #60a5fa;">${formatMonthly(car.monthlyEst)}</span>
-            <span style="font-size: 0.8rem; color: var(--silver-500);">/month for 72 mos @ 5.9% APR</span>
-          </div>
-          <p style="font-size: 0.75rem; color: var(--silver-500);">*Based on $2,500 down payment. Financing available.</p>
-        </div>
       </div>
 
       <div>
@@ -1516,9 +1576,9 @@ function openTestDriveModal(carId) {
     <div style="padding: 2rem; max-width: 600px; margin: 0 auto;">
       <div style="text-align: center; margin-bottom: 1.75rem;">
         <div class="badge badge-silver" style="margin-bottom: 0.5rem;">VIP Showroom Appointment</div>
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Schedule a Test Drive</h2>
-        <p style="color: var(--silver-400); font-size: 0.9rem;">
-          ${car ? `You are scheduling a drive for <strong>${car.year} ${car.make} ${car.model}</strong> (${car.stockNumber})` : 'Select your vehicle and preferred time.'}
+        <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem; color: var(--gray-900);">Schedule a Test Drive</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          ${car ? `You are scheduling a drive for <strong style="color: var(--gray-900);">${car.year} ${car.make} ${car.model}</strong> (${car.stockNumber})` : 'Select your vehicle and preferred time.'}
         </p>
       </div>
 
@@ -1526,33 +1586,33 @@ function openTestDriveModal(carId) {
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">First Name *</label>
-            <input type="text" class="form-control" required placeholder="John">
+            <input type="text" id="td-first-name" class="form-control" required placeholder="John">
           </div>
           <div class="form-group">
             <label class="form-label">Last Name *</label>
-            <input type="text" class="form-control" required placeholder="Doe">
+            <input type="text" id="td-last-name" class="form-control" required placeholder="Doe">
           </div>
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Email Address *</label>
-            <input type="email" class="form-control" required placeholder="john@example.com">
+            <input type="email" id="td-email" class="form-control" required placeholder="john@example.com">
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number *</label>
-            <input type="tel" class="form-control" required placeholder="(555) 000-1234">
+            <input type="tel" id="td-phone" class="form-control" required placeholder="(604) 270-7662">
           </div>
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Preferred Date *</label>
-            <input type="date" class="form-control" required value="${new Date().toISOString().split('T')[0]}">
+            <input type="date" id="td-date" class="form-control" required value="${new Date().toISOString().split('T')[0]}">
           </div>
           <div class="form-group">
             <label class="form-label">Preferred Time *</label>
-            <select class="form-control" required>
+            <select id="td-time" class="form-control" required>
               <option>10:00 AM - Morning</option>
               <option>12:00 PM - Noon</option>
               <option>02:00 PM - Afternoon</option>
@@ -1563,7 +1623,7 @@ function openTestDriveModal(carId) {
 
         <div class="form-group">
           <label class="form-label">Do you have a vehicle to trade in?</label>
-          <select class="form-control">
+          <select id="td-trade" class="form-control">
             <option>No, I am only test driving</option>
             <option>Yes, I want a trade-in appraisal</option>
           </select>
@@ -1571,10 +1631,10 @@ function openTestDriveModal(carId) {
 
         <div class="form-group">
           <label class="form-label">Additional Questions or Requests</label>
-          <textarea class="form-control" rows="2" placeholder="Any specific feature or questions about this vehicle?"></textarea>
+          <textarea id="td-notes" class="form-control" rows="2" placeholder="Any specific feature or questions about this vehicle?"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-silver btn-lg" style="margin-top: 0.5rem; width: 100%;">
+        <button type="submit" id="td-submit-btn" class="btn btn-blue btn-lg" style="margin-top: 0.5rem; width: 100%;">
           Confirm Test Drive Reservation
         </button>
       </form>
@@ -1584,12 +1644,79 @@ function openTestDriveModal(carId) {
   modalBackdrop.classList.add('active');
   document.getElementById('modal-close').onclick = () => modalBackdrop.classList.remove('active');
 
-  document.getElementById('test-drive-form').addEventListener('submit', (e) => {
+  document.getElementById('test-drive-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = document.getElementById('td-submit-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Submitting & Forwarding...';
+    }
+
+    const payload = {
+      LeadType: 'Test Drive Reservation',
+      Vehicle: car ? `${car.year} ${car.make} ${car.model} (${car.stockNumber})` : 'General Inquiry',
+      CustomerName: `${document.getElementById('td-first-name')?.value || ''} ${document.getElementById('td-last-name')?.value || ''}`.trim(),
+      Email: document.getElementById('td-email')?.value || '',
+      Phone: document.getElementById('td-phone')?.value || '',
+      PreferredDate: document.getElementById('td-date')?.value || '',
+      PreferredTime: document.getElementById('td-time')?.value || '',
+      HasTradeIn: document.getElementById('td-trade')?.value || 'No',
+      Notes: document.getElementById('td-notes')?.value || '',
+      Location: 'Motor Trends Auto Group - 10740 Cambie Road, Richmond, BC (Dealer #30859)'
+    };
+
+    if (window.sendEmailSubmission) {
+      await window.sendEmailSubmission(payload, `Test Drive: ${payload.Vehicle} - ${payload.CustomerName}`);
+    }
+
     modalBackdrop.classList.remove('active');
-    showToast('🎉 Your Test Drive appointment has been confirmed! Our specialist will reach out shortly.', 'success');
+    showToast('🎉 Your Test Drive appointment request has been submitted! Our specialist will reach out shortly.', 'success');
   });
 }
+
+/* ----------------------------------------------------
+   Unified Global Email Submission Function
+   Direct delivery to rightclicksapp@gmail.com
+----------------------------------------------------- */
+async function sendEmailSubmission(formData, formSubject) {
+  const TARGET_EMAIL = 'rightclicksapp@gmail.com';
+  const endpoint = `https://formsubmit.co/ajax/${TARGET_EMAIL}`;
+
+  // Local storage backup for dealer records
+  try {
+    const leads = JSON.parse(localStorage.getItem('motortrends_leads') || '[]');
+    leads.unshift({
+      id: 'lead_' + Date.now(),
+      subject: formSubject || 'Motor Trends Inquiry',
+      data: formData,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('motortrends_leads', JSON.stringify(leads.slice(0, 50)));
+  } catch(e) {}
+
+  try {
+    const payload = {
+      _subject: `Motor Trends Lead: ${formSubject || 'Website Submission'}`,
+      _template: 'table',
+      _captcha: 'false',
+      ...formData
+    };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    return res.ok;
+  } catch(err) {
+    console.warn('Email submission background notice:', err);
+    return false;
+  }
+}
+window.sendEmailSubmission = sendEmailSubmission;
 
 /* ----------------------------------------------------
    Global Modals Setup & Toast Notifications
@@ -1640,4 +1767,63 @@ function showToast(message, type = 'info') {
     toast.style.transition = 'all 0.3s ease';
     setTimeout(() => toast.remove(), 300);
   }, 3500);
+}
+
+/* ================================================================
+   Dynamic Card & Text Pulse Effects
+   Triggers random glow on vehicle cards and section titles
+   at irregular intervals: 10, 13, 16, 8, 29, 11 seconds etc.
+================================================================ */
+function initDynamicPulseEffects() {
+  var intervals = [8000, 10000, 11000, 13000, 16000, 29000];
+  var altIntervals = [12000, 15000, 9000, 22000, 18000, 7000];
+
+  function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function pulseRandomCard(useRed) {
+    var cards = document.querySelectorAll('.vehicle-card');
+    if (!cards.length) return;
+    var card = cards[Math.floor(Math.random() * cards.length)];
+    var cls = useRed ? 'card-pulse-red' : 'card-pulse-blue';
+    card.classList.remove('card-pulse-blue', 'card-pulse-red');
+    void card.offsetWidth; // force reflow
+    card.classList.add(cls);
+    card.addEventListener('animationend', function() {
+      card.classList.remove(cls);
+    }, { once: true });
+    // Schedule next
+    var delay = pickRandom(useRed ? altIntervals : intervals);
+    setTimeout(function() { pulseRandomCard(!useRed); }, delay);
+  }
+
+  function pulseBodyTypeCard() {
+    var cards = document.querySelectorAll('.body-type-card');
+    if (!cards.length) return;
+    var card = cards[Math.floor(Math.random() * cards.length)];
+    card.classList.remove('card-pulse-blue');
+    void card.offsetWidth;
+    card.classList.add('card-pulse-blue');
+    card.addEventListener('animationend', function() {
+      card.classList.remove('card-pulse-blue');
+    }, { once: true });
+    setTimeout(pulseBodyTypeCard, pickRandom(intervals));
+  }
+
+  function shimmerSectionTitles() {
+    var titles = document.querySelectorAll('.section-title');
+    if (!titles.length) return;
+    var title = titles[Math.floor(Math.random() * titles.length)];
+    title.classList.remove('shimmer');
+    void title.offsetWidth;
+    title.classList.add('shimmer');
+    title.addEventListener('animationend', function() {
+      title.classList.remove('shimmer');
+    }, { once: true });
+    setTimeout(shimmerSectionTitles, pickRandom(altIntervals));
+  }
+
+  // Start staggered so they don't all fire at once
+  setTimeout(function() { pulseRandomCard(false); }, 3000);
+  setTimeout(function() { pulseBodyTypeCard(); },   6000);
+  setTimeout(function() { shimmerSectionTitles(); },9000);
 }

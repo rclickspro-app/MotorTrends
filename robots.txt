@@ -1,4 +1,4 @@
-﻿User-agent: *
+User-agent: *
 Allow: /
 
 # Priority pages for crawling
@@ -9,8 +9,11 @@ Allow: /about.html
 Allow: /contact.html
 Allow: /sell-trade.html
 
-# Block admin panel
+# Block admin & sales panels
 Disallow: /admin.index.html
+Disallow: /admin.html
+Disallow: /sales.index.html
+Disallow: /sales.html
 Disallow: /js/admin.js
 
 Sitemap: https://www.motortrends.ca/sitemap.xml

@@ -16,36 +16,54 @@
   <link rel="stylesheet" href="css/style.css">
 
   <style>
-    /* Admin Portal Dedicated Styling */
+    /* ================================================================
+       Admin Portal — Clean Light Theme Styling
+       Consistent with Motor Trends Automotive Palette
+    ================================================================ */
+    :root {
+      --admin-bg: #F4F6F9;
+      --admin-card: #FFFFFF;
+      --admin-border: #E2E8F0;
+      --admin-border-dark: #CBD5E1;
+      --admin-text-main: #0F172A;
+      --admin-text-muted: #64748B;
+    }
+
+    body {
+      background: var(--admin-bg);
+      color: var(--admin-text-main);
+    }
+
     .admin-auth-container {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
-      background: radial-gradient(circle at top right, #1e293b, #0a0a0d 60%);
+      background: linear-gradient(135deg, #0F2042 0%, #1B3A6B 50%, #2352A0 100%);
     }
 
     .admin-auth-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-xl);
+      background: #FFFFFF;
+      border: 1px solid var(--admin-border);
+      border-radius: 16px;
       padding: 2.5rem;
       width: 100%;
       max-width: 480px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+      color: var(--admin-text-main);
     }
 
     .admin-layout {
       display: flex;
       min-height: 100vh;
-      background: var(--bg-primary);
+      background: var(--admin-bg);
     }
 
     .admin-sidebar {
       width: 260px;
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border-subtle);
+      background: #FFFFFF;
+      border-right: 1px solid var(--admin-border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -53,11 +71,12 @@
       top: 0;
       height: 100vh;
       overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
     }
 
     .admin-sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -76,24 +95,25 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-md);
-      color: var(--silver-400);
-      font-weight: 500;
-      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.88rem;
       transition: all 0.2s ease;
       text-decoration: none;
     }
 
     .admin-nav-item:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
+      color: #1B3A6B;
+      background: #F1F5F9;
     }
 
     .admin-nav-item.active {
-      color: #0a0a0d;
-      background: var(--silver-gradient);
+      color: #1B3A6B;
+      background: #EBF0F8;
       font-weight: 700;
+      border-left: 3px solid #1B3A6B;
     }
 
     .admin-content {
@@ -105,16 +125,16 @@
     }
 
     .admin-top-nav {
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 0.85rem 2rem;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--admin-border);
+      padding: 0.95rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
 
     .admin-body-area {
@@ -126,16 +146,17 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
       padding: 1.25rem 1.5rem;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
     .kpi-card::before {
@@ -145,84 +166,117 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: var(--silver-gradient);
+      background: linear-gradient(90deg, #1B3A6B, #C0392B);
     }
 
     .kpi-title {
-      font-size: 0.8rem;
-      color: var(--silver-500);
+      font-size: 0.75rem;
+      color: #64748B;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
     }
 
     .kpi-val {
       font-size: 1.75rem;
       font-weight: 800;
-      color: #fff;
+      color: #0F172A;
       font-family: var(--font-heading);
     }
 
     .admin-table-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .admin-table-toolbar {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid var(--admin-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
+      background: #FAFAFA;
     }
 
     .admin-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.875rem;
+      font-size: 0.88rem;
       text-align: left;
     }
 
     .admin-table th {
-      background: rgba(255, 255, 255, 0.02);
+      background: #F8FAFC;
       padding: 0.85rem 1.25rem;
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--silver-500);
-      border-bottom: 1px solid var(--border-medium);
+      color: #475569;
+      font-weight: 700;
+      border-bottom: 1.5px solid var(--admin-border);
     }
 
     .admin-table td {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.95rem 1.25rem;
+      border-bottom: 1px solid #F1F5F9;
       vertical-align: middle;
+      color: #1E293B;
     }
 
     .admin-table tr:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: #F8FAFC;
     }
 
-    .btn-toggle-featured {
-      background: transparent;
-      border: 1px solid var(--border-medium);
-      color: var(--silver-400);
+    /* Quick Toggle Buttons for Inventory Management */
+    .btn-toggle-featured,
+    .btn-toggle-new,
+    .btn-toggle-slideshow {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      color: #64748B;
       border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.75rem;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .btn-toggle-featured:hover,
+    .btn-toggle-new:hover,
+    .btn-toggle-slideshow:hover {
+      background: #E2E8F0;
     }
 
     .btn-toggle-featured.active {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: #f59e0b;
-      color: #fbbf24;
+      background: #FEF3C7;
+      border-color: #F59E0B;
+      color: #B45309;
+      font-weight: 700;
+    }
+
+    .btn-toggle-new.active {
+      background: #FEE2E2;
+      border-color: #EF4444;
+      color: #B91C1C;
+      font-weight: 700;
+    }
+
+    .btn-toggle-slideshow.active {
+      background: #E0E7FF;
+      border-color: #6366F1;
+      color: #3730A3;
       font-weight: 700;
     }
 
@@ -235,21 +289,58 @@
     }
 
     .alert-error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
     }
 
     .alert-warning {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      color: #fde68a;
+      background: #FEF3C7;
+      border: 1px solid #FCD34D;
+      color: #92400E;
     }
 
     .alert-info {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: #bae6fd;
+      background: #E0F2FE;
+      border: 1px solid #BAE6FD;
+      color: #075985;
+    }
+
+    /* Modal Form Enhancements */
+    .form-group label {
+      color: #334155;
+      font-weight: 600;
+      font-size: 0.84rem;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .form-control {
+      background: #FFFFFF !important;
+      border: 1.5px solid #CBD5E1 !important;
+      color: #0F172A !important;
+      border-radius: 8px !important;
+      padding: 0.6rem 0.85rem !important;
+      font-size: 0.9rem !important;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: #1B3A6B !important;
+      box-shadow: 0 0 0 3px rgba(27, 58, 107, 0.15) !important;
+      outline: none;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row-2 {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 900px) {
@@ -258,8 +349,9 @@
       }
       .admin-sidebar {
         width: 100%;
+        height: auto;
         border-right: none;
-        border-bottom: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--admin-border);
       }
       .admin-nav-list {
         flex-direction: row;
@@ -297,57 +389,11 @@
       <div style="text-align: center; margin-bottom: 2rem;">
         <a href="index.html" class="brand-logo" style="display: inline-block; margin-bottom: 0.75rem;">
           <div class="brand-logo-badge" style="background: #ffffff; padding: 6px 14px; border-radius: 8px; display: inline-flex;">
-            <img src="images/logo.png" alt="Motor Trends Auto Group" style="height: 48px; width: auto; object-fit: contain;">
+            <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" style="height: 48px; width: auto; object-fit: contain;">
           </div>
         </a>
-        <h2 style="font-size: 1.4rem; color: #fff; margin-top: 0.75rem;">Staff & Admin Portal</h2>
-        <p style="font-size: 0.85rem; color: var(--silver-400);">Log in to manage inventory, sales accounts, HR & leads</p>
-      </div>
-
-      <!-- Live Auth & Firebase Status Indicator -->
-      <div id="auth-status-chip" style="background: rgba(0, 123, 255, 0.12); border: 1px solid rgba(0, 123, 255, 0.35); border-radius: 8px; padding: 0.65rem 0.95rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem;">
-        <span style="display: flex; align-items: center; gap: 0.45rem; color: #93c5fd; font-weight: 600;">
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span>
-          <span id="firebase-conn-text">Firebase Auth: Initialized & Ready</span>
-        </span>
-        <span class="badge badge-blue" style="font-size: 0.7rem;">Free Tier</span>
-      </div>
-
-      <!-- Quick Role Preset Selector for Testing & Fast Sign-In -->
-      <div style="margin-bottom: 1.25rem;">
-        <label style="font-size: 0.75rem; color: var(--silver-400); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem; font-weight: 700;">
-          ⚡ Quick Role Fill (Click to Test Any Department):
-        </label>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin-bottom: 0.4rem;">
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="admin" data-pass="admin" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="General Manager (Admin)">
-            👑 Admin 1 (General Manager)
-          </button>
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="admin2" data-pass="admin123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Operations Admin">
-            👑 Admin 2 (Inventory Director)
-          </button>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.4rem;">
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales" data-pass="sales" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Jason Wong)">
-            💼 Sales 1 (Jason)
-          </button>
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales2" data-pass="sales123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Amrit Singh)">
-            💼 Sales 2 (Amrit)
-          </button>
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="sales3" data-pass="sales123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Sales Agent (Chloe Tremblay)">
-            💼 Sales 3 (Chloe)
-          </button>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="finance" data-pass="finance123" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="F&I Finance Director">
-            💳 Finance Director
-          </button>
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="hr" data-pass="hr" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="HR Manager">
-            👥 HR Manager
-          </button>
-          <button type="button" class="btn btn-dark btn-sm quick-role-btn" data-user="tech" data-pass="tech" style="font-size: 0.75rem; padding: 0.45rem 0.5rem; justify-content: center;" title="Inspection Tech">
-            🔧 Tech &amp; Service
-          </button>
-        </div>
+        <h2 style="font-size: 1.4rem; color: #111827; margin-top: 0.75rem; font-weight: 800;">Staff &amp; Admin Portal</h2>
+        <p style="font-size: 0.85rem; color: #64748B;">Log in to manage inventory, sales accounts, HR &amp; leads</p>
       </div>
 
       <!-- Alert Notification -->
@@ -358,26 +404,34 @@
         <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 1.1rem;">
           <div class="form-group">
             <label class="form-label" for="login-username">Username or Work Email</label>
-            <input type="text" id="login-username" class="form-control" required placeholder="admin" value="admin" autocomplete="username">
+            <input type="text" id="login-username" class="form-control" required placeholder="Enter username or email" autocomplete="username">
           </div>
 
           <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
-              <span id="role-pass-hint" style="font-size: 0.75rem; color: #60a5fa;">Default: <strong>admin</strong></span>
-            </div>
-            <input type="password" id="login-password" class="form-control" required placeholder="••••••••" value="admin" autocomplete="current-password">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-control" required placeholder="Enter password" autocomplete="current-password">
           </div>
 
-          <button type="submit" class="btn btn-blue btn-lg" style="width: 100%; margin-top: 0.5rem;">
-            Sign In to Admin Portal
+          <button type="submit" class="btn btn-blue btn-lg" style="width: 100%; margin-top: 0.35rem; font-weight: 700;">
+            Sign In with Credentials
+          </button>
+
+          <div style="display: flex; align-items: center; margin: 0.5rem 0; gap: 0.75rem;">
+            <div style="flex: 1; height: 1px; background: #E2E8F0;"></div>
+            <span style="font-size: 0.75rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">OR</span>
+            <div style="flex: 1; height: 1px; background: #E2E8F0;"></div>
+          </div>
+
+          <button type="button" id="btn-google-signin" class="btn btn-outline btn-lg" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.65rem; background: #ffffff; color: #1E293B; border: 1.5px solid #CBD5E1; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            Sign in with Google (Super Admin)
           </button>
         </form>
 
         <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 1.15rem;">
           <p style="font-size: 0.85rem; color: var(--silver-400);">
             Need a new account? 
-            <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Register Staff / Firebase</a>
+            <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Register Staff Account</a>
           </p>
           <p style="font-size: 0.8rem; margin-top: 0.75rem;">
             <a href="index.html" style="color: var(--silver-500);">← Back to Public Dealership Website</a>
@@ -394,8 +448,8 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Official Work Email *</label>
-            <input type="email" id="reg-email" class="form-control" required placeholder="manager@yourdealership.com">
+            <label class="form-label">Work Email *</label>
+            <input type="email" id="reg-email" class="form-control" required placeholder="name@motortrends.ca or name@motortrendsautogroup.com">
           </div>
 
           <div class="form-group">
@@ -481,7 +535,7 @@
         <div class="admin-sidebar-header">
           <a href="index.html" class="brand-logo">
             <div class="brand-logo-badge" style="background: #ffffff; padding: 4px 10px; border-radius: 6px; display: inline-flex;">
-              <img src="images/logo.png" alt="Motor Trends Auto Group" style="height: 38px; width: auto; object-fit: contain;">
+              <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" style="height: 38px; width: auto; object-fit: contain;">
             </div>
           </a>
         </div>
@@ -515,6 +569,12 @@
             <a href="#" class="admin-nav-item" data-tab="firebase">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
               Firebase Cloud & Auth
+            </a>
+          </li>
+          <li>
+            <a href="#" class="admin-nav-item" data-tab="settings" id="nav-item-settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              Superadmin Settings
             </a>
           </li>
           <li>
@@ -555,17 +615,17 @@
         <!-- Top Toolbar with prominent Quick Sign Out -->
         <header class="admin-top-nav">
           <div>
-            <h1 style="font-size: 1.35rem; margin-bottom: 0.15rem; font-weight: 800;">Marketplace & Inventory Manager</h1>
-            <p style="font-size: 0.82rem; color: var(--silver-500);">Live synchronization with public auto dealership marketplace</p>
+            <h1 style="font-size: 1.35rem; margin-bottom: 0.15rem; font-weight: 800; color: #0F172A;">Marketplace &amp; Inventory Manager</h1>
+            <p style="font-size: 0.82rem; color: #64748B;">Live synchronization with public auto dealership marketplace</p>
           </div>
 
           <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
             <button id="btn-export-inventory" class="btn btn-outline btn-sm" title="Export database as JSON">
               📥 Export Data
             </button>
-            <button id="btn-add-vehicle" class="btn btn-silver btn-sm">
+            <button id="btn-add-vehicle" class="btn btn-blue" style="font-weight: 700; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(27, 58, 107, 0.25);">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Add New Vehicle
+              + Add New Vehicle
             </button>
           </div>
         </header>
@@ -583,19 +643,23 @@
               </div>
               <div class="kpi-card">
                 <div class="kpi-title">Certified Pre-Owned</div>
-                <div id="kpi-certified-count" class="kpi-val" style="color: #60a5fa;">8</div>
+                <div id="kpi-certified-count" class="kpi-val" style="color: #2352A0;">8</div>
               </div>
               <div class="kpi-card">
                 <div class="kpi-title">Total Inventory Value</div>
-                <div id="kpi-total-value" class="kpi-val" style="color: #34d399;">$0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-title">Average Car Price</div>
-                <div id="kpi-avg-price" class="kpi-val">$0</div>
+                <div id="kpi-total-value" class="kpi-val" style="color: #16A34A;">$0</div>
               </div>
               <div class="kpi-card">
                 <div class="kpi-title">Homepage Featured</div>
-                <div id="kpi-featured-count" class="kpi-val" style="color: #fbbf24;">6</div>
+                <div id="kpi-featured-count" class="kpi-val" style="color: #D97706;">6</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">New Arrivals</div>
+                <div id="kpi-new-count" class="kpi-val" style="color: #DC2626;">0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Hero Slideshow</div>
+                <div id="kpi-slideshow-count" class="kpi-val" style="color: #4F46E5;">0</div>
               </div>
             </div>
 
@@ -616,13 +680,15 @@
 
                   <select id="admin-filter-status" class="form-control" style="width: auto; padding: 0.5rem 0.85rem; font-size: 0.85rem;">
                     <option value="all">All Inventory</option>
-                    <option value="featured">Featured Deals Only</option>
-                    <option value="certified">Certified Only</option>
+                    <option value="featured">⭐ Featured Deals Only</option>
+                    <option value="new">🔥 New Arrivals Only</option>
+                    <option value="slideshow">🎬 Hero Slideshow Only</option>
+                    <option value="certified">Certified Pre-Owned</option>
                     <option value="preowned">Pre-Owned Only</option>
                   </select>
                 </div>
 
-                <div style="font-size: 0.85rem; color: var(--silver-500);">
+                <div style="font-size: 0.85rem; color: #64748B;">
                   Real-time updates apply directly to public website
                 </div>
               </div>
@@ -631,13 +697,13 @@
                 <table class="admin-table">
                   <thead>
                     <tr>
-                      <th>Image</th>
+                      <th style="width: 75px;">Image</th>
                       <th>Vehicle Info</th>
-                      <th>Stock & Condition</th>
-                      <th>Body & Specs</th>
-                      <th>Price ($ CAD) / Monthly</th>
-                      <th>Featured</th>
-                      <th style="text-align: right;">Actions</th>
+                      <th>Stock &amp; Condition</th>
+                      <th>Body &amp; Specs</th>
+                      <th>Price ($ CAD)</th>
+                      <th style="text-align: center; width: 165px;">Display Controls</th>
+                      <th style="text-align: right; width: 140px;">Actions</th>
                     </tr>
                   </thead>
                   <tbody id="admin-vehicles-tbody">
@@ -702,20 +768,16 @@
             <input type="text" id="form-car-model" class="form-control" required placeholder="e.g. RAV4, Civic, F-150">
           </div>
           <div class="form-group">
-            <label class="form-label">Trim / Package *</label>
-            <input type="text" id="form-car-trim" class="form-control" required placeholder="e.g. XLE Premium AWD">
+            <label class="form-label">Trim / Package (Optional)</label>
+            <input type="text" id="form-car-trim" class="form-control" placeholder="e.g. XLE Premium AWD (Optional)">
           </div>
         </div>
 
         <!-- Row 2: Pricing -->
         <div class="form-row-2">
-          <div class="form-group">
+          <div class="form-group" style="grid-column: 1 / -1;">
             <label class="form-label">Retail Price ($ CAD) *</label>
             <input type="number" id="form-car-price" class="form-control" required step="any" placeholder="Retail Price in CAD (e.g. 28500 or 8888.50)">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Est. Monthly Payment ($ CAD/mo)</label>
-            <input type="number" id="form-car-monthly" class="form-control" step="any" placeholder="e.g. 385">
           </div>
         </div>
 
@@ -801,27 +863,60 @@
               <option value="Pre-Owned">Pre-Owned</option>
             </select>
           </div>
-          <div class="form-group" style="display: flex; align-items: center; margin-top: 1.75rem;">
-            <label class="checkbox-label" style="cursor: pointer;">
-              <input type="checkbox" id="form-car-featured">
-              <span style="color: #fff; font-weight: 600; margin-left: 0.5rem;">⭐ Feature this car on Homepage Deals</span>
+          <div class="form-group">
+            <label class="form-label">Vehicle Transmission</label>
+            <input type="text" id="form-car-trans" class="form-control" placeholder="Automatic" value="Automatic">
+          </div>
+        </div>
+
+        <!-- Marketplace Display & Promotion Placement Options -->
+        <div style="background: #F0F4FA; border: 1.5px solid #C7D7EE; border-radius: 10px; padding: 1.25rem;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: #1B3A6B; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>📢</span> Marketplace Display &amp; Promotion Placement
+          </div>
+          <div style="font-size: 0.8rem; color: #4B5563; margin-bottom: 0.85rem;">
+            Choose where this vehicle will appear across the public website:
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem;">
+            <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: #FFFFFF; padding: 0.85rem 1rem; border-radius: 8px; border: 1.5px solid #D1D5DB; cursor: pointer;">
+              <input type="checkbox" id="form-car-featured" style="width: 18px; height: 18px; margin-top: 2px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #111827;">⭐ Featured Deal</div>
+                <div style="font-size: 0.76rem; color: #6B7280; margin-top: 2px;">Show in Homepage Featured Inventory Grid</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: #FFFFFF; padding: 0.85rem 1rem; border-radius: 8px; border: 1.5px solid #D1D5DB; cursor: pointer;">
+              <input type="checkbox" id="form-car-new-arrival" style="width: 18px; height: 18px; margin-top: 2px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #C0392B;">🔥 New Arrival</div>
+                <div style="font-size: 0.76rem; color: #6B7280; margin-top: 2px;">Highlight with red New Arrival badge &amp; filter</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: #FFFFFF; padding: 0.85rem 1rem; border-radius: 8px; border: 1.5px solid #D1D5DB; cursor: pointer;">
+              <input type="checkbox" id="form-car-slideshow" style="width: 18px; height: 18px; margin-top: 2px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #1B3A6B;">🎬 Main Screen Slideshow</div>
+                <div style="font-size: 0.76rem; color: #6B7280; margin-top: 2px;">Display in the top Hero Slider on homepage</div>
+              </div>
             </label>
           </div>
         </div>
 
-        <!-- Row 5: 10 Vehicle Images Attachment Section -->
-        <div class="form-group" style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-medium);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <!-- Row 5: 12 Vehicle Images Attachment Section -->
+        <div class="form-group" style="background: #F8FAFC; padding: 1.25rem; border-radius: var(--radius-md); border: 1.5px solid #E2E8F0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <label class="form-label" style="font-size: 1rem; color: #fff; margin-bottom: 0.15rem;">
-                📸 Vehicle Photo Gallery (Up to 10 Images)
+              <label class="form-label" style="font-size: 0.95rem; color: #0F172A; margin-bottom: 0.15rem; font-weight: 700;">
+                📸 Vehicle Photo Gallery (Up to 12 Images)
               </label>
-              <div style="font-size: 0.8rem; color: var(--silver-500);">
-                Add high-resolution exterior, interior & angle photos. Select files from device or enter image URLs.
+              <div style="font-size: 0.8rem; color: #64748B;">
+                Add high-resolution exterior, interior &amp; angle photos. Click any + slot to select files directly from your computer (select up to 12 at once).
               </div>
             </div>
-            <label for="bulk-image-upload" class="btn btn-silver btn-sm" style="cursor: pointer;">
-              📁 Browse Files (Max 10)
+            <label for="bulk-image-upload" class="btn btn-blue btn-sm" style="cursor: pointer; font-weight: 600;">
+              📁 Browse Files (Max 12)
             </label>
             <input type="file" id="bulk-image-upload" accept="image/*" multiple style="display: none;">
           </div>
@@ -834,19 +929,19 @@
           <!-- Direct URL Quick Paste Input -->
           <div style="display: flex; gap: 0.5rem; align-items: center;">
             <input type="url" id="quick-image-url-input" class="form-control" placeholder="Or paste direct image URL (https://...) and click Add" style="font-size: 0.85rem;">
-            <button type="button" id="btn-add-image-url" class="btn btn-dark btn-sm" style="white-space: nowrap;">
+            <button type="button" id="btn-add-image-url" class="btn btn-outline btn-sm" style="white-space: nowrap; font-weight: 600;">
               + Add URL
             </button>
           </div>
         </div>
 
         <!-- Row 6: Video Walkaround Attachment Section -->
-        <div class="form-group" style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-medium);">
+        <div class="form-group" style="background: #F8FAFC; padding: 1.25rem; border-radius: var(--radius-md); border: 1.5px solid #E2E8F0;">
           <div style="margin-bottom: 0.75rem;">
-            <label class="form-label" style="font-size: 1rem; color: #fff; margin-bottom: 0.15rem;">
+            <label class="form-label" style="font-size: 0.95rem; color: #0F172A; margin-bottom: 0.15rem; font-weight: 700;">
               🎥 Vehicle Video Walkaround (1 Video Attachment)
             </label>
-            <div style="font-size: 0.8rem; color: var(--silver-500);">
+            <div style="font-size: 0.8rem; color: #64748B;">
               Attach a YouTube video, Vimeo, or direct MP4 link for customers to preview this car.
             </div>
           </div>
@@ -856,12 +951,83 @@
             <label for="file-video-upload" class="btn btn-outline btn-sm" style="cursor: pointer; white-space: nowrap;">
               📹 Upload Video File
             </label>
-            <button type="button" id="btn-remove-video" class="btn btn-dark btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); white-space: nowrap; display: none;">
+            <button type="button" id="btn-remove-video" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); white-space: nowrap; display: none;">
               🗑️ Remove Video
             </button>
             <input type="file" id="file-video-upload" accept="video/mp4,video/webm" style="display: none;">
           </div>
-          <div id="video-preview-tag" style="margin-top: 0.65rem; font-size: 0.85rem; color: #38bdf8; display: none; align-items: center; gap: 8px;"></div>
+          <div id="video-preview-tag" style="margin-top: 0.65rem; font-size: 0.85rem; color: #1B3A6B; display: none; align-items: center; gap: 8px;"></div>
+        </div>
+
+        <!-- Extra Section: Basic Features Quick-Select & Custom Option -->
+        <div class="form-group" style="background: #F8FAFC; padding: 1.25rem; border-radius: var(--radius-md); border: 1.5px solid #E2E8F0;">
+          <div style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.95rem; color: #0F172A; margin-bottom: 0.2rem; font-weight: 700;">
+              ✨ Basic Features &amp; Equipment (Quick Select)
+            </label>
+            <div style="font-size: 0.8rem; color: #64748B;">
+              Check the standard features included on this vehicle, or use the custom button below to add custom options.
+            </div>
+          </div>
+
+          <div id="basic-features-chips-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.6rem; margin-bottom: 1rem;">
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Apple CarPlay & Android Auto">
+              <span>📱 Apple CarPlay / Android Auto</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Rearview Backup Camera">
+              <span>📷 Rear Backup Camera</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Heated Front Seats">
+              <span>🔥 Heated Front Seats</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Dual-Zone Automatic Climate Control">
+              <span>❄️ Dual-Zone Climate</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="GPS Navigation System">
+              <span>🧭 GPS Navigation</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Power Sunroof / Moonroof">
+              <span>🪟 Power Sunroof</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Premium Leather Interior">
+              <span>🛋️ Leather Interior</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Blind Spot Monitoring">
+              <span>🛡️ Blind Spot Monitor</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Lane Departure Warning & Keep Assist">
+              <span>🚗 Lane Keep Assist</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Keyless Entry & Push Button Start">
+              <span>🔑 Push-Button Start</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Bluetooth Hands-Free & Wireless Audio">
+              <span>⚡ Bluetooth Audio</span>
+            </label>
+            <label class="feature-chip-label" style="display: flex; align-items: center; gap: 0.5rem; background: #fff; padding: 0.55rem 0.75rem; border-radius: 6px; border: 1px solid #CBD5E1; cursor: pointer; font-size: 0.825rem; font-weight: 600; color: #1E293B;">
+              <input type="checkbox" class="basic-feature-cb" value="Adaptive Cruise Control">
+              <span>🛑 Adaptive Cruise</span>
+            </label>
+          </div>
+
+          <!-- Custom Feature Input Bar -->
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="custom-feature-input" class="form-control" placeholder="Add custom option (e.g. Towing Package, Heated Steering Wheel, Harman Kardon...)" style="font-size: 0.85rem; background: #fff;">
+            <button type="button" id="btn-add-custom-feature" class="btn btn-outline btn-sm" style="white-space: nowrap; font-weight: 700; background: #fff;">
+              + Add Custom Option
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -881,10 +1047,10 @@
 
         <!-- Buttons -->
         <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
-          <button type="button" id="btn-cancel-vehicle-modal" class="btn btn-dark">
+          <button type="button" id="btn-cancel-vehicle-modal" class="btn btn-outline">
             Cancel
           </button>
-          <button type="submit" class="btn btn-silver btn-lg">
+          <button type="submit" class="btn btn-blue btn-lg" style="font-weight: 700; padding: 0.75rem 2rem; box-shadow: 0 4px 14px rgba(27, 58, 107, 0.28);">
             💾 Save Vehicle to Marketplace
           </button>
         </div>
@@ -963,14 +1129,16 @@
     </div>
   </div>
 
+  <!-- Core Data & Storage Models -->
+  <script src="js/data.js"></script>
+
   <!-- Firebase SDKs (Free Tier Compatibility) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/firebase-config.js"></script>
 
-  <!-- Scripts -->
-  <script src="js/data.js"></script>
+  <!-- App & Admin Logic -->
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
 </body>

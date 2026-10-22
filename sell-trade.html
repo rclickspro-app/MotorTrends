@@ -14,6 +14,29 @@
   
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- JSON-LD Structured Data: Trade-In Service -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Vehicle Appraisal & Trade-In Service",
+    "description": "Get top dollar for your vehicle in Richmond, BC with instant appraisal request forwarded directly to Motor Trends Auto Group.",
+    "provider": {
+      "@type": "AutoDealer",
+      "name": "Motor Trends Auto Group",
+      "telephone": "+16042707662",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "10740 Cambie Road",
+        "addressLocality": "Richmond",
+        "addressRegion": "BC",
+        "postalCode": "V6X 1K8",
+        "addressCountry": "CA"
+      }
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -40,7 +63,7 @@
           <span class="dealer-top-address dealer-transition">10740 Cambie Road, Richmond, BC V6X 1K8</span>
         </div>
         <div class="top-bar-item">
-          <span class="top-bar-badge">● Open Mon - Sat 9:00 AM - 7:00 PM</span>
+          <span class="top-bar-badge">● Open Mon - Fri 9:00 AM - 8:00 PM, Sat 9:00 AM - 6:00 PM</span>
         </div>
       </div>
       <div class="top-bar-right">
@@ -68,7 +91,7 @@
       <div class="nav-wrapper">
         <a href="index.html" class="brand-logo" title="Motor Trends Auto Group">
           <div class="brand-logo-badge">
-            <img src="images/logo.png" alt="Motor Trends Auto Group" class="brand-logo-img">
+            <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" class="brand-logo-img">
           </div>
         </a>
 
@@ -105,36 +128,33 @@
         Get Top Dollar for Your Car.<br>
         <span class="text-gradient-silver">Sell for Cash or Trade-In Today.</span>
       </h1>
-      <p class="page-subtitle">
-        We make selling your current vehicle simple. No strangers coming to your house, no lowball offers. Receive a live market-backed valuation and get paid today.
-      </p>
     </div>
 
     <!-- 3-Step Process Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
       <div class="trust-card">
-        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; color: #fff;">1</div>
+        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; background: var(--blue-light); color: var(--blue); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">1</div>
         <h3 class="trust-title">Tell Us About Your Car</h3>
         <p class="trust-desc">Enter your vehicle year, make, mileage, and condition into our appraisal form below.</p>
       </div>
 
       <div class="trust-card">
-        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; color: #fff;">2</div>
+        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; background: var(--blue-light); color: var(--blue); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">2</div>
         <h3 class="trust-title">Instant Cash Appraisal</h3>
         <p class="trust-desc">We cross-reference live regional wholesale auctions and retail sales data for your maximum value.</p>
       </div>
 
       <div class="trust-card">
-        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; color: #fff;">3</div>
+        <div class="trust-icon-box" style="font-size: 1.25rem; font-weight: 800; background: var(--blue-light); color: var(--blue); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">3</div>
         <h3 class="trust-title">Get Paid or Trade Up</h3>
-        <p class="trust-desc">Bring your vehicle to our showroom for quick verification. Leave with a certified check or drive home your new car.</p>
+        <p class="trust-desc">Bring your vehicle to our showroom for quick verification.</p>
       </div>
     </div>
 
     <!-- Appraisal Form & Result Container -->
-    <div class="trade-in-card" style="max-width: 800px; margin: 0 auto;">
-      <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff;">Vehicle Appraisal Form</h2>
-      <p style="color: var(--silver-500); font-size: 0.875rem; margin-bottom: 1.5rem;">Complete the details below to receive your estimated appraisal</p>
+    <div class="trade-in-card" style="max-width: 800px; margin: 0 auto; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: var(--shadow-sm);">
+      <h2 style="font-size: 1.45rem; margin-bottom: 0.5rem; color: var(--gray-900);">Vehicle Appraisal Form</h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">Complete your vehicle details below to submit for a review request:</p>
 
       <form id="trade-in-estimator-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
         <div class="form-row-2">
@@ -173,12 +193,12 @@
 
         <div class="form-row-2">
           <div class="form-group">
-            <label class="form-label">Model & Trim</label>
-            <input type="text" class="form-control" placeholder="e.g. RAV4 XLE AWD">
+            <label class="form-label">Model &amp; Trim</label>
+            <input type="text" id="trade-model" class="form-control" placeholder="e.g. RAV4 XLE AWD">
           </div>
           <div class="form-group">
-            <label class="form-label">Exact Mileage (miles) *</label>
-            <input type="number" id="trade-mileage" class="form-control" value="36000" required>
+            <label class="form-label">Exact Mileage (km) *</label>
+            <input type="number" id="trade-mileage" class="form-control" value="45000" required>
           </div>
         </div>
 
@@ -193,7 +213,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Existing Loan?</label>
-            <select class="form-control">
+            <select id="trade-loan" class="form-control">
               <option>No, I own the title</option>
               <option>Yes, I have an auto loan</option>
             </select>
@@ -202,28 +222,47 @@
 
         <div class="form-group">
           <label class="form-label">VIN Number (Optional - For faster exact quote)</label>
-          <input type="text" class="form-control" placeholder="17-character VIN number">
+          <input type="text" id="trade-vin" class="form-control" placeholder="17-character VIN number">
         </div>
 
-        <button type="submit" class="btn btn-silver btn-lg" style="margin-top: 0.5rem; width: 100%;">
-          Calculate My Guaranteed Appraisal
+        <!-- Customer Contact for Review Request -->
+        <div style="padding-top: 0.5rem; border-top: 1px dashed var(--border);">
+          <div style="font-size: 0.9rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.75rem;">Your Contact Information</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Your Full Name *</label>
+              <input type="text" id="trade-name" class="form-control" required placeholder="John Smith">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" id="trade-phone" class="form-control" required placeholder="(604) 270-7662">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="trade-email" class="form-control" required placeholder="john@example.com">
+          </div>
+        </div>
+
+        <button type="submit" id="trade-submit-btn" class="btn btn-blue btn-lg" style="margin-top: 0.5rem; width: 100%;">
+          Submit for Review Request
         </button>
       </form>
 
       <!-- Results Box -->
-      <div id="trade-in-result-card" style="display: none; margin-top: 2rem; background: var(--bg-input); padding: 2rem; border-radius: var(--radius-md); border: 1px solid var(--silver-400); text-align: center;">
+      <div id="trade-in-result-card" style="display: none; margin-top: 2rem; background: var(--off-white); padding: 2rem; border-radius: var(--radius-md); border: 1.5px solid var(--border-blue); text-align: center;">
         <div class="badge badge-green" style="margin-bottom: 0.5rem;">Official Valuation Output</div>
-        <div style="font-size: 0.9rem; color: var(--silver-400); margin-bottom: 0.25rem;">Estimated Cash or Trade-In Value:</div>
-        <div id="trade-in-offer-amount" style="font-size: 3rem; font-weight: 800; color: #fff; font-family: var(--font-heading); margin-bottom: 0.25rem;">$22,500 CAD</div>
-        <div style="font-size: 0.95rem; color: #60a5fa; margin-bottom: 1.5rem;">Estimated Regional Market Range: <span id="trade-in-offer-range">$21,200 - $23,800 CAD</span></div>
+        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.25rem;">Estimated Cash or Trade-In Value:</div>
+        <div id="trade-in-offer-amount" style="font-size: 2.8rem; font-weight: 800; color: var(--blue); font-family: var(--font-heading); margin-bottom: 0.25rem;">$22,500 CAD</div>
+        <div style="font-size: 0.95rem; color: var(--blue); margin-bottom: 1.5rem;">Estimated Regional Market Range: <span id="trade-in-offer-range" style="font-weight: 700;">$21,200 - $23,800 CAD</span></div>
         
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="inventory.html" class="btn btn-silver">
+          <a href="inventory.html" class="btn btn-blue">
             Apply Toward a Vehicle in Inventory
           </a>
-          <button class="btn btn-outline" onclick="showToast('Appraisal certificate saved! Check your email or show at front desk.', 'success')">
-            Save Valuation Certificate
-          </button>
+          <a href="contact.html" class="btn btn-outline">
+            Schedule Showroom Verification →
+          </a>
         </div>
       </div>
     </div>
@@ -236,16 +275,16 @@
         <div>
           <a href="index.html" class="brand-logo" style="margin-bottom: 1rem; display: inline-block;">
             <div class="footer-logo-badge">
-              <img src="images/logo.png" alt="Motor Trends Auto Group" class="footer-brand-logo-img">
+              <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" class="footer-brand-logo-img">
             </div>
           </a>
           <p style="font-size: 0.875rem; color: var(--silver-400); line-height: 1.6; margin-bottom: 1.25rem; max-width: 340px;">
-            Motor Trends Auto Group is Richmond&#39;s destination for quality pre-owned cars, trucks and SUVs &mdash; priced to sell and ready to drive. We approve car loans for all Canadians regardless of credit!
+            Motor Trends Auto Group is Richmond&#39;s destination for quality pre-owned cars, trucks and SUVs &mdash; priced to sell and ready to drive. Professionally inspected vehicles with CarFax history and in-house financing directly through third-party banks and credit unions (OAC).
           </p>
           <div style="font-size: 0.875rem; color: var(--silver-300); line-height: 1.7;" class="dealer-footer-showroom dealer-transition">
             <strong>Showroom:</strong> 10740 Cambie Road, Richmond, BC V6X 1K8<br>
             <strong>Phone:</strong> <a href="tel:6042707662" style="color: #60a5fa; font-weight: 700;">604-270-7662</a><br>
-            <strong>Dealer #:</strong> 40212<br>
+            <strong>Dealer #:</strong> 30859<br>
             <strong>Email:</strong> sales@motortrends.ca
           </div>
         </div>
@@ -258,7 +297,7 @@
             <li><a href="inventory.html?bodyType=Sedan">Sedans & Hatchbacks</a></li>
             <li><a href="inventory.html?bodyType=Truck">Trucks & 4x4</a></li>
             <li><a href="inventory.html?fuelType=Hybrid">Hybrids & Electric</a></li>
-            <li><a href="inventory.html?maxPrice=25000">Vehicles Under $25,000 CAD</a></li>
+            <li><a href="inventory.html?maxPrice=10000">Vehicles Under $10,000 CAD</a></li>
           </ul>
         </div>
 
@@ -268,7 +307,7 @@
             <li><a href="financing.html">Buy Here Pay Here Financing</a></li>
             <li><a href="financing.html">Financing BC</a></li>
             <li><a href="sell-trade.html">Instant Trade-In Appraisal</a></li>
-            <li><a href="about.html">150-Point Safety Check</a></li>
+            <li><a href="about.html">Comprehensive Safety Check</a></li>
             <li><a href="contact.html">Schedule Test Drive</a></li>
           </ul>
         </div>
@@ -276,7 +315,7 @@
         <div>
           <div class="footer-col-title" data-i18n="footer_hours">Dealership Hours</div>
           <ul class="footer-hours-list">
-            <li class="footer-hours-item"><span>Monday - Friday:</span> <span>9:00 AM - 7:00 PM</span></li>
+            <li class="footer-hours-item"><span>Monday - Friday:</span> <span>9:00 AM - 8:00 PM</span></li>
             <li class="footer-hours-item"><span>Saturday:</span> <span>9:00 AM - 6:00 PM</span></li>
             <li class="footer-hours-item"><span>Sunday:</span> <span>11:00 AM - 5:00 PM</span></li>
           </ul>
@@ -290,9 +329,11 @@
 
       <div class="footer-bottom">
         <div data-i18n="footer_rights">© 2026 Motor Trends Auto Group. All rights reserved. Richmond, BC Licensed Motor Dealer.</div>
-        <div style="display: flex; gap: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
           <a href="#" class="text-silver" data-i18n="footer_privacy">Privacy Policy</a>
           <a href="#" class="text-silver" data-i18n="footer_terms">Terms of Service</a>
+          <span style="color: rgba(255,255,255,0.3);">•</span>
+          <span style="color: #cbd5e1;">Powered by <a href="https://rightclickpro.ca" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 700; text-decoration: underline;">Right Click</a></span>
         </div>
       </div>
     </div>

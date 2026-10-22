@@ -5,7 +5,7 @@
  * All Prices in CAD | All Mileage in km | CAD Currency Enforcement
  */
 
-const DEFAULT_VEHICLES_DATA = [
+const SAMPLE_DEMO_VEHICLES = [
   {
     id: "veh-mt-01",
     year: 2021,
@@ -50,9 +50,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Touchscreen Navigation & Backup Camera",
       "Off-road Capable & Trail Rated",
       "Clean Inside & Out - Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#40212. Buy Here Pay Here financing available."
+    overview: "2021 Jeep Wrangler 4xe Unlimited High Altitude 4x4. Local BC, clean title, single owner, no accidents. 68,000 KM, $37,888 CAD. Plug-in Hybrid, 4x4, Automatic, High Altitude Unlimited with premium leather interior, off-road capable, clean inside and out, runs and drives great. DL#30859. Buy Here Pay Here financing available."
   },
   {
     id: "veh-mt-02",
@@ -97,9 +97,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Great on Gas - Fuel Efficient Commuter",
       "Touchscreen Infotainment & Backup Camera",
       "Clean Inside and Out - Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#40212. Financing available!"
+    overview: "2023 Mitsubishi Outlander PHEV. Local BC, clean title, single owner, no accidents. 166,000 KM, $23,888 CAD. Plug-in Hybrid AWD SUV, Automatic. Great on gas, fuel efficient, spacious interior, great daily driver. Clean inside and out, runs and drives great. DL#30859. Financing available!"
   },
   {
     id: "veh-mt-03",
@@ -143,9 +143,9 @@ const DEFAULT_VEHICLES_DATA = [
       "Reliable Toyota Durability",
       "Clean Inside and Out",
       "Runs and Drives Great",
-      "DL#40212 - Approval"
+      "DL#30859 - Approval"
     ],
-    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#40212 (Richmond, BC). Financing available!"
+    overview: "2017 Toyota RAV4. Local BC, clean title, no accidents. 439,000 KM, $8,888 CAD. Automatic, highway driven, regularly used for work and commuting. Reliable, great daily driver, clean inside and out, runs and drives great. DL#30859 (Richmond, BC). Financing available!"
   },
   {
     id: "veh-001",
@@ -779,49 +779,94 @@ const DEFAULT_VEHICLES_DATA = [
   }
 ];
 
-// LocalStorage Key for persistent marketplace edits (v3 contains real MT Inventory Jeep, Outlander, RAV4)
-const STORAGE_KEY_VEHICLES = 'motortrends_vehicles_db_v3';
-const STORAGE_KEY_VEHICLES_LEGACY = 'motortrends_vehicles_db';
+// Fresh start for live dealership launch: empty inventory catalog
+const DEFAULT_VEHICLES_DATA = [];
+
+// LocalStorage Keys for persistent marketplace edits & deleted vehicle tombstones
+const STORAGE_KEY_VEHICLES = 'motortrends_vehicles_db_live';
+const STORAGE_KEY_VEHICLES_LEGACY = 'motortrends_vehicles_db_live_legacy';
+const STORAGE_KEY_DELETED_VEHICLES = 'motortrends_deleted_vehicles_ids_live';
+
+function getDeletedVehicleIds() {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_DELETED_VEHICLES);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list.map(String) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function addDeletedVehicleId(id) {
+  if (!id || typeof localStorage === 'undefined') return;
+  const list = getDeletedVehicleIds();
+  const strId = String(id);
+  if (!list.includes(strId)) {
+    list.push(strId);
+    localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, JSON.stringify(list));
+  }
+}
+
+function removeDeletedVehicleId(id) {
+  if (!id || typeof localStorage === 'undefined') return;
+  const list = getDeletedVehicleIds();
+  const strId = String(id);
+  const updated = list.filter(item => String(item) !== strId);
+  localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, JSON.stringify(updated));
+}
+
+function isVehicleDeleted(id) {
+  if (!id) return false;
+  return getDeletedVehicleIds().includes(String(id));
+}
 
 // Initialize VEHICLES_DATA from LocalStorage if available, otherwise use initial default catalog
 function getStoredVehicles() {
+  const deletedIds = getDeletedVehicleIds();
   if (typeof localStorage !== 'undefined') {
     const localData = localStorage.getItem(STORAGE_KEY_VEHICLES) || localStorage.getItem(STORAGE_KEY_VEHICLES_LEGACY);
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure the 3 MT inventory vehicles are present at top
-          const hasMTVehicles = parsed.some(v => v.id === 'veh-mt-01' || v.stockNumber === 'MT-4022');
-          if (!hasMTVehicles) {
-            const merged = [DEFAULT_VEHICLES_DATA[0], DEFAULT_VEHICLES_DATA[1], DEFAULT_VEHICLES_DATA[2], ...parsed];
-            localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(merged));
-            localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(merged));
-            return merged;
-          }
-          return parsed;
+        if (Array.isArray(parsed)) {
+          // Filter out any vehicles that have been deleted
+          return parsed.filter(v => v && v.id && !deletedIds.includes(String(v.id)));
         }
       } catch (e) {
         console.error('Error reading localStorage vehicles data:', e);
       }
     }
-    // Store default copy
-    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(DEFAULT_VEHICLES_DATA));
-    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(DEFAULT_VEHICLES_DATA));
+    // Filter initial default catalog so deleted vehicles are never resurrected
+    const initialDefaults = DEFAULT_VEHICLES_DATA.filter(v => !deletedIds.includes(String(v.id)));
+    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(initialDefaults));
+    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(initialDefaults));
+    return initialDefaults;
   }
-  return DEFAULT_VEHICLES_DATA;
+  return DEFAULT_VEHICLES_DATA.filter(v => !deletedIds.includes(String(v.id)));
 }
 
 function saveVehiclesData(data) {
-  const items = Array.isArray(data) ? [...data] : [];
+  const deletedIds = getDeletedVehicleIds();
+  const items = Array.isArray(data) ? data.filter(v => v && v.id && !deletedIds.includes(String(v.id))) : [];
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(items));
     localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(items));
   }
-  if (data !== VEHICLES_DATA) {
+  if (typeof VEHICLES_DATA !== 'undefined') {
     VEHICLES_DATA.length = 0;
     VEHICLES_DATA.push(...items);
   }
+}
+
+function deleteVehicleLocally(id) {
+  if (!id) return [];
+  const strId = String(id);
+  addDeletedVehicleId(strId);
+  const remaining = (typeof VEHICLES_DATA !== 'undefined' ? VEHICLES_DATA : getStoredVehicles())
+    .filter(v => String(v.id) !== strId);
+  saveVehiclesData(remaining);
+  return remaining;
 }
 
 // Active working array
@@ -839,7 +884,8 @@ function getAllBodyTypes() {
 }
 
 function getVehicleById(id) {
-  return VEHICLES_DATA.find(v => v.id === id);
+  if (id === undefined || id === null) return undefined;
+  return VEHICLES_DATA.find(v => String(v.id) === String(id));
 }
 
 // Generic number formatter for mileage, counts, and measurements
@@ -891,6 +937,9 @@ if (typeof window !== 'undefined') {
   window.formatMileageKm = formatMileageKm;
   window.saveVehiclesData = saveVehiclesData;
   window.getStoredVehicles = getStoredVehicles;
+  window.getDeletedVehicleIds = getDeletedVehicleIds;
+  window.addDeletedVehicleId = addDeletedVehicleId;
+  window.isVehicleDeleted = isVehicleDeleted;
 }
 
 // Export for module systems if needed
@@ -900,6 +949,9 @@ if (typeof module !== 'undefined' && module.exports) {
     VEHICLES_DATA,
     getStoredVehicles,
     saveVehiclesData,
+    getDeletedVehicleIds,
+    addDeletedVehicleId,
+    isVehicleDeleted,
     getAllMakes,
     getAllBodyTypes,
     getVehicleById,
