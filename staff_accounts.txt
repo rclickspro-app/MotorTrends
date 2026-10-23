@@ -1,0 +1,95 @@
+================================================================================
+MOTOR TRENDS AUTO GROUP - STAFF ACCOUNTS & CREDENTIALS REFERENCE
+Dealership DL# 30859 | 10740 Cambie Road, Richmond, BC V6X 1K8
+Dedicated Technical Support: Right Click | Phone: +1 250 885 5678 | rightclickpro.ca
+================================================================================
+
+ADMIN PORTAL URL:
+  Local / Staging: admin.html (or admin.index.html)
+  Live Production: https://admin.motortrends.ca (or https://admin.motortrendsautogroup.com)
+
+SALES PORTAL URL:
+  Local / Staging: sales.html (or sales.index.html)
+  Live Production: https://sales.motortrends.ca (or https://sales.motortrendsautogroup.com)
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUPER ADMIN (FULL SYSTEM & QUOTA CONTROL)
+--------------------------------------------------------------------------------
+  Username:       superadmin
+  Work Email:     superadmin@motortrendsautogroup.com
+  Password:       !@uto#@u$
+  Google Sign-In: rclickspro@gmail.com (Click "Sign in with Google" button)
+  Role:           Super Administrator / Executive Management
+  Permissions:    Full Access (Inventory, Quota Settings, Max Limits, Photo Slots,
+                  Sales Passwords, Team Accounts, Customer Leads, Inquiries, Analytics)
+
+--------------------------------------------------------------------------------
+2. DEALERSHIP MANAGER / ADMIN
+--------------------------------------------------------------------------------
+  Username:       admin
+  Work Email:     admin@motortrendsautogroup.com
+  Password:       !@uto#@u$
+  Role:           Dealership Admin / General Manager
+  Permissions:    Full Marketplace & Inventory Management, Leads, Analytics, HR
+
+--------------------------------------------------------------------------------
+3. SENIOR SALES AGENT
+--------------------------------------------------------------------------------
+  Username:       sales
+  Work Email:     sales@motortrends.ca
+  Password:       ^^0ToRTre&d$
+  Role:           Sales Agent
+  Permissions:    Inventory Management (Vehicle Add & Remove only)
+
+--------------------------------------------------------------------------------
+4. SALES AGENT 1 (NEW ACCOUNT)
+--------------------------------------------------------------------------------
+  Username:       sales1
+  Work Email:     sales1@motortrends.ca
+  Password:       sales 8855678   (or: sales8855678)
+  Role:           Sales Agent
+  Permissions:    Inventory Management (Vehicle Add & Remove only)
+
+--------------------------------------------------------------------------------
+5. HUMAN RESOURCES DIRECTOR
+--------------------------------------------------------------------------------
+  Username:       hr
+  Work Email:     hr@motortrendsautogroup.com
+  Password:       hr
+  Role:           HR Manager
+  Permissions:    Staff Management, HR records, Employee verification
+
+--------------------------------------------------------------------------------
+6. VEHICLE INSPECTION TECHNICIAN
+--------------------------------------------------------------------------------
+  Username:       tech
+  Work Email:     tech@motortrendsautogroup.com
+  Password:       tech
+  Role:           Tech / Quality Inspection
+  Permissions:    Vehicle 150-Point Inspection check-sheets & reporting
+
+--------------------------------------------------------------------------------
+7. SERVICE & RECONDITIONING TECHNICIAN
+--------------------------------------------------------------------------------
+  Username:       service
+  Work Email:     service@motortrendsautogroup.com
+  Password:       service
+  Role:           Service Tech
+  Permissions:    Vehicle service orders & reconditioning log
+
+================================================================================
+PUBLIC FORM SUBMISSIONS DISPATCH DESTINATION:
+================================================================================
+  All inquiries from Contact Form, Test Drive Bookings, Financing Pre-Approvals,
+  and Trade-In / Sell Appraisals are automatically dispatched to:
+  rclickspro@gmail.com
+
+================================================================================
+SYSTEM LIMITS & QUOTAS:
+================================================================================
+  - Max Vehicle Inventory Capacity: 25 Vehicles
+  - Max Photos Per Vehicle:        12 Photos (High Resolution)
+  - Starting Catalog:              Fresh Start (0 vehicles, awaiting sales team upload)
+  - Currency:                      Canadian Dollars ($ CAD)
+  - Technical Dispatch & Support:  Right Click (+1 250 885 5678)
+================================================================================
