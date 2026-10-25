@@ -34,36 +34,116 @@ function sanitizeId(id) {
 }
 
 function readCatalog() {
+  const vehiclesMap = new Map();
+
+  // 1. Scan physical folders in uploads/vehicles/ (the primary source of truth)
+  if (fs.existsSync(uploadsVehiclesDir)) {
+    try {
+      const folders = fs.readdirSync(uploadsVehiclesDir);
+      for (const folder of folders) {
+        const folderPath = path.join(uploadsVehiclesDir, folder);
+        try {
+          if (!fs.statSync(folderPath).isDirectory()) continue;
+          const cleanId = sanitizeId(folder);
+          const vFile = path.join(folderPath, 'vehicle.json');
+          let vData = null;
+          if (fs.existsSync(vFile)) {
+            try {
+              vData = JSON.parse(fs.readFileSync(vFile, 'utf8'));
+            } catch (e) {}
+          }
+
+          // Scan all image files inside this vehicle's folder
+          const allFiles = fs.readdirSync(folderPath);
+          const imageFiles = allFiles
+            .filter(f => /\.(jpe?g|png|webp|gif)$/i.test(f))
+            .sort((a, b) => {
+              const numA = parseInt((a.match(/\d+/) || [0])[0]);
+              const numB = parseInt((b.match(/\d+/) || [0])[0]);
+              return numA - numB;
+            })
+            .map(f => `uploads/vehicles/${folder}/${f}`);
+
+          if (vData && vData.id) {
+            // If physical photos exist in this folder, use them
+            if (imageFiles.length > 0) {
+              vData.images = imageFiles;
+            } else if (!Array.isArray(vData.images) || vData.images.length === 0) {
+              vData.images = ['images/slide1.jpg'];
+            }
+            vehiclesMap.set(String(vData.id), vData);
+          } else if (imageFiles.length > 0) {
+            // Folder with images but missing vehicle.json
+            vehiclesMap.set(cleanId, {
+              id: cleanId,
+              year: new Date().getFullYear(),
+              make: 'Vehicle',
+              model: cleanId,
+              price: 0,
+              mileage: 0,
+              bodyType: 'Sedan',
+              fuelType: 'Gasoline',
+              condition: 'Pre-Owned',
+              featured: true,
+              isNewVehicle: true,
+              images: imageFiles,
+              createdAt: new Date().toISOString()
+            });
+          }
+        } catch (folderErr) {
+          console.warn(`Error reading folder ${folder}:`, folderErr);
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading uploads/vehicles directory:', err);
+    }
+  }
+
+  // 2. Also check catalogFile for any metadata
   if (fs.existsSync(catalogFile)) {
     try {
       const raw = fs.readFileSync(catalogFile, 'utf8');
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) {
-      console.warn('Error parsing catalog file, attempting rebuild:', e);
-    }
+      if (Array.isArray(parsed)) {
+        for (const item of parsed) {
+          if (item && item.id) {
+            const strId = String(item.id);
+            if (!vehiclesMap.has(strId)) {
+              const fPath = path.join(uploadsVehiclesDir, strId);
+              if (fs.existsSync(fPath)) {
+                vehiclesMap.set(strId, item);
+              }
+            } else {
+              const existing = vehiclesMap.get(strId);
+              vehiclesMap.set(strId, { ...item, ...existing });
+            }
+          }
+        }
+      }
+    } catch (e) {}
   }
 
-  // Fallback: Rebuild from folders
-  const vehicles = [];
-  if (fs.existsSync(uploadsVehiclesDir)) {
-    const folders = fs.readdirSync(uploadsVehiclesDir);
-    for (const folder of folders) {
-      const vFile = path.join(uploadsVehiclesDir, folder, 'vehicle.json');
-      if (fs.existsSync(vFile)) {
-        try {
-          const vData = JSON.parse(fs.readFileSync(vFile, 'utf8'));
-          if (vData && vData.id) vehicles.push(vData);
-        } catch (e) {}
-      }
-    }
-  }
-  fs.writeFileSync(catalogFile, JSON.stringify(vehicles, null, 2), 'utf8');
+  const vehicles = Array.from(vehiclesMap.values());
+
+  // Sort: Newest additions first
+  vehicles.sort((a, b) => {
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  // Always keep catalog file updated
+  try {
+    fs.writeFileSync(catalogFile, JSON.stringify(vehicles, null, 2), 'utf8');
+  } catch (e) {}
+
   return vehicles;
 }
 
 function saveCatalog(vehicles) {
-  fs.writeFileSync(catalogFile, JSON.stringify(vehicles, null, 2), 'utf8');
+  try {
+    fs.writeFileSync(catalogFile, JSON.stringify(vehicles, null, 2), 'utf8');
+  } catch (e) {}
 }
 
 const server = http.createServer((req, res) => {

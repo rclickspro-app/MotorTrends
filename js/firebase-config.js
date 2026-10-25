@@ -67,7 +67,7 @@ async function fetchVehiclesFromServer() {
     const res = await fetch(API_ENDPOINT, { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) && data.length > 0) {
         saveLocalCacheVehicles(data);
         return data;
       }
@@ -78,7 +78,7 @@ async function fetchVehiclesFromServer() {
       const fallbackRes = await fetch('data/vehicles.json', { cache: 'no-cache' });
       if (fallbackRes.ok) {
         const data = await fallbackRes.json();
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           saveLocalCacheVehicles(data);
           return data;
         }

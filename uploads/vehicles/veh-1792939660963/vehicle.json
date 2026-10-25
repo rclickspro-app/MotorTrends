@@ -1,0 +1,43 @@
+{
+  "id": "veh-1792939660963",
+  "year": 2022,
+  "make": "Toyota",
+  "model": "RAV4",
+  "trim": "",
+  "price": 28500,
+  "monthlyEst": 0,
+  "mileage": 35000,
+  "bodyType": "SUV",
+  "fuelType": "Gasoline",
+  "transmission": "Automatic",
+  "drivetrain": "AWD",
+  "engine": "",
+  "exteriorColor": "",
+  "interiorColor": "",
+  "vin": "N/A",
+  "stockNumber": "MT-5879",
+  "condition": "Certified Pre-Owned",
+  "featured": true,
+  "isNewVehicle": true,
+  "heroSlide": true,
+  "isSlideshow": true,
+  "onTestDrive": false,
+  "badges": [
+    "Clean Title",
+    "Inspected",
+    "New Arrival"
+  ],
+  "images": [
+    "https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80"
+  ],
+  "video": "",
+  "features": [
+    "Apple CarPlay & Android Auto",
+    "Blind Spot Monitoring",
+    "Rearview Backup Camera",
+    "Bluetooth Hands-free"
+  ],
+  "overview": "",
+  "createdAt": "2026-10-25T14:47:40.964Z",
+  "updatedAt": "2026-10-25T14:47:40.977Z"
+}

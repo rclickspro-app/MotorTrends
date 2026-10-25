@@ -1315,7 +1315,7 @@ function openVehicleEditorModal(carId = null) {
     if (document.getElementById('form-car-test-drive')) {
       document.getElementById('form-car-test-drive').checked = false;
     }
-    currentEditingImages = ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+    currentEditingImages = [];
     document.getElementById('form-car-features').value = 'Apple CarPlay & Android Auto\nBlind Spot Monitoring\nRearview Backup Camera\nBluetooth Hands-free';
     document.getElementById('form-car-badges').value = 'Clean Title, Inspected, New Arrival';
   }
@@ -1547,7 +1547,7 @@ async function saveVehicleFromForm() {
     const video = document.getElementById('form-car-video').value.trim();
 
     const maxSlots = getSystemSettings().maxUploadSlots || 12;
-    const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, maxSlots) : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+    const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, maxSlots) : ['images/slide1.jpg'];
 
     const features = document.getElementById('form-car-features').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
     let badges = document.getElementById('form-car-badges').value.trim().split(',').map(b => b.trim()).filter(Boolean);
@@ -1613,12 +1613,21 @@ async function saveVehicleFromForm() {
       showToast(`New vehicle "${make} ${model}" added to marketplace with top priority!`, 'success');
     }
 
-    saveVehiclesData(VEHICLES_DATA);
-
-    // Sync to Firebase Cloud if connected
-    if (typeof saveVehicleToFirebase === 'function') {
+    // Sync to Server File Storage (uploads/vehicles/{id}/)
+    if (typeof saveVehicleToServer === 'function') {
+      const serverResult = await saveVehicleToServer(vehicleObject);
+      if (serverResult && serverResult.vehicle) {
+        vehicleObject.images = serverResult.vehicle.images;
+        const curIdx = VEHICLES_DATA.findIndex(v => String(v.id) === String(id));
+        if (curIdx > -1) {
+          VEHICLES_DATA[curIdx] = serverResult.vehicle;
+        }
+      }
+    } else if (typeof saveVehicleToFirebase === 'function') {
       await saveVehicleToFirebase(vehicleObject);
     }
+
+    saveVehiclesData(VEHICLES_DATA);
 
     document.getElementById('vehicle-edit-modal-backdrop').classList.remove('active');
     loadMarketplaceDashboard();

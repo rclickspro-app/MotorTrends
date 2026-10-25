@@ -33,30 +33,95 @@ if (!is_dir($dataDir)) {
     @mkdir($dataDir, 0755, true);
 }
 
-// Helper: Read central catalog
+// Helper: Read central catalog from physical folders in uploads/vehicles/
 function readCatalog($catalogFile, $uploadsVehiclesDir) {
-    if (file_exists($catalogFile)) {
-        $content = @file_get_contents($catalogFile);
-        $decoded = json_decode($content, true);
-        if (is_array($decoded)) {
-            return $decoded;
-        }
-    }
-    // Fallback: Rebuild catalog from individual vehicle.json files in folders
-    $vehicles = [];
+    $vehiclesMap = [];
+
+    // 1. Scan physical folders in uploads/vehicles/ (primary source of truth)
     if (is_dir($uploadsVehiclesDir)) {
         $folders = scandir($uploadsVehiclesDir);
         foreach ($folders as $folder) {
             if ($folder === '.' || $folder === '..') continue;
-            $vFile = $uploadsVehiclesDir . '/' . $folder . '/vehicle.json';
+            $folderPath = $uploadsVehiclesDir . '/' . $folder;
+            if (!is_dir($folderPath)) continue;
+
+            $cleanId = sanitizeId($folder);
+            $vFile = $folderPath . '/vehicle.json';
+            $vData = null;
             if (file_exists($vFile)) {
-                $vData = json_decode(@file_get_contents($vFile), true);
-                if (is_array($vData) && !empty($vData['id'])) {
-                    $vehicles[] = $vData;
+                $raw = @file_get_contents($vFile);
+                $vData = json_decode($raw, true);
+            }
+
+            // Scan image files inside this vehicle folder
+            $allFiles = scandir($folderPath);
+            $imageFiles = [];
+            foreach ($allFiles as $f) {
+                if (preg_match('/\.(jpe?g|png|webp|gif)$/i', $f)) {
+                    $imageFiles[] = 'uploads/vehicles/' . $folder . '/' . $f;
+                }
+            }
+
+            // Sort natural order (photo_1.jpg before photo_2.jpg)
+            natsort($imageFiles);
+            $imageFiles = array_values($imageFiles);
+
+            if (is_array($vData) && !empty($vData['id'])) {
+                if (!empty($imageFiles)) {
+                    $vData['images'] = $imageFiles;
+                } elseif (empty($vData['images'])) {
+                    $vData['images'] = ['images/slide1.jpg'];
+                }
+                $vehiclesMap[(string)$vData['id']] = $vData;
+            } elseif (!empty($imageFiles)) {
+                $vehiclesMap[$cleanId] = [
+                    'id' => $cleanId,
+                    'year' => (int)date('Y'),
+                    'make' => 'Vehicle',
+                    'model' => $cleanId,
+                    'price' => 0,
+                    'mileage' => 0,
+                    'bodyType' => 'Sedan',
+                    'fuelType' => 'Gasoline',
+                    'condition' => 'Pre-Owned',
+                    'featured' => true,
+                    'isNewVehicle' => true,
+                    'images' => $imageFiles,
+                    'createdAt' => date('c')
+                ];
+            }
+        }
+    }
+
+    // 2. Also check catalogFile for extra metadata
+    if (file_exists($catalogFile)) {
+        $raw = @file_get_contents($catalogFile);
+        $parsed = json_decode($raw, true);
+        if (is_array($parsed)) {
+            foreach ($parsed as $item) {
+                if (isset($item['id'])) {
+                    $strId = (string)$item['id'];
+                    if (!isset($vehiclesMap[$strId])) {
+                        if (is_dir($uploadsVehiclesDir . '/' . $strId)) {
+                            $vehiclesMap[$strId] = $item;
+                        }
+                    } else {
+                        $vehiclesMap[$strId] = array_merge($item, $vehiclesMap[$strId]);
+                    }
                 }
             }
         }
     }
+
+    $vehicles = array_values($vehiclesMap);
+
+    // Sort: Newest additions first
+    usort($vehicles, function($a, $b) {
+        $timeA = isset($a['createdAt']) ? strtotime($a['createdAt']) : 0;
+        $timeB = isset($b['createdAt']) ? strtotime($b['createdAt']) : 0;
+        return $timeB - $timeA;
+    });
+
     @file_put_contents($catalogFile, json_encode($vehicles, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     return $vehicles;
 }
