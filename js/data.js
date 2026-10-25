@@ -786,13 +786,28 @@ const DEFAULT_VEHICLES_DATA = [];
 const STORAGE_KEY_VEHICLES = 'motortrends_vehicles_db_live';
 const STORAGE_KEY_VEHICLES_LEGACY = 'motortrends_vehicles_db_live_legacy';
 const STORAGE_KEY_DELETED_VEHICLES = 'motortrends_deleted_vehicles_ids_live';
+const LEGACY_STORAGE_KEY_DELETED = 'motortrends_deleted_vehicles_ids';
+
+const ALL_VEHICLE_CACHE_KEYS = [
+  'motortrends_vehicles_db_live',
+  'motortrends_vehicles_db_live_legacy',
+  'motortrends_vehicles_db',
+  'motortrends_vehicles_db_v3',
+  'motortrends_vehicles_data'
+];
 
 function getDeletedVehicleIds() {
   if (typeof localStorage === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_DELETED_VEHICLES);
-    const list = raw ? JSON.parse(raw) : [];
-    return Array.isArray(list) ? list.map(String) : [];
+    const rawLive = localStorage.getItem(STORAGE_KEY_DELETED_VEHICLES);
+    const rawLegacy = localStorage.getItem(LEGACY_STORAGE_KEY_DELETED);
+    const listLive = rawLive ? JSON.parse(rawLive) : [];
+    const listLegacy = rawLegacy ? JSON.parse(rawLegacy) : [];
+    const merged = [
+      ...(Array.isArray(listLive) ? listLive : []),
+      ...(Array.isArray(listLegacy) ? listLegacy : [])
+    ];
+    return [...new Set(merged.map(String))];
   } catch (e) {
     return [];
   }
@@ -804,8 +819,26 @@ function addDeletedVehicleId(id) {
   const strId = String(id);
   if (!list.includes(strId)) {
     list.push(strId);
-    localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, JSON.stringify(list));
   }
+  const payload = JSON.stringify(list);
+  try {
+    localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, payload);
+    localStorage.setItem(LEGACY_STORAGE_KEY_DELETED, payload);
+  } catch (e) {}
+
+  // Explicitly purge this deleted vehicle from all known vehicle storage keys in localStorage
+  ALL_VEHICLE_CACHE_KEYS.forEach(key => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          const cleaned = arr.filter(v => v && String(v.id) !== strId && String(v.stockNumber || '') !== strId);
+          localStorage.setItem(key, JSON.stringify(cleaned));
+        }
+      }
+    } catch (e) {}
+  });
 }
 
 function removeDeletedVehicleId(id) {
@@ -813,7 +846,11 @@ function removeDeletedVehicleId(id) {
   const list = getDeletedVehicleIds();
   const strId = String(id);
   const updated = list.filter(item => String(item) !== strId);
-  localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, JSON.stringify(updated));
+  const payload = JSON.stringify(updated);
+  try {
+    localStorage.setItem(STORAGE_KEY_DELETED_VEHICLES, payload);
+    localStorage.setItem(LEGACY_STORAGE_KEY_DELETED, payload);
+  } catch (e) {}
 }
 
 function isVehicleDeleted(id) {
@@ -825,22 +862,33 @@ function isVehicleDeleted(id) {
 function getStoredVehicles() {
   const deletedIds = getDeletedVehicleIds();
   if (typeof localStorage !== 'undefined') {
-    const localData = localStorage.getItem(STORAGE_KEY_VEHICLES) || localStorage.getItem(STORAGE_KEY_VEHICLES_LEGACY);
-    if (localData) {
-      try {
-        const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed)) {
-          // Filter out any vehicles that have been deleted
-          return parsed.filter(v => v && v.id && !deletedIds.includes(String(v.id)));
+    // Check primary live key, then fallbacks
+    for (const key of ALL_VEHICLE_CACHE_KEYS) {
+      const localData = localStorage.getItem(key);
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Filter out any vehicles that have been deleted
+            const filtered = parsed.filter(v => v && v.id && !deletedIds.includes(String(v.id)));
+            // Normalize primary keys
+            try {
+              localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(filtered));
+              localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(filtered));
+            } catch (e) {}
+            return filtered;
+          }
+        } catch (e) {
+          console.error(`Error reading ${key}:`, e);
         }
-      } catch (e) {
-        console.error('Error reading localStorage vehicles data:', e);
       }
     }
-    // Filter initial default catalog so deleted vehicles are never resurrected
+    // Catalog is clean/empty by default for live inventory
     const initialDefaults = DEFAULT_VEHICLES_DATA.filter(v => !deletedIds.includes(String(v.id)));
-    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(initialDefaults));
-    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(initialDefaults));
+    try {
+      localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(initialDefaults));
+      localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(initialDefaults));
+    } catch (e) {}
     return initialDefaults;
   }
   return DEFAULT_VEHICLES_DATA.filter(v => !deletedIds.includes(String(v.id)));
@@ -848,10 +896,14 @@ function getStoredVehicles() {
 
 function saveVehiclesData(data) {
   const deletedIds = getDeletedVehicleIds();
-  const items = Array.isArray(data) ? data.filter(v => v && v.id && !deletedIds.includes(String(v.id))) : [];
+  const items = Array.isArray(data)
+    ? data.filter(v => v && v.id && !deletedIds.includes(String(v.id)) && !deletedIds.includes(String(v.stockNumber || '')))
+    : [];
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY_VEHICLES, JSON.stringify(items));
-    localStorage.setItem(STORAGE_KEY_VEHICLES_LEGACY, JSON.stringify(items));
+    const payload = JSON.stringify(items);
+    ALL_VEHICLE_CACHE_KEYS.forEach(k => {
+      try { localStorage.setItem(k, payload); } catch (e) {}
+    });
   }
   if (typeof VEHICLES_DATA !== 'undefined') {
     VEHICLES_DATA.length = 0;
@@ -863,8 +915,10 @@ function deleteVehicleLocally(id) {
   if (!id) return [];
   const strId = String(id);
   addDeletedVehicleId(strId);
-  const remaining = (typeof VEHICLES_DATA !== 'undefined' ? VEHICLES_DATA : getStoredVehicles())
-    .filter(v => String(v.id) !== strId);
+  const current = (typeof VEHICLES_DATA !== 'undefined' && VEHICLES_DATA.length > 0)
+    ? VEHICLES_DATA
+    : getStoredVehicles();
+  const remaining = current.filter(v => v && String(v.id) !== strId && String(v.stockNumber || '') !== strId);
   saveVehiclesData(remaining);
   return remaining;
 }
@@ -931,6 +985,10 @@ function formatMileageKm(val) {
 
 // Attach globally if in browser
 if (typeof window !== 'undefined') {
+  window.STORAGE_KEY_VEHICLES = STORAGE_KEY_VEHICLES;
+  window.STORAGE_KEY_DELETED_VEHICLES = STORAGE_KEY_DELETED_VEHICLES;
+  window.LEGACY_STORAGE_KEY_DELETED = LEGACY_STORAGE_KEY_DELETED;
+  window.ALL_VEHICLE_CACHE_KEYS = ALL_VEHICLE_CACHE_KEYS;
   window.formatNumber = formatNumber;
   window.formatPrice = formatPrice;
   window.formatMonthly = formatMonthly;
@@ -939,7 +997,9 @@ if (typeof window !== 'undefined') {
   window.getStoredVehicles = getStoredVehicles;
   window.getDeletedVehicleIds = getDeletedVehicleIds;
   window.addDeletedVehicleId = addDeletedVehicleId;
+  window.removeDeletedVehicleId = removeDeletedVehicleId;
   window.isVehicleDeleted = isVehicleDeleted;
+  window.deleteVehicleLocally = deleteVehicleLocally;
 }
 
 // Export for module systems if needed

@@ -387,7 +387,7 @@
       
       <!-- Brand Logo Header -->
       <div style="text-align: center; margin-bottom: 2rem;">
-        <a href="index.html" class="brand-logo" style="display: inline-block; margin-bottom: 0.75rem;">
+        <a href="./" class="brand-logo" style="display: inline-block; margin-bottom: 0.75rem;">
           <div class="brand-logo-badge" style="background: #ffffff; padding: 6px 14px; border-radius: 8px; display: inline-flex;">
             <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" style="height: 48px; width: auto; object-fit: contain;">
           </div>
@@ -434,7 +434,7 @@
             <a href="#" id="btn-show-register" style="color: #60a5fa; font-weight: 600;">Register Staff Account</a>
           </p>
           <p style="font-size: 0.8rem; margin-top: 0.75rem;">
-            <a href="index.html" style="color: var(--silver-500);">← Back to Public Dealership Website</a>
+            <a href="./" style="color: var(--silver-500);">← Back to Public Dealership Website</a>
           </p>
         </div>
       </div>
@@ -533,7 +533,7 @@
       <!-- Admin Sidebar -->
       <aside class="admin-sidebar">
         <div class="admin-sidebar-header">
-          <a href="index.html" class="brand-logo">
+          <a href="./" class="brand-logo">
             <div class="brand-logo-badge" style="background: #ffffff; padding: 4px 10px; border-radius: 6px; display: inline-flex;">
               <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" style="height: 38px; width: auto; object-fit: contain;">
             </div>
@@ -567,8 +567,8 @@
           </li>
           <li>
             <a href="#" class="admin-nav-item" data-tab="firebase">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-              Firebase Cloud & Auth
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              Server &amp; File Storage
             </a>
           </li>
           <li>
@@ -685,6 +685,7 @@
                     <option value="slideshow">🎬 Hero Slideshow Only</option>
                     <option value="certified">Certified Pre-Owned</option>
                     <option value="preowned">Pre-Owned Only</option>
+                    <option value="testdrive">🚗 On Test Drive Only</option>
                   </select>
                 </div>
 
@@ -901,6 +902,14 @@
                 <div style="font-size: 0.76rem; color: #6B7280; margin-top: 2px;">Display in the top Hero Slider on homepage</div>
               </div>
             </label>
+
+            <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: #FFFFFF; padding: 0.85rem 1rem; border-radius: 8px; border: 1.5px solid #A7F3D0; cursor: pointer;">
+              <input type="checkbox" id="form-car-test-drive" style="width: 18px; height: 18px; margin-top: 2px; accent-color: #059669;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #047857;">🚗 On Test Drive</div>
+                <div style="font-size: 0.76rem; color: #6B7280; margin-top: 2px;">Changes action button to "Sold" in dashboard</div>
+              </div>
+            </label>
           </div>
         </div>
 
@@ -1061,9 +1070,9 @@
 
   <!-- Modal: Add / Edit Dealership User -->
   <div id="modal-user-backdrop" class="modal-backdrop">
-    <div class="modal-box" style="max-width: 580px;">
+    <div class="modal-box" style="max-width: 580px; background: #FFFFFF; color: #0F172A;">
       <div class="modal-header">
-        <h3 id="modal-user-title" style="font-size: 1.25rem; font-weight: 700; color: #fff;">Add Team Member</h3>
+        <h3 id="modal-user-title" style="font-size: 1.25rem; font-weight: 800; color: #0F172A;">Add Team Member</h3>
         <button type="button" class="modal-close" id="btn-close-user-modal">&times;</button>
       </div>
       <form id="form-manage-user" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
@@ -1101,21 +1110,21 @@
           </select>
         </div>
 
-        <div style="background: rgba(0, 123, 255, 0.08); border: 1px solid rgba(0, 123, 255, 0.25); border-radius: 8px; padding: 1rem;">
-          <label style="color: #fff; font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Access & Role Permissions:</label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+        <div style="background: #F0F4FA; border: 1px solid #BFDBFE; border-radius: 8px; padding: 1rem;">
+          <label style="color: #0F172A; font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Access & Role Permissions:</label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #1E293B; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
             <input type="checkbox" id="perm-inventory" checked>
             <span><strong>Maintain Inventory:</strong> Can Add, Edit, Price, Feature & Delete Vehicles</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #1E293B; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
             <input type="checkbox" id="perm-leads" checked>
             <span><strong>Customer Leads:</strong> Can View & Follow up on Test Drives & Financing</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #1E293B; font-size: 0.85rem; margin-bottom: 0.4rem; cursor: pointer;">
             <input type="checkbox" id="perm-admin">
             <span><strong>User Administration:</strong> Can Create & Manage Team Accounts</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; color: #e2e8f0; font-size: 0.85rem; cursor: pointer;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; color: #1E293B; font-size: 0.85rem; cursor: pointer;">
             <input type="checkbox" id="perm-hr">
             <span><strong>HR & Staff Records:</strong> Staff Profiles, Roles & Department Records</span>
           </label>

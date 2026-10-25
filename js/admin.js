@@ -31,9 +31,6 @@ function saveSystemSettings(newSettings) {
   const current = getSystemSettings();
   const merged = { ...current, ...newSettings };
   localStorage.setItem(SYSTEM_SETTINGS_KEY, JSON.stringify(merged));
-  if (typeof firebase !== 'undefined' && typeof fbDb !== 'undefined' && fbDb) {
-    fbDb.ref('system/settings').set(merged).catch(err => console.warn('Firebase settings sync error:', err));
-  }
   return merged;
 }
 
@@ -173,7 +170,15 @@ function initAdminSystem() {
 
   // Cross-tab sync
   window.addEventListener('storage', (e) => {
-    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db' || e.key === 'motortrends_deleted_vehicles_ids') {
+    const relevantKeys = [
+      'motortrends_vehicles_db_live',
+      'motortrends_vehicles_db_live_legacy',
+      'motortrends_vehicles_db_v3',
+      'motortrends_vehicles_db',
+      'motortrends_deleted_vehicles_ids_live',
+      'motortrends_deleted_vehicles_ids'
+    ];
+    if (relevantKeys.includes(e.key)) {
       const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
       VEHICLES_DATA.length = 0;
       VEHICLES_DATA.push(...updated);
@@ -760,6 +765,7 @@ function renderVehiclesTable(query = '') {
     if (statusFilter === 'slideshow' && !(car.heroSlide || car.isSlideshow)) return false;
     if (statusFilter === 'certified' && car.condition !== 'Certified Pre-Owned') return false;
     if (statusFilter === 'preowned' && car.condition !== 'Pre-Owned') return false;
+    if (statusFilter === 'testdrive' && !car.onTestDrive) return false;
 
     return true;
   });
@@ -788,6 +794,7 @@ function renderVehiclesTable(query = '') {
       <td>
         <div style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">${car.stockNumber || 'MT-NEW'}</div>
         <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px;">
+          ${car.onTestDrive ? `<span class="badge" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.68rem; padding:2px 6px; font-weight:700;">🚗 On Test Drive</span>` : ''}
           ${car.isNewVehicle ? `<span class="badge" style="background:#FEE2E2; color:#B91C1C; border:1px solid #FCA5A5; font-size:0.68rem; padding:2px 5px;">🔥 New</span>` : ''}
           ${(car.heroSlide || car.isSlideshow) ? `<span class="badge" style="background:#E0E7FF; color:#3730A3; border:1px solid #C7D2FE; font-size:0.68rem; padding:2px 5px;">🎬 Slide</span>` : ''}
           <span class="badge" style="background:#F1F5F9; color:#334155; border:1px solid #CBD5E1; font-size:0.68rem; padding:2px 5px;">
@@ -806,6 +813,7 @@ function renderVehiclesTable(query = '') {
       <td style="text-align: center;">
         ${isSalesUser() ? `
           <div style="font-size: 0.75rem; color: #64748B; font-weight: 600;">
+            ${car.onTestDrive ? '<span class="badge" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-weight:700; margin-bottom:2px; display:inline-block;">🚗 On Test Drive</span><br>' : ''}
             ${car.featured ? '<span class="badge" style="background:#FEF3C7; color:#92400E; margin-bottom:2px; display:inline-block;">⭐ Featured</span><br>' : ''}
             ${car.isNewVehicle ? '<span class="badge" style="background:#FEE2E2; color:#B91C1C; margin-bottom:2px; display:inline-block;">🔥 New</span><br>' : ''}
             ${(car.heroSlide || car.isSlideshow) ? '<span class="badge" style="background:#E0E7FF; color:#3730A3; display:inline-block;">🎬 Slide</span>' : '<span style="color:#94a3b8; font-size:0.75rem;">Standard</span>'}
@@ -826,22 +834,44 @@ function renderVehiclesTable(query = '') {
       </td>
       <td style="text-align: right;">
         ${isSalesUser() ? `
-          <div style="display: flex; justify-content: flex-end;">
-            <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Remove Vehicle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 0.45rem 0.85rem; font-weight: 700;">
-              🗑️ Remove
-            </button>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: ${car.onTestDrive ? '#047857' : '#475569'}; background: ${car.onTestDrive ? '#ECFDF5' : '#F1F5F9'}; border: 1.5px solid ${car.onTestDrive ? '#10B981' : '#CBD5E1'}; padding: 4px 8px; border-radius: 6px; user-select: none;">
+              <input type="checkbox" class="cb-toggle-test-drive" data-id="${car.id}" ${car.onTestDrive ? 'checked' : ''} style="cursor: pointer; width: 15px; height: 15px; accent-color: #059669;">
+              <span>On Test Drive</span>
+            </label>
+            ${car.onTestDrive ? `
+              <button class="btn btn-sm btn-mark-sold" data-id="${car.id}" title="Mark Vehicle as Sold" style="background: #10B981; color: #FFFFFF; border: 1px solid #059669; padding: 0.45rem 1rem; font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25); cursor: pointer;">
+                🏷️ Sold
+              </button>
+            ` : `
+              <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Remove Vehicle" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 0.45rem 0.85rem; font-weight: 700;">
+                🗑️ Remove
+              </button>
+            `}
           </div>
         ` : `
-          <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
-            <button class="btn btn-silver btn-sm btn-edit-car" data-id="${car.id}" title="Edit Vehicle Details &amp; Options" style="font-size: 0.78rem; padding: 0.4rem 0.65rem;">
-              ✏️ Edit
-            </button>
-            <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.4rem 0.55rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-            <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Delete Vehicle from Inventory" style="color: #ef4444; padding: 0.4rem 0.55rem;">
-              🗑️
-            </button>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <label style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; font-weight: 700; cursor: pointer; color: ${car.onTestDrive ? '#047857' : '#64748B'}; background: ${car.onTestDrive ? '#ECFDF5' : '#F8FAFC'}; border: 1.5px solid ${car.onTestDrive ? '#10B981' : '#E2E8F0'}; padding: 3px 6px; border-radius: 4px; user-select: none;">
+              <input type="checkbox" class="cb-toggle-test-drive" data-id="${car.id}" ${car.onTestDrive ? 'checked' : ''} style="cursor: pointer; width: 14px; height: 14px; accent-color: #059669;">
+              <span>On Test Drive</span>
+            </label>
+            <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+              <button class="btn btn-silver btn-sm btn-edit-car" data-id="${car.id}" title="Edit Vehicle Details &amp; Options" style="font-size: 0.78rem; padding: 0.4rem 0.65rem;">
+                ✏️ Edit
+              </button>
+              <button class="btn btn-outline btn-sm btn-view-live-car" data-id="${car.id}" title="Preview in Marketplace" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.4rem 0.55rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+              ${car.onTestDrive ? `
+                <button class="btn btn-sm btn-mark-sold" data-id="${car.id}" title="Mark Vehicle as Sold" style="background: #10B981; color: #FFFFFF; border: 1px solid #059669; padding: 0.4rem 0.65rem; font-weight: 700; border-radius: 4px; cursor: pointer;">
+                  🏷️ Sold
+                </button>
+              ` : `
+                <button class="btn btn-dark btn-sm btn-delete-car" data-id="${car.id}" title="Delete Vehicle from Inventory" style="color: #ef4444; padding: 0.4rem 0.55rem;">
+                  🗑️
+                </button>
+              `}
+            </div>
           </div>
         `}
       </td>
@@ -874,15 +904,24 @@ function attachTableActionEvents() {
           // 1. Mark permanently deleted in tombstone storage so it never resurrects
           if (typeof addDeletedVehicleId === 'function') {
             addDeletedVehicleId(carId);
+            if (car && car.stockNumber) addDeletedVehicleId(String(car.stockNumber));
           }
 
           // 2. Remove immediately from local working array and storage
           if (typeof deleteVehicleLocally === 'function') {
             deleteVehicleLocally(carId);
-          } else {
-            const updated = VEHICLES_DATA.filter(v => String(v.id) !== String(carId));
-            saveVehiclesData(updated);
           }
+          if (typeof VEHICLES_DATA !== 'undefined') {
+            const updated = VEHICLES_DATA.filter(v => v && String(v.id) !== String(carId) && String(v.stockNumber || '') !== String(carId));
+            VEHICLES_DATA.length = 0;
+            VEHICLES_DATA.push(...updated);
+            if (typeof saveVehiclesData === 'function') {
+              saveVehiclesData(updated);
+            }
+          }
+
+          // Render dashboard immediately so deleted car vanishes instantly
+          loadMarketplaceDashboard();
           
           // 3. Permanently remove from Firebase Cloud Database and record cloud tombstone
           if (typeof deleteVehicleFromFirebase === 'function') {
@@ -891,6 +930,91 @@ function attachTableActionEvents() {
 
           loadMarketplaceDashboard();
           showToast(`Vehicle permanently deleted and will not reappear.`, 'info');
+        } finally {
+          if (typeof window.hideActionLoader === 'function') {
+            setTimeout(() => window.hideActionLoader(), 250);
+          }
+        }
+      }
+    });
+  });
+
+  // Toggle On Test Drive status directly from table checkbox
+  document.querySelectorAll('.cb-toggle-test-drive').forEach(cb => {
+    cb.addEventListener('change', async () => {
+      const carId = cb.dataset.id;
+      const car = getVehicleById(carId) || VEHICLES_DATA.find(v => String(v.id) === String(carId));
+      if (car) {
+        car.onTestDrive = cb.checked;
+        if (car.onTestDrive) {
+          car.testDriveUpdatedAt = new Date().toISOString();
+        }
+        saveVehiclesData(VEHICLES_DATA);
+        if (typeof saveVehicleToFirebase === 'function') {
+          await saveVehicleToFirebase(car);
+        }
+        loadMarketplaceDashboard();
+        if (car.onTestDrive) {
+          showToast(`"${car.year} ${car.make} ${car.model}" marked as On Test Drive. Action changed to "Sold".`, 'success');
+        } else {
+          showToast(`"${car.year} ${car.make} ${car.model}" removed from Test Drive. Action restored to "Remove".`, 'info');
+        }
+      }
+    });
+  });
+
+  // Mark Vehicle as Sold (Triggered by Sold button when on test drive)
+  document.querySelectorAll('.btn-mark-sold').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const carId = btn.dataset.id;
+      const car = getVehicleById(carId) || VEHICLES_DATA.find(v => String(v.id) === String(carId));
+      const carTitle = car ? `"${car.year} ${car.make} ${car.model}" (Stock #${car.stockNumber || car.id})` : `Vehicle #${carId}`;
+      if (confirm(`Are you sure you want to mark ${carTitle} as SOLD?\n\nThis will complete the deal and permanently remove this vehicle from active showroom inventory.`)) {
+        if (typeof window.showActionLoader === 'function') {
+          window.showActionLoader('Recording Deal as SOLD and Updating CAD Inventory...');
+        }
+        try {
+          // Record sale log
+          try {
+            const salesLog = JSON.parse(localStorage.getItem('motortrends_sales_completed') || '[]');
+            salesLog.unshift({
+              vehicleId: carId,
+              title: carTitle,
+              price: car ? car.price : 0,
+              stockNumber: car ? (car.stockNumber || car.id) : carId,
+              soldAt: new Date().toISOString(),
+              soldBy: (typeof currentAdminUser !== 'undefined' && currentAdminUser) ? currentAdminUser.username : 'sales_agent'
+            });
+            localStorage.setItem('motortrends_sales_completed', JSON.stringify(salesLog.slice(0, 100)));
+          } catch (e) {}
+
+          // 1. Tombstone in all local storage
+          if (typeof addDeletedVehicleId === 'function') {
+            addDeletedVehicleId(carId);
+            if (car && car.stockNumber) addDeletedVehicleId(String(car.stockNumber));
+          }
+
+          // 2. Remove from active working array
+          if (typeof deleteVehicleLocally === 'function') {
+            deleteVehicleLocally(carId);
+          }
+          if (typeof VEHICLES_DATA !== 'undefined') {
+            const updated = VEHICLES_DATA.filter(v => v && String(v.id) !== String(carId) && String(v.stockNumber || '') !== String(carId));
+            VEHICLES_DATA.length = 0;
+            VEHICLES_DATA.push(...updated);
+            if (typeof saveVehiclesData === 'function') {
+              saveVehiclesData(updated);
+            }
+          }
+          loadMarketplaceDashboard();
+
+          // 3. Remove permanently from Firebase Cloud
+          if (typeof deleteVehicleFromFirebase === 'function') {
+            await deleteVehicleFromFirebase(carId);
+          }
+
+          loadMarketplaceDashboard();
+          showToast(`🎉 Congratulations! ${carTitle} marked as SOLD and completed!`, 'success');
         } finally {
           if (typeof window.hideActionLoader === 'function') {
             setTimeout(() => window.hideActionLoader(), 250);
@@ -1106,6 +1230,9 @@ function openVehicleEditorModal(carId = null) {
     if (document.getElementById('form-car-slideshow')) {
       document.getElementById('form-car-slideshow').checked = !!(car.heroSlide || car.isSlideshow);
     }
+    if (document.getElementById('form-car-test-drive')) {
+      document.getElementById('form-car-test-drive').checked = !!car.onTestDrive;
+    }
     const videoVal = car.video || '';
     document.getElementById('form-car-video').value = videoVal;
     updateVideoPreviewUI(videoVal);
@@ -1130,6 +1257,9 @@ function openVehicleEditorModal(carId = null) {
     }
     if (document.getElementById('form-car-slideshow')) {
       document.getElementById('form-car-slideshow').checked = true;
+    }
+    if (document.getElementById('form-car-test-drive')) {
+      document.getElementById('form-car-test-drive').checked = false;
     }
     currentEditingImages = ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
     document.getElementById('form-car-features').value = 'Apple CarPlay & Android Auto\nBlind Spot Monitoring\nRearview Backup Camera\nBluetooth Hands-free';
@@ -1359,6 +1489,7 @@ async function saveVehicleFromForm() {
     const featured = document.getElementById('form-car-featured') ? document.getElementById('form-car-featured').checked : true;
     const isNewVehicle = document.getElementById('form-car-new-arrival') ? document.getElementById('form-car-new-arrival').checked : false;
     const heroSlide = document.getElementById('form-car-slideshow') ? document.getElementById('form-car-slideshow').checked : false;
+    const onTestDrive = document.getElementById('form-car-test-drive') ? document.getElementById('form-car-test-drive').checked : false;
     const video = document.getElementById('form-car-video').value.trim();
 
     const maxSlots = getSystemSettings().maxUploadSlots || 12;
@@ -1400,6 +1531,7 @@ async function saveVehicleFromForm() {
       isNewVehicle,
       heroSlide,
       isSlideshow: heroSlide,
+      onTestDrive,
       badges,
       images,
       video,
@@ -1460,36 +1592,38 @@ function renderAnalyticsView() {
     bodyCount[v.bodyType] = (bodyCount[v.bodyType] || 0) + 1;
   });
 
+  const totalCars = VEHICLES_DATA.length || 1;
+
   container.innerHTML = `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
-      <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem;">
-        <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #fff;">Inventory by Make / Brand</h3>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <h3 style="font-size: 1.15rem; margin-bottom: 1.25rem; color: #0F172A; font-weight: 800;">Inventory by Make / Brand</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
           ${Object.entries(makesCount).sort((a,b)=>b[1]-a[1]).map(([make, count]) => `
             <div>
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
-                <span style="color: #fff; font-weight: 600;">${make}</span>
-                <span style="color: var(--silver-400);">${count} cars (${Math.round(count/VEHICLES_DATA.length*100)}%)</span>
+              <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.35rem;">
+                <span style="color: #0F172A; font-weight: 700;">${make}</span>
+                <span style="color: #64748B; font-weight: 600;">${count} cars (${Math.round(count/totalCars*100)}%)</span>
               </div>
-              <div style="background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden;">
-                <div style="background: var(--silver-300); height: 100%; width: ${(count/VEHICLES_DATA.length)*100}%;"></div>
+              <div style="background: #E2E8F0; height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="background: #1B3A6B; height: 100%; width: ${(count/totalCars)*100}%; border-radius: 4px;"></div>
               </div>
             </div>
           `).join('')}
         </div>
       </div>
 
-      <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem;">
-        <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #fff;">Inventory by Body Type</h3>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <h3 style="font-size: 1.15rem; margin-bottom: 1.25rem; color: #0F172A; font-weight: 800;">Inventory by Body Type</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
           ${Object.entries(bodyCount).sort((a,b)=>b[1]-a[1]).map(([type, count]) => `
             <div>
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
-                <span style="color: #fff; font-weight: 600;">${type}</span>
-                <span style="color: var(--silver-400);">${count} cars</span>
+              <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.35rem;">
+                <span style="color: #0F172A; font-weight: 700;">${type}</span>
+                <span style="color: #64748B; font-weight: 600;">${count} cars</span>
               </div>
-              <div style="background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden;">
-                <div style="background: #38bdf8; height: 100%; width: ${(count/VEHICLES_DATA.length)*100}%;"></div>
+              <div style="background: #E2E8F0; height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="background: #0284C7; height: 100%; width: ${(count/totalCars)*100}%; border-radius: 4px;"></div>
               </div>
             </div>
           `).join('')}
@@ -1504,8 +1638,11 @@ function renderInquiriesView() {
   if (!container) return;
 
   container.innerHTML = `
-    <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1rem;">
-      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #fff;">Recent Customer Leads & Test Drive Bookings</h3>
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.75rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div style="margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.25rem; color: #0F172A; font-weight: 800;">Recent Customer Leads &amp; Test Drive Bookings</h3>
+        <p style="font-size: 0.85rem; color: #64748B;">Live customer inquiries submitted through inventory, test drive requests, and trade-in appraisals.</p>
+      </div>
       <div style="overflow-x: auto;">
         <table class="admin-table">
           <thead>
@@ -1521,23 +1658,23 @@ function renderInquiriesView() {
           <tbody>
             <tr>
               <td>
-                <div style="font-weight: 700; color: #fff;">David Miller</div>
-                <div style="font-size: 0.75rem; color: var(--silver-500);">david.m@example.com • 604-555-1120</div>
+                <div style="font-weight: 700; color: #0F172A;">David Miller</div>
+                <div style="font-size: 0.78rem; color: #64748B;">david.m@example.com • 604-555-1120</div>
               </td>
-              <td>2023 Toyota RAV4 (MT-4821)</td>
+              <td style="color: #1E293B; font-weight: 600;">2023 Toyota RAV4 (MT-4821)</td>
               <td><span class="badge badge-blue">Test Drive</span></td>
-              <td>Oct 8, 2026 @ 10:00 AM</td>
+              <td style="color: #64748B; font-size: 0.85rem;">Oct 8, 2026 @ 10:00 AM</td>
               <td><span class="badge badge-green">Confirmed</span></td>
               <td><button class="btn btn-silver btn-sm" onclick="showToast('Lead marked contacted', 'info')">Contact</button></td>
             </tr>
             <tr>
               <td>
-                <div style="font-weight: 700; color: #fff;">Sarah Jenkins</div>
-                <div style="font-size: 0.75rem; color: var(--silver-500);">sarah.j@example.com • 604-555-4421</div>
+                <div style="font-weight: 700; color: #0F172A;">Sarah Jenkins</div>
+                <div style="font-size: 0.78rem; color: #64748B;">sarah.j@example.com • 604-555-4421</div>
               </td>
-              <td>2023 Ford F-150 (MT-4823)</td>
+              <td style="color: #1E293B; font-weight: 600;">2023 Ford F-150 (MT-4823)</td>
               <td><span class="badge badge-silver">Pre-Approval</span></td>
-              <td>Oct 7, 2026 @ 2:30 PM</td>
+              <td style="color: #64748B; font-size: 0.85rem;">Oct 7, 2026 @ 2:30 PM</td>
               <td><span class="badge badge-blue">Pending Review</span></td>
               <td><button class="btn btn-silver btn-sm" onclick="showToast('Pre-approval opened', 'info')">Review</button></td>
             </tr>
@@ -1580,19 +1717,19 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
   });
 
   container.innerHTML = `
-    <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1rem;">
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.75rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
       
       <!-- Top Title & Add Button -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h3 style="font-size: 1.35rem; color: #fff; margin-bottom: 0.35rem; font-weight: 800;">
-            Team, Staff & Department Management
+          <h3 style="font-size: 1.35rem; color: #0F172A; margin-bottom: 0.35rem; font-weight: 800;">
+            Team, Staff &amp; Department Management
           </h3>
-          <p style="font-size: 0.85rem; color: var(--silver-400);">
+          <p style="font-size: 0.85rem; color: #64748B;">
             Manage Executive Admin, Sales Agents, Human Resources (HR), and Inspection/Service Technicians.
           </p>
         </div>
-        <button id="btn-add-team-user" class="btn btn-blue btn-sm" style="box-shadow: 0 0 15px rgba(0, 123, 255, 0.35);">
+        <button id="btn-add-team-user" class="btn btn-blue btn-sm" style="box-shadow: 0 4px 14px rgba(27, 58, 107, 0.25);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           + Add New Team Member
         </button>
@@ -1600,35 +1737,35 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
 
       <!-- KPI Metric Cards for Staff -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem;">
-          <div style="font-size: 0.75rem; color: var(--silver-400); text-transform: uppercase;">Total Active Staff</div>
-          <div style="font-size: 1.75rem; font-weight: 900; color: #fff; margin-top: 0.25rem;">${totalCount}</div>
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #64748B; text-transform: uppercase; font-weight: 700;">Total Active Staff</div>
+          <div style="font-size: 1.75rem; font-weight: 900; color: #0F172A; margin-top: 0.25rem;">${totalCount}</div>
         </div>
-        <div style="background: rgba(0, 123, 255, 0.08); border: 1px solid rgba(0, 123, 255, 0.25); border-radius: var(--radius-md); padding: 1rem;">
-          <div style="font-size: 0.75rem; color: #93c5fd; text-transform: uppercase;">Sales Specialists</div>
-          <div style="font-size: 1.75rem; font-weight: 900; color: #60a5fa; margin-top: 0.25rem;">${salesCount}</div>
-          <div style="font-size: 0.7rem; color: var(--silver-400);">Maintain Inventory Access</div>
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #1D4ED8; text-transform: uppercase; font-weight: 700;">Sales Specialists</div>
+          <div style="font-size: 1.75rem; font-weight: 900; color: #1E40AF; margin-top: 0.25rem;">${salesCount}</div>
+          <div style="font-size: 0.72rem; color: #64748B; margin-top: 2px;">Maintain Inventory Access</div>
         </div>
-        <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.25); border-radius: var(--radius-md); padding: 1rem;">
-          <div style="font-size: 0.75rem; color: #f472b6; text-transform: uppercase;">HR & Management</div>
-          <div style="font-size: 1.75rem; font-weight: 900; color: #ec4899; margin-top: 0.25rem;">${hrCount}</div>
-          <div style="font-size: 0.7rem; color: var(--silver-400);">Staff & Payroll Admin</div>
+        <div style="background: #FDF2F8; border: 1px solid #FBCFE8; border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #BE185D; text-transform: uppercase; font-weight: 700;">HR &amp; Management</div>
+          <div style="font-size: 1.75rem; font-weight: 900; color: #9D174D; margin-top: 0.25rem;">${hrCount}</div>
+          <div style="font-size: 0.72rem; color: #64748B; margin-top: 2px;">Staff &amp; Payroll Admin</div>
         </div>
-        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 1rem;">
-          <div style="font-size: 0.75rem; color: #fbbf24; text-transform: uppercase;">Tech & Reconditioning</div>
-          <div style="font-size: 1.75rem; font-weight: 900; color: #f59e0b; margin-top: 0.25rem;">${techCount}</div>
-          <div style="font-size: 0.7rem; color: var(--silver-400);">Vehicle Inspection Team</div>
+        <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 1rem;">
+          <div style="font-size: 0.75rem; color: #B45309; text-transform: uppercase; font-weight: 700;">Tech &amp; Reconditioning</div>
+          <div style="font-size: 1.75rem; font-weight: 900; color: #92400E; margin-top: 0.25rem;">${techCount}</div>
+          <div style="font-size: 0.72rem; color: #64748B; margin-top: 2px;">Vehicle Inspection Team</div>
         </div>
       </div>
 
       <!-- Filters & Search Toolbar -->
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
         <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-          <button class="btn btn-sm ${filterDept === 'all' ? 'btn-blue' : 'btn-dark'}" onclick="renderUsersView('all')">All Staff (${totalCount})</button>
-          <button class="btn btn-sm ${filterDept === 'management' ? 'btn-blue' : 'btn-dark'}" onclick="renderUsersView('management')">👑 Admin</button>
-          <button class="btn btn-sm ${filterDept === 'sales' ? 'btn-blue' : 'btn-dark'}" onclick="renderUsersView('sales')">💼 Sales (${salesCount})</button>
-          <button class="btn btn-sm ${filterDept === 'hr' ? 'btn-blue' : 'btn-dark'}" onclick="renderUsersView('hr')">👥 HR</button>
-          <button class="btn btn-sm ${filterDept === 'tech' ? 'btn-blue' : 'btn-dark'}" onclick="renderUsersView('tech')">🔧 Tech & Service (${techCount})</button>
+          <button class="btn btn-sm ${filterDept === 'all' ? 'btn-blue' : 'btn-silver'}" onclick="renderUsersView('all')">All Staff (${totalCount})</button>
+          <button class="btn btn-sm ${filterDept === 'management' ? 'btn-blue' : 'btn-silver'}" onclick="renderUsersView('management')">👑 Admin</button>
+          <button class="btn btn-sm ${filterDept === 'sales' ? 'btn-blue' : 'btn-silver'}" onclick="renderUsersView('sales')">💼 Sales (${salesCount})</button>
+          <button class="btn btn-sm ${filterDept === 'hr' ? 'btn-blue' : 'btn-silver'}" onclick="renderUsersView('hr')">👥 HR</button>
+          <button class="btn btn-sm ${filterDept === 'tech' ? 'btn-blue' : 'btn-silver'}" onclick="renderUsersView('tech')">🔧 Tech &amp; Service (${techCount})</button>
         </div>
         <div style="min-width: 240px;">
           <input type="text" id="staff-search-input" class="form-control form-control-sm" placeholder="🔍 Search staff name, role, email..." value="${searchQuery}">
@@ -1642,7 +1779,7 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
             <tr>
               <th>Team Member</th>
               <th>Username</th>
-              <th>Department & Role</th>
+              <th>Department &amp; Role</th>
               <th>Assigned Permissions</th>
               <th>Status</th>
               <th style="text-align: right;">Actions</th>
@@ -1664,23 +1801,23 @@ function renderUsersView(filterDept = 'all', searchQuery = '') {
                 <tr style="${isSuspended ? 'opacity: 0.6;' : ''}">
                   <td>
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                      <div style="width: 36px; height: 36px; border-radius: 50%; background: ${roleColor}25; border: 1px solid ${roleColor}60; color: ${roleColor}; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                      <div style="width: 36px; height: 36px; border-radius: 50%; background: ${roleColor}18; border: 1px solid ${roleColor}50; color: ${roleColor}; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
                         ${(u.name || 'U').split(' ').map(n => n[0]).slice(0, 2).join('')}
                       </div>
                       <div>
-                        <div style="font-weight: 700; color: #fff;">${u.name}</div>
-                        <div style="font-size: 0.78rem; color: var(--silver-500);">${u.email}</div>
+                        <div style="font-weight: 700; color: #0F172A;">${u.name}</div>
+                        <div style="font-size: 0.78rem; color: #64748B;">${u.email}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <code style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; color: #e2e8f0; font-weight: 600;">${u.username || 'user'}</code>
+                    <code style="background: #F1F5F9; border: 1px solid #E2E8F0; padding: 3px 8px; border-radius: 4px; color: #0F172A; font-weight: 700;">${u.username || 'user'}</code>
                   </td>
                   <td>
-                    <span class="badge" style="background: rgba(255,255,255,0.05); color: ${roleColor}; border: 1px solid ${roleColor}60;">
+                    <span class="badge" style="background: ${roleColor}14; color: ${roleColor}; border: 1px solid ${roleColor}40; font-weight: 700;">
                       ● ${u.role}
                     </span>
-                    <div style="font-size: 0.72rem; color: var(--silver-400); margin-top: 3px;">${u.department || 'Dealership'}</div>
+                    <div style="font-size: 0.75rem; color: #64748B; margin-top: 3px; font-weight: 500;">${u.department || 'Dealership'}</div>
                   </td>
                   <td>
                     <div style="display: flex; flex-direction: column; gap: 3px;">
@@ -2077,142 +2214,125 @@ function deleteAdminUser(userId) {
 }
 
 /* ----------------------------------------------------
-   Firebase Cloud & Auth Management
+   HostPapa Server Storage & File Manager Dashboard
 ----------------------------------------------------- */
 function renderFirebaseView() {
   const container = document.getElementById('tab-view-firebase');
   if (!container) return;
 
-  const currentCfg = typeof firebaseConfig !== 'undefined' ? firebaseConfig : {};
-  const isFbInit = typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0;
-  const isAuthReady = typeof fbAuth !== 'undefined' && fbAuth !== null;
-  const isDbReady = typeof fbDb !== 'undefined' && fbDb !== null;
+  const totalVehicles = Array.isArray(VEHICLES_DATA) ? VEHICLES_DATA.length : 0;
+  const vehiclesWithFolders = (VEHICLES_DATA || []).filter(v => v.images && v.images.some(img => img.includes('uploads/vehicles/'))).length;
 
   container.innerHTML = `
-    <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1rem;">
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 1.75rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h3 style="font-size: 1.35rem; color: #fff; margin-bottom: 0.35rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-            🔥 Firebase Cloud & Authentication Center
+          <h3 style="font-size: 1.35rem; color: #0F172A; margin-bottom: 0.35rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            📁 HostPapa Server Storage &amp; File Manager
           </h3>
-          <p style="font-size: 0.85rem; color: var(--silver-400);">
-            Cloud Authentication (Free Tier), Realtime Database sync, and project credentials management.
+          <p style="font-size: 0.85rem; color: #64748B;">
+            Independent file-based inventory engine. Each vehicle has its own folder for photos and metadata.
           </p>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
-          <button id="btn-test-fb-conn" class="btn btn-blue btn-sm">
-            ⚡ Test Connection
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="btn-refresh-server-catalog" class="btn btn-blue btn-sm">
+            🔄 Refresh From Server
           </button>
-          <button id="btn-seed-fb-cloud" class="btn btn-silver btn-sm">
-            ☁️ Push Inventory to Firebase
-          </button>
+          <a href="api/vehicles.php" target="_blank" class="btn btn-silver btn-sm">
+            🌐 View API JSON Endpoint
+          </a>
         </div>
       </div>
 
       <!-- Live Service Status Cards -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.15rem;">
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 1.15rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: var(--silver-400); text-transform: uppercase; font-weight: 700;">Firebase App SDK</span>
-            <span class="badge ${isFbInit ? 'badge-green' : 'badge-silver'}">${isFbInit ? '● Connected' : 'Offline'}</span>
+            <span style="font-size: 0.75rem; color: #1D4ED8; text-transform: uppercase; font-weight: 700;">Storage Backend</span>
+            <span class="badge badge-green">● Connected</span>
           </div>
-          <div style="font-size: 1rem; font-weight: 800; color: #fff;">${currentCfg.projectId || 'Motor Trends App'}</div>
-          <div style="font-size: 0.72rem; color: var(--silver-500); margin-top: 4px;">App ID: ${currentCfg.appId ? currentCfg.appId.slice(0, 24) + '...' : 'Configured'}</div>
+          <div style="font-size: 1.05rem; font-weight: 800; color: #1E40AF;">HostPapa File Storage</div>
+          <div style="font-size: 0.75rem; color: #64748B; margin-top: 4px;">PHP / Apache + Local Node API</div>
         </div>
 
-        <div style="background: rgba(0, 123, 255, 0.08); border: 1px solid rgba(0, 123, 255, 0.3); border-radius: var(--radius-md); padding: 1.15rem;">
+        <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 10px; padding: 1.15rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #93c5fd; text-transform: uppercase; font-weight: 700;">Firebase Authentication</span>
-            <span class="badge ${isAuthReady ? 'badge-green' : 'badge-silver'}">${isAuthReady ? '● Active' : 'Pending'}</span>
+            <span style="font-size: 0.75rem; color: #047857; text-transform: uppercase; font-weight: 700;">Active Inventory</span>
+            <span class="badge badge-green">● ${totalVehicles} Vehicles</span>
           </div>
-          <div style="font-size: 1rem; font-weight: 800; color: #60a5fa;">Email & Password Auth</div>
-          <div style="font-size: 0.72rem; color: var(--silver-400); margin-top: 4px;">Free Spark Plan (100% Free - Unlimited Logins)</div>
+          <div style="font-size: 1.05rem; font-weight: 800; color: #065F46;">${totalVehicles} Vehicles in Catalog</div>
+          <div style="font-size: 0.75rem; color: #64748B; margin-top: 4px;">Stored in <code>data/vehicles.json</code></div>
         </div>
 
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 1.15rem;">
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.15rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #6ee7b7; text-transform: uppercase; font-weight: 700;">Realtime Database</span>
-            <span class="badge ${isDbReady ? 'badge-green' : 'badge-silver'}">${isDbReady ? '● Real-Time Sync' : 'Offline'}</span>
+            <span style="font-size: 0.75rem; color: #475569; text-transform: uppercase; font-weight: 700;">Usage Limit</span>
+            <span class="badge badge-green">Unlimited</span>
           </div>
-          <div style="font-size: 1rem; font-weight: 800; color: #34d399;">Cloud RTDB Active</div>
-          <div style="font-size: 0.72rem; color: var(--silver-400); margin-top: 4px;">${VEHICLES_DATA.length} Inventory Vehicles Synced</div>
+          <div style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">100% Free Hosting</div>
+          <div style="font-size: 0.75rem; color: #64748B; margin-top: 4px;">No external database quota limits</div>
         </div>
       </div>
 
-      <!-- Firebase Configuration Settings Form -->
-      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem;">
-        <h4 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Custom Firebase Credentials</h4>
-        <p style="font-size: 0.825rem; color: var(--silver-400); margin-bottom: 1.25rem;">
-          Connect your own Firebase project or view the active dealership cloud credentials.
+      <!-- HostPapa File Manager Guide -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <h4 style="font-size: 1.05rem; color: #0F172A; font-weight: 800; margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>📁</span> Folder &amp; Storage Architecture (cPanel File Manager)
+        </h4>
+        <p style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 1rem;">
+          When an administrator adds or edits a vehicle in the Admin dashboard, the system automatically creates a dedicated directory inside <code>uploads/vehicles/</code> named with that vehicle's ID. All photos are extracted and saved as physical image files (<code>photo_1.jpg</code>, <code>photo_2.jpg</code>, etc.) alongside the vehicle's JSON data.
         </p>
 
-        <form id="form-firebase-config" style="display: flex; flex-direction: column; gap: 1rem;">
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Project ID</label>
-              <input type="text" id="fb-cfg-project-id" class="form-control" value="${currentCfg.projectId || ''}" placeholder="e.g. motortrends-dealer">
-            </div>
-            <div class="form-group">
-              <label class="form-label">API Key</label>
-              <input type="text" id="fb-cfg-api-key" class="form-control" value="${currentCfg.apiKey || ''}" placeholder="AIzaSy...">
-            </div>
-          </div>
+        <div style="background: #0F172A; color: #E2E8F0; border-radius: 8px; padding: 1rem 1.25rem; font-family: monospace; font-size: 0.85rem; line-height: 1.7; overflow-x: auto;">
+          <div style="color: #38BDF8; font-weight: 700;">public_html/ (HostPapa Root)</div>
+          <div>├── <span style="color: #FCD34D;">api/</span></div>
+          <div>│   └── <span style="color: #4ADE80;">vehicles.php</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Handles GET, POST, DELETE requests</span></div>
+          <div>├── <span style="color: #FCD34D;">data/</span></div>
+          <div>│   └── <span style="color: #4ADE80;">vehicles.json</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Fast central catalog index</span></div>
+          <div>└── <span style="color: #FCD34D;">uploads/vehicles/</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color: #F472B6;">veh-1718881500000/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Dedicated folder for vehicle</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span style="color: #67E8F9;">photo_1.jpg</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Main image</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span style="color: #67E8F9;">photo_2.jpg</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Gallery image 2</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span style="color: #4ADE80;">vehicle.json</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #94A3B8;"># Vehicle metadata &amp; details</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;└── <span style="color: #F472B6;">[other-vehicle-id]/</span></div>
+        </div>
+      </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Auth Domain</label>
-              <input type="text" id="fb-cfg-auth-domain" class="form-control" value="${currentCfg.authDomain || ''}" placeholder="motortrends.firebaseapp.com">
+      <!-- Live Vehicles on Server List -->
+      <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+        <h4 style="font-size: 1rem; color: #0F172A; font-weight: 700; margin-bottom: 0.75rem;">
+          Current Server Folders &amp; Catalog Status
+        </h4>
+        <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 1rem;">
+          Below are the vehicles currently saved on disk in <code>uploads/vehicles/</code>:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          ${(VEHICLES_DATA || []).map(v => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 0.65rem 1rem; font-size: 0.85rem;">
+              <div>
+                <strong style="color: #0F172A;">${v.year} ${v.make} ${v.model}</strong>
+                <span style="color: #64748B; margin-left: 0.5rem;">(#${v.stockNumber || 'N/A'})</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <code style="background: #E2E8F0; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">uploads/vehicles/${v.id}/</code>
+                <span class="badge badge-green">${(v.images || []).length} Photos</span>
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Database URL</label>
-              <input type="text" id="fb-cfg-db-url" class="form-control" value="${currentCfg.databaseURL || ''}" placeholder="https://...-rtdb.firebaseio.com">
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
-            <button type="button" id="btn-save-fb-cfg" class="btn btn-blue btn-sm">
-              Save & Re-Connect Firebase
-            </button>
-          </div>
-        </form>
+          `).join('') || '<p style="color: #64748B; font-size: 0.85rem;">No vehicles found in storage.</p>'}
+        </div>
       </div>
 
     </div>
   `;
 
-  // Test Firebase Connection Button
-  document.getElementById('btn-test-fb-conn')?.addEventListener('click', () => {
-    if (typeof firebase !== 'undefined' && fbAuth) {
-      showToast('🔥 Firebase Auth & Database connection test PASSED! Ready for live users.', 'success');
-    } else {
-      showToast('Firebase SDK loaded. Local fallback is actively maintaining sessions.', 'info');
-    }
-  });
-
-  // Push to Firebase Button
-  document.getElementById('btn-seed-fb-cloud')?.addEventListener('click', () => {
-    if (typeof seedFirebaseInitialData === 'function') {
-      seedFirebaseInitialData();
-      showToast('Cloud sync triggered: All vehicles sent to Firebase Realtime Database!', 'success');
-    } else {
-      showToast('Firebase DB sync simulated successfully.', 'info');
-    }
-  });
-
-  // Save Custom Config
-  document.getElementById('btn-save-fb-cfg')?.addEventListener('click', () => {
-    const projId = document.getElementById('fb-cfg-project-id').value.trim();
-    const apiKey = document.getElementById('fb-cfg-api-key').value.trim();
-    const authDom = document.getElementById('fb-cfg-auth-domain').value.trim();
-    const dbUrl = document.getElementById('fb-cfg-db-url').value.trim();
-
-    if (projId && apiKey) {
-      const newCfg = { ...firebaseConfig, projectId: projId, apiKey, authDomain: authDom, databaseURL: dbUrl };
-      localStorage.setItem('motortrends_custom_fb_config', JSON.stringify(newCfg));
-      showToast('Firebase credentials saved! Re-initializing...', 'success');
-      setTimeout(() => location.reload(), 1200);
-    } else {
-      alert('Please enter at least a Project ID and API Key.');
+  // Refresh Button Handler
+  document.getElementById('btn-refresh-server-catalog')?.addEventListener('click', async () => {
+    if (typeof fetchVehiclesFromServer === 'function') {
+      showToast('Fetching latest catalog from server...', 'info');
+      const data = await fetchVehiclesFromServer();
+      renderFirebaseView();
+      if (typeof loadMarketplaceDashboard === 'function') loadMarketplaceDashboard();
+      showToast(`Refreshed! ${data.length} vehicles loaded from server.`, 'success');
     }
   });
 }

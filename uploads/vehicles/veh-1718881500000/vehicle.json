@@ -1,0 +1,39 @@
+{
+  "id": "veh-1718881500000",
+  "year": 2009,
+  "make": "MINI",
+  "model": "Cooper S",
+  "trim": "Coupe",
+  "price": 4995,
+  "monthlyEst": 85,
+  "mileage": 145000,
+  "bodyType": "Coupe",
+  "fuelType": "Gasoline",
+  "transmission": "Automatic",
+  "drivetrain": "FWD",
+  "engine": "1.6L Turbo 4-Cylinder",
+  "exteriorColor": "Silver / Black",
+  "interiorColor": "Black",
+  "vin": "WMWMF7C5X9TW88150",
+  "stockNumber": "MT-8815",
+  "condition": "Pre-Owned",
+  "featured": true,
+  "isNewVehicle": true,
+  "isSlideshow": true,
+  "heroSlide": true,
+  "badges": [
+    "New Arrival",
+    "Featured Vehicle"
+  ],
+  "images": [
+    "uploads/vehicles/veh-1718881500000/photo_1.jpg"
+  ],
+  "features": [
+    "Turbocharged Engine",
+    "Clean Title",
+    "Sport Mode",
+    "Alloy Wheels",
+    "DL#30859 - Richmond / Vancouver BC"
+  ],
+  "overview": "2009 MINI Cooper S Coupe. Stock #MT-8815. $4,995 CAD. 145,000 KM. Gasoline, Automatic, FWD. Clean title, sport mode, alloy wheels, runs and drives great. DL#30859."
+}

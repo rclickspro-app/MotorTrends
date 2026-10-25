@@ -4,6 +4,18 @@
  * Features animated loader (vw leo.gif) on every page load & action
  */
 
+// Automatically clean 'index.html' from browser address bar if present
+(function () {
+  try {
+    if (window.location.pathname.endsWith('/index.html')) {
+      var cleanPath = window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search + window.location.hash;
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', cleanPath);
+      }
+    }
+  } catch (e) { }
+})();
+
 // Universal Page Preloader
 function initPreloader() {
   const preloader = document.getElementById('mt-page-preloader');
@@ -141,6 +153,7 @@ function initApp() {
       } else if (isHomePage) {
         populateHomeDropdowns();
         renderFeaturedVehicles();
+        initHeroSlideshow();
       }
     });
   }
@@ -153,12 +166,21 @@ function initApp() {
     } else if (isHomePage) {
       populateHomeDropdowns();
       renderFeaturedVehicles();
+      initHeroSlideshow();
     }
   });
 
   // Cross-tab real-time storage sync
   window.addEventListener('storage', (e) => {
-    if (e.key === 'motortrends_vehicles_db_v3' || e.key === 'motortrends_vehicles_db' || e.key === 'motortrends_deleted_vehicles_ids') {
+    const relevantKeys = [
+      'motortrends_vehicles_db_live',
+      'motortrends_vehicles_db_live_legacy',
+      'motortrends_vehicles_db_v3',
+      'motortrends_vehicles_db',
+      'motortrends_deleted_vehicles_ids_live',
+      'motortrends_deleted_vehicles_ids'
+    ];
+    if (relevantKeys.includes(e.key)) {
       const updated = (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
       VEHICLES_DATA.length = 0;
       VEHICLES_DATA.push(...updated);
@@ -168,6 +190,7 @@ function initApp() {
       } else if (isHomePage) {
         populateHomeDropdowns();
         renderFeaturedVehicles();
+        initHeroSlideshow();
       }
     }
   });
@@ -397,6 +420,12 @@ function initHeroSlideshow() {
   var nextBtn      = document.getElementById('next-slide');
   if (!slider) return;
 
+  // Clear any existing slideshow timer to prevent concurrent rogue intervals
+  if (window.__heroSlideInterval) {
+    clearInterval(window.__heroSlideInterval);
+    window.__heroSlideInterval = null;
+  }
+
   /* --- Fisher-Yates shuffle for true randomness each visit --- */
   function shuffle(arr) {
     var a = arr.slice();
@@ -405,37 +434,6 @@ function initHeroSlideshow() {
       var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
     }
     return a;
-  }
-
-  /* --- Pick up to 6 vehicles: admin slideshow picks first, new arrivals next, rest random --- */
-  var heroVehicles= VEHICLES_DATA.filter(function(v) { return v.heroSlide || v.isSlideshow; });
-  var newArrivals = VEHICLES_DATA.filter(function(v) { return v.isNewVehicle && !(v.heroSlide || v.isSlideshow); });
-  var rest        = shuffle(VEHICLES_DATA.filter(function(v) { return !(v.heroSlide || v.isSlideshow) && !v.isNewVehicle; }));
-  var pool        = heroVehicles.concat(newArrivals).concat(rest).slice(0, 6);
-  if (!pool.length && VEHICLES_DATA.length) pool = shuffle(VEHICLES_DATA).slice(0, 6);
-
-  if (!pool.length) {
-    slider.innerHTML = '<div class="hero-slide active">' +
-      '<div class="container" style="position:relative;z-index:3;">' +
-      '<div class="hero-slide-grid" style="grid-template-columns: 1fr;">' +
-      '<div class="hero-slide-content" style="max-width: 800px; margin: 0 auto; text-align: center;">' +
-      '<div class="slide-pill">🔥 QUALITY PRE-OWNED VEHICLES</div>' +
-      '<div class="slide-title">USED CARS, TRUCKS &amp; SUVs</div>' +
-      '<div class="slide-highlight">MOTOR TRENDS AUTO GROUP</div>' +
-      '<p class="slide-desc" style="max-width: 650px; margin: 0.75rem auto 1.5rem;">' +
-        'Richmond\'s premier destination for quality pre-owned vehicles. Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome (OAC).' +
-      '</p>' +
-      '<div class="slide-dealer-info dealer-slide-info" style="justify-content: center; margin-bottom: 1.5rem;">' +
-        '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
-        '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
-        '<span class="dealer-tag">Dealer #30859</span>' +
-      '</div>' +
-      '<div class="slide-actions" style="justify-content: center;">' +
-        '<a href="inventory.html" class="btn btn-blue btn-lg">Browse Inventory</a>' +
-        '<a href="financing.html" class="btn btn-outline btn-lg">Apply for Financing (OAC)</a>' +
-      '</div></div></div></div></div>';
-    if (dotsContainer) dotsContainer.innerHTML = '';
-    return;
   }
 
   /* --- 6 rotating promo messages for left text panel --- */
@@ -459,6 +457,48 @@ function initHeroSlideshow() {
       desc: 'From vehicles under $10,000 to late-model family SUVs — every vehicle professionally inspected and priced below BC market value.',
       b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Explore Financing'} }
   ];
+
+  /* --- Pick vehicles: admin slideshow picks first, new arrivals next, rest random --- */
+  var heroVehicles = VEHICLES_DATA.filter(function(v) { return v.heroSlide || v.isSlideshow; });
+  var newArrivals  = VEHICLES_DATA.filter(function(v) { return v.isNewVehicle && !(v.heroSlide || v.isSlideshow); });
+  var rest         = shuffle(VEHICLES_DATA.filter(function(v) { return !(v.heroSlide || v.isSlideshow) && !v.isNewVehicle; }));
+  var pool         = heroVehicles.concat(newArrivals).concat(rest);
+  if (!pool.length && VEHICLES_DATA.length) pool = shuffle(VEHICLES_DATA);
+
+  // If no vehicles available at all, render static fallback
+  if (!pool.length) {
+    slider.innerHTML = '<div class="hero-slide active">' +
+      '<div class="container" style="position:relative;z-index:3;">' +
+      '<div class="hero-slide-grid" style="grid-template-columns: 1fr;">' +
+      '<div class="hero-slide-content" style="max-width: 800px; margin: 0 auto; text-align: center;">' +
+      '<div class="slide-pill">🔥 QUALITY PRE-OWNED VEHICLES</div>' +
+      '<div class="slide-title">USED CARS, TRUCKS &amp; SUVs</div>' +
+      '<div class="slide-highlight">MOTOR TRENDS AUTO GROUP</div>' +
+      '<p class="slide-desc" style="max-width: 650px; margin: 0.75rem auto 1.5rem;">' +
+        'Richmond\'s premier destination for quality pre-owned vehicles. Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome (OAC).' +
+      '</p>' +
+      '<div class="slide-dealer-info dealer-slide-info" style="justify-content: center; margin-bottom: 1.5rem;">' +
+        '<span>📍 10740 Cambie Road, Richmond, BC</span><span>•</span>' +
+        '<span>📞 <a href="tel:6042707662">604-270-7662</a></span><span>•</span>' +
+        '<span class="dealer-tag">Dealer #30859</span>' +
+      '</div>' +
+      '<div class="slide-actions" style="justify-content: center;">' +
+        '<a href="inventory.html" class="btn btn-blue btn-lg">Browse Inventory</a>' +
+        '<a href="financing.html" class="btn btn-outline btn-lg">Apply for Financing (OAC)</a>' +
+      '</div></div></div></div></div>';
+    if (dotsContainer) dotsContainer.innerHTML = '';
+    if (prevBtn) prevBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
+    return;
+  }
+
+  // Ensure we build multiple slides by pairing available vehicles with promos (at least 4 slides)
+  var slidesList = [];
+  var totalSlidesCount = Math.max(pool.length, Math.min(promos.length, 4));
+  for (var sIdx = 0; sIdx < totalSlidesCount; sIdx++) {
+    var assignedVehicle = pool[sIdx % pool.length];
+    slidesList.push({ vehicle: assignedVehicle, promoIdx: sIdx });
+  }
 
   /* --- Build HTML for ONE slide --- */
   function makeSlideHTML(vehicle, promoIdx, isFirst) {
@@ -549,97 +589,101 @@ function initHeroSlideshow() {
   }
 
   /* --- Inject all slides --- */
-  slider.innerHTML = pool.map(function(v, i) { return makeSlideHTML(v, i, i === 0); }).join('');
+  slider.innerHTML = slidesList.map(function(item, i) { return makeSlideHTML(item.vehicle, item.promoIdx, i === 0); }).join('');
 
   /* --- Rebuild dots --- */
   if (dotsContainer) {
-    dotsContainer.innerHTML = pool.map(function(_, i) {
-      return '<button class="slider-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '" aria-label="Slide ' + (i+1) + '"></button>';
-    }).join('');
+    dotsContainer.innerHTML = (slidesList.length > 1)
+      ? slidesList.map(function(_, i) {
+          return '<button class="slider-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '" aria-label="Slide ' + (i+1) + '"></button>';
+        }).join('')
+      : '';
   }
 
-  /* --- Slideshow controller with directional animation --- */
+  if (prevBtn) prevBtn.style.display = (slidesList.length > 1) ? 'flex' : 'none';
+  if (nextBtn) nextBtn.style.display = (slidesList.length > 1) ? 'flex' : 'none';
+
+  /* --- Slideshow controller with safe directional animation --- */
   var currentIndex = 0;
-  var slideInterval = null;
   var DELAY = 5500;
   var isAnimating = false;
 
   function goToSlide(idx, dir) {
     if (isAnimating) return;
     var slides = slider.querySelectorAll('.hero-slide');
-    var dots   = dotsContainer ? dotsContainer.querySelectorAll('.slider-dot') : [];
-    if (!slides.length) return;
+    if (!slides.length || slides.length <= 1) return;
 
-    var direction = (typeof dir !== 'undefined') ? dir : (idx > currentIndex ? 1 : -1);
-    var outClass  = direction > 0 ? 'slide-exit-left'  : 'slide-exit-right';
+    var targetIndex = ((idx % slides.length) + slides.length) % slides.length;
+    if (targetIndex === currentIndex) return;
+
+    var direction = (typeof dir !== 'undefined') ? dir : (targetIndex > currentIndex ? 1 : -1);
+    var outClass  = direction > 0 ? 'slide-exit-left'   : 'slide-exit-right';
     var inClass   = direction > 0 ? 'slide-enter-right' : 'slide-enter-left';
 
     isAnimating = true;
     var outSlide = slides[currentIndex];
-    outSlide.classList.add(outClass);
-
-    currentIndex = ((idx % slides.length) + slides.length) % slides.length;
+    var inSlide  = slides[targetIndex];
+    currentIndex = targetIndex;
 
     // Update dots
+    var dots = dotsContainer ? dotsContainer.querySelectorAll('.slider-dot') : [];
     for (var d = 0; d < dots.length; d++) dots[d].classList.remove('active');
     if (dots[currentIndex]) dots[currentIndex].classList.add('active');
 
-    // Enter new slide
-    var inSlide = slides[currentIndex];
-    inSlide.classList.add(inClass, 'active');
+    // Reset all other slides to base class
+    slides.forEach(function(s) {
+      if (s !== outSlide && s !== inSlide) {
+        s.className = 'hero-slide';
+      }
+    });
 
-    function onOutEnd() {
-      outSlide.classList.remove('active', outClass);
-      outSlide.removeEventListener('animationend', onOutEnd);
-    }
-    function onInEnd() {
-      inSlide.classList.remove(inClass);
-      inSlide.removeEventListener('animationend', onInEnd);
-      isAnimating = false;
-    }
-    outSlide.addEventListener('animationend', onOutEnd);
-    inSlide.addEventListener('animationend', onInEnd);
+    outSlide.className = 'hero-slide active ' + outClass;
+    inSlide.className  = 'hero-slide active ' + inClass;
 
-    // Safety fallback in case animationend doesn't fire
     setTimeout(function() {
-      outSlide.classList.remove('active', outClass);
-      inSlide.classList.remove(inClass);
+      outSlide.className = 'hero-slide';
+      inSlide.className  = 'hero-slide active';
       isAnimating = false;
-    }, 750);
+    }, 520);
   }
 
   function next() { goToSlide(currentIndex + 1, 1); }
   function prev() { goToSlide(currentIndex - 1, -1); }
-  function startAuto() { stopAuto(); slideInterval = setInterval(next, DELAY); }
-  function stopAuto()  { if (slideInterval) { clearInterval(slideInterval); slideInterval = null; } }
+  function startAuto() {
+    stopAuto();
+    if (slidesList.length > 1) {
+      window.__heroSlideInterval = setInterval(next, DELAY);
+    }
+  }
+  function stopAuto() {
+    if (window.__heroSlideInterval) {
+      clearInterval(window.__heroSlideInterval);
+      window.__heroSlideInterval = null;
+    }
+  }
 
-  if (nextBtn) nextBtn.addEventListener('click', function() { next(); startAuto(); });
-  if (prevBtn) prevBtn.addEventListener('click', function() { prev(); startAuto(); });
+  if (nextBtn) nextBtn.onclick = function() { next(); startAuto(); };
+  if (prevBtn) prevBtn.onclick = function() { prev(); startAuto(); };
 
   if (dotsContainer) {
-    dotsContainer.addEventListener('click', function(e) {
+    dotsContainer.onclick = function(e) {
       var dot = e.target.closest ? e.target.closest('.slider-dot') : e.target;
       if (dot && dot.dataset && dot.dataset.index !== undefined) {
         var i = parseInt(dot.dataset.index, 10);
         if (!isNaN(i)) { goToSlide(i); startAuto(); }
       }
-    });
+    };
   }
 
-  slider.addEventListener('mouseenter', stopAuto);
-  slider.addEventListener('mouseleave', startAuto);
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight') { next(); startAuto(); }
-    else if (e.key === 'ArrowLeft') { prev(); startAuto(); }
-  });
+  slider.onmouseenter = stopAuto;
+  slider.onmouseleave = startAuto;
 
   var touchX = 0;
   slider.addEventListener('touchstart', function(e) {
-    if (e.changedTouches[0]) touchX = e.changedTouches[0].screenX;
+    if (e.changedTouches && e.changedTouches[0]) touchX = e.changedTouches[0].screenX;
   }, { passive: true });
   slider.addEventListener('touchend', function(e) {
-    if (e.changedTouches[0]) {
+    if (e.changedTouches && e.changedTouches[0]) {
       var dx = e.changedTouches[0].screenX - touchX;
       if (dx < -45) { next(); startAuto(); }
       else if (dx > 45) { prev(); startAuto(); }
@@ -650,6 +694,7 @@ function initHeroSlideshow() {
     document.hidden ? stopAuto() : startAuto();
   });
 
+  // Start auto-advance
   startAuto();
 }
 /* ----------------------------------------------------
@@ -662,7 +707,7 @@ function setupHeroQuickSearch() {
 
     var target = document.getElementById('home-inventory-search');
     if (!target) {
-      window.location.href = 'index.html#home-inventory-search';
+      window.location.href = './#home-inventory-search';
       return;
     }
 
@@ -1135,16 +1180,30 @@ function renderInventory() {
 function createVehicleCardHtml(car) {
   const isWishlisted = wishlist.includes(car.id);
   const isCompared = compareList.includes(car.id);
-  const mainImage = (Array.isArray(car.images) && car.images[0]) ? car.images[0] : 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80';
+  const carImages = (Array.isArray(car.images) && car.images.length > 0)
+    ? car.images
+    : (car.image ? [car.image] : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80']);
+  const mainImage = carImages[0];
   const badgesList = Array.isArray(car.badges) ? car.badges : [];
   const transmissionShort = car.transmission ? car.transmission.split(' ')[0] : 'Auto';
+  const hasMultipleImages = carImages.length > 1;
 
   return `
     <article class="vehicle-card" data-vehicle-id="${car.id}">
-      <div class="vehicle-thumb-wrap">
+      <div class="vehicle-thumb-wrap" data-has-slideshow="${hasMultipleImages ? 'true' : 'false'}">
         <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         
+        ${hasMultipleImages ? `
+          <div class="card-photo-counter" style="position: absolute; bottom: 8px; right: 8px; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 12px; backdrop-filter: blur(4px); z-index: 3; pointer-events: none; border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; gap: 3px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span class="card-slide-cur">1</span>/<span class="card-slide-tot">${carImages.length}</span>
+          </div>
+          <button type="button" class="card-img-nav card-img-prev" data-dir="-1" title="Previous Photo" aria-label="Previous Photo">‹</button>
+          <button type="button" class="card-img-nav card-img-next" data-dir="1" title="Next Photo" aria-label="Next Photo">›</button>
+        ` : ''}
+
         <div class="vehicle-badge-overlay">
+          ${car.onTestDrive ? `<span class="badge" style="background:#10B981; color:#FFFFFF; border:1px solid #059669; font-weight:700;">🚗 On Test Drive</span>` : ''}
           ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Arrival</span>` : ''}
           <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition || 'Pre-Owned'}</span>
           ${badgesList.filter(b => b !== 'New Arrival').slice(0, 1).map(b => `<span class="badge badge-green">${b}</span>`).join('')}
@@ -1207,6 +1266,109 @@ function createVehicleCardHtml(car) {
   `;
 }
 
+// Active card slideshow timers registry
+let activeCardSlideshowTimers = [];
+
+function clearCardSlideshows() {
+  activeCardSlideshowTimers.forEach(t => clearInterval(t));
+  activeCardSlideshowTimers = [];
+}
+
+function initCardSlideshows(parentEl) {
+  clearCardSlideshows();
+
+  const cards = parentEl.querySelectorAll('.vehicle-card');
+  cards.forEach((card, cardIndex) => {
+    const carId = card.dataset.vehicleId;
+    const car = getVehicleById(carId);
+    if (!car) return;
+
+    const carImages = (Array.isArray(car.images) && car.images.length > 0)
+      ? car.images
+      : (car.image ? [car.image] : []);
+
+    if (carImages.length <= 1) return;
+
+    const imgEl = card.querySelector('.vehicle-img');
+    const curCounter = card.querySelector('.card-slide-cur');
+    if (!imgEl) return;
+
+    let currentIdx = 0;
+    let timer = null;
+
+    function showImage(idx) {
+      if (idx < 0) idx = carImages.length - 1;
+      if (idx >= carImages.length) idx = 0;
+      currentIdx = idx;
+
+      imgEl.style.opacity = '0.4';
+      setTimeout(() => {
+        imgEl.src = carImages[currentIdx];
+        imgEl.style.opacity = '1';
+      }, 110);
+
+      if (curCounter) {
+        curCounter.textContent = currentIdx + 1;
+      }
+    }
+
+    function startTimer() {
+      stopTimer();
+      timer = setInterval(() => {
+        if (!card.isConnected) {
+          stopTimer();
+          return;
+        }
+        showImage(currentIdx + 1);
+      }, 3500);
+      activeCardSlideshowTimers.push(timer);
+    }
+
+    function stopTimer() {
+      if (timer) {
+        clearInterval(timer);
+        const tIndex = activeCardSlideshowTimers.indexOf(timer);
+        if (tIndex > -1) activeCardSlideshowTimers.splice(tIndex, 1);
+        timer = null;
+      }
+    }
+
+    // Stagger start slightly so cards don't all rotate at the exact same millisecond
+    const stagger = (cardIndex % 4) * 700;
+    setTimeout(() => {
+      if (card.isConnected) startTimer();
+    }, stagger);
+
+    // Pause on hover so user can inspect photo, resume on leave
+    card.addEventListener('mouseenter', stopTimer);
+    card.addEventListener('mouseleave', () => {
+      if (card.isConnected) startTimer();
+    });
+
+    // Manual navigation buttons on card (‹ and ›)
+    const prevBtn = card.querySelector('.card-img-prev');
+    const nextBtn = card.querySelector('.card-img-next');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        showImage(currentIdx - 1);
+        startTimer();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        showImage(currentIdx + 1);
+        startTimer();
+      });
+    }
+  });
+}
+
 function attachCardEvents(parentEl) {
   // Wishlist toggle
   parentEl.querySelectorAll('.btn-wishlist').forEach(btn => {
@@ -1241,6 +1403,9 @@ function attachCardEvents(parentEl) {
       openTestDriveModal(carId);
     });
   });
+
+  // Initialize auto-slideshows for cards with multiple images
+  initCardSlideshows(parentEl);
 }
 
 /* ----------------------------------------------------
@@ -1493,36 +1658,36 @@ function openVehicleModal(carId) {
 
       </div>
 
-      <div>
+      <div style="color: var(--gray-900);">
         <div style="margin-bottom: 1.25rem;">
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
             ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Arrival</span>` : ''}
             <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
             ${car.vin && car.vin !== 'N/A' ? `<span class="badge badge-green">VIN: ${car.vin}</span>` : `<span class="badge badge-silver" style="opacity: 0.8;">VIN: Optional / N/A</span>`}
           </div>
-          <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem; line-height: 1.2;">${car.year} ${car.make} ${car.model}</h2>
-          <div style="font-size: 0.95rem; color: var(--silver-400);">${car.trim}</div>
-          <div style="font-size: 2rem; font-weight: 800; color: #fff; margin-top: 0.5rem; font-family: var(--font-heading);">${formatPrice(car.price)}</div>
+          <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem; line-height: 1.2; color: #0F172A; font-weight: 800;">${car.year} ${car.make} ${car.model}</h2>
+          <div style="font-size: 0.95rem; color: #64748B; font-weight: 500;">${car.trim}</div>
+          <div style="font-size: 2rem; font-weight: 800; color: #1B3A6B; margin-top: 0.5rem; font-family: var(--font-heading);">${formatPrice(car.price)}</div>
         </div>
 
-        <p style="font-size: 0.875rem; color: var(--silver-400); margin-bottom: 1.25rem; line-height: 1.6;">${car.overview}</p>
+        <p style="font-size: 0.875rem; color: #475569; margin-bottom: 1.25rem; line-height: 1.6;">${car.overview}</p>
 
-        <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--silver-400); margin-bottom: 0.75rem; letter-spacing: 0.05em;">Key Specifications</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; font-size: 0.85rem; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-          <div><strong style="color: var(--silver-300);">Mileage:</strong> ${formatNumber(car.mileage)} km</div>
-          <div><strong style="color: var(--silver-300);">Drivetrain:</strong> ${car.drivetrain}</div>
-          <div><strong style="color: var(--silver-300);">Engine:</strong> ${car.engine}</div>
-          <div><strong style="color: var(--silver-300);">Transmission:</strong> ${car.transmission}</div>
-          <div><strong style="color: var(--silver-300);">Exterior:</strong> ${car.exteriorColor}</div>
-          <div><strong style="color: var(--silver-300);">Interior:</strong> ${car.interiorColor}</div>
+        <h4 style="font-size: 0.85rem; text-transform: uppercase; color: #0F172A; margin-bottom: 0.75rem; letter-spacing: 0.05em; font-weight: 700;">Key Specifications</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; font-size: 0.85rem; margin-bottom: 1.5rem; background: #F8FAFC; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #E2E8F0; color: #334155;">
+          <div><strong style="color: #0F172A;">Mileage:</strong> ${formatNumber(car.mileage)} km</div>
+          <div><strong style="color: #0F172A;">Drivetrain:</strong> ${car.drivetrain}</div>
+          <div><strong style="color: #0F172A;">Engine:</strong> ${car.engine}</div>
+          <div><strong style="color: #0F172A;">Transmission:</strong> ${car.transmission}</div>
+          <div><strong style="color: #0F172A;">Exterior:</strong> ${car.exteriorColor}</div>
+          <div><strong style="color: #0F172A;">Interior:</strong> ${car.interiorColor}</div>
         </div>
 
-        <h4 style="font-size: 0.9rem; text-transform: uppercase; color: var(--silver-400); margin-bottom: 0.75rem; letter-spacing: 0.05em;">Top Features</h4>
-        <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.8rem; color: var(--silver-300); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.85rem; text-transform: uppercase; color: #0F172A; margin-bottom: 0.75rem; letter-spacing: 0.05em; font-weight: 700;">Top Features</h4>
+        <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.82rem; color: #334155; margin-bottom: 1.5rem; padding-left: 0;">
           ${carFeatures.map(f => `
             <li style="display: flex; align-items: center; gap: 0.35rem;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              ${f}
+              <span>${f}</span>
             </li>
           `).join('')}
         </ul>
@@ -1569,22 +1734,67 @@ function openVehicleModal(carId) {
     });
   }
 
-  // Next / Prev button listeners
+  // Auto Slideshow in Vehicle Details Modal
+  let modalSlideshowTimer = null;
+
+  function startModalSlideshow() {
+    if (totalImgs <= 1) return;
+    stopModalSlideshow();
+    modalSlideshowTimer = setInterval(() => {
+      if (!modalBackdrop.classList.contains('active')) {
+        stopModalSlideshow();
+        return;
+      }
+      switchModalImage(currentImgIdx + 1);
+    }, 3200);
+  }
+
+  function stopModalSlideshow() {
+    if (modalSlideshowTimer) {
+      clearInterval(modalSlideshowTimer);
+      modalSlideshowTimer = null;
+    }
+  }
+
+  // Start auto-slideshow immediately
+  startModalSlideshow();
+
+  // Pause on hover over main image or thumbnails, resume on mouse leave
+  const mediaStage = document.getElementById('modal-media-container');
+  if (mediaStage) {
+    mediaStage.addEventListener('mouseenter', stopModalSlideshow);
+    mediaStage.addEventListener('mouseleave', () => {
+      if (modalBackdrop.classList.contains('active')) startModalSlideshow();
+    });
+  }
+
+  const thumbsWrap = modalContainer.querySelector('.modal-thumbs-carousel-wrap');
+  if (thumbsWrap) {
+    thumbsWrap.addEventListener('mouseenter', stopModalSlideshow);
+    thumbsWrap.addEventListener('mouseleave', () => {
+      if (modalBackdrop.classList.contains('active')) startModalSlideshow();
+    });
+  }
+
+  // Next / Prev button listeners (reset auto-slideshow timer)
   document.getElementById('modal-prev-img')?.addEventListener('click', (e) => {
     e.stopPropagation();
     switchModalImage(currentImgIdx - 1);
+    startModalSlideshow();
   });
 
   document.getElementById('modal-next-img')?.addEventListener('click', (e) => {
     e.stopPropagation();
     switchModalImage(currentImgIdx + 1);
+    startModalSlideshow();
   });
 
-  // Thumbnail clicks
+  // Thumbnail clicks (reset auto-slideshow timer)
   modalContainer.querySelectorAll('.modal-thumb-item').forEach(thumb => {
     thumb.addEventListener('click', () => {
       const idx = parseInt(thumb.dataset.idx);
       switchModalImage(idx);
+      startModalSlideshow();
     });
   });
 
@@ -1601,6 +1811,7 @@ function openVehicleModal(carId) {
   const videoBtn = modalContainer.querySelector('#btn-play-walkaround-video');
   if (videoBtn && car.video) {
     videoBtn.addEventListener('click', () => {
+      stopModalSlideshow();
       const mediaWrap = document.getElementById('modal-media-container');
       if (mediaWrap) {
         let embedHtml = '';
@@ -1620,8 +1831,27 @@ function openVehicleModal(carId) {
     });
   }
 
+  // Modal Close Cleanup
+  function closeModal() {
+    stopModalSlideshow();
+    modalBackdrop.classList.remove('active');
+  }
+
   modalBackdrop.classList.add('active');
-  document.getElementById('modal-close').onclick = () => modalBackdrop.classList.remove('active');
+  const closeBtn = document.getElementById('modal-close');
+  if (closeBtn) closeBtn.onclick = closeModal;
+
+  modalBackdrop.onclick = (e) => {
+    if (e.target === modalBackdrop) closeModal();
+  };
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 }
 
 /* ----------------------------------------------------
@@ -1727,12 +1957,24 @@ function openTestDriveModal(carId) {
       Location: 'Motor Trends Auto Group - 10740 Cambie Road, Richmond, BC (Dealer #30859)'
     };
 
+    if (car) {
+      car.onTestDrive = true;
+      car.testDriveBookedAt = new Date().toISOString();
+      car.testDriveCustomer = payload.CustomerName;
+      if (typeof saveVehiclesData === 'function' && typeof VEHICLES_DATA !== 'undefined') {
+        saveVehiclesData(VEHICLES_DATA);
+      }
+      if (typeof saveVehicleToFirebase === 'function') {
+        try { await saveVehicleToFirebase(car); } catch (e) {}
+      }
+    }
+
     if (window.sendEmailSubmission) {
       await window.sendEmailSubmission(payload, `Test Drive: ${payload.Vehicle} - ${payload.CustomerName}`);
     }
 
     modalBackdrop.classList.remove('active');
-    showToast('🎉 Your Test Drive appointment request has been submitted! Our specialist will reach out shortly.', 'success');
+    showToast('🎉 Your Test Drive appointment request has been confirmed! Our specialist will prepare the vehicle.', 'success');
   });
 }
 
