@@ -5,6 +5,51 @@
  * 100% Free - Completely independent of Firebase Database limits
  */
 
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDzX6dYYoa46PTR1yK2a-nu3SJgQ8RyiW4",
+  authDomain: "motor-trends.firebaseapp.com",
+  projectId: "motor-trends",
+  storageBucket: "motor-trends.firebasestorage.app",
+  messagingSenderId: "818376550814",
+  appId: "1:818376550814:web:b95241af2fc4512bbece8f",
+  measurementId: "G-SJEW350XQJ"
+};
+
+var firebaseConfig = { ...DEFAULT_FIREBASE_CONFIG };
+var fbApp = null;
+var fbAuth = null;
+var fbDb = null;
+var isFirebaseReady = false;
+
+function initFirebaseApp() {
+  try {
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        fbApp = firebase.initializeApp(firebaseConfig);
+      } else {
+        fbApp = firebase.app();
+      }
+      if (typeof firebase.auth === 'function') {
+        fbAuth = firebase.auth();
+      }
+      isFirebaseReady = true;
+    }
+  } catch (err) {
+    console.warn('Optional Firebase Auth init:', err);
+  }
+}
+
+if (typeof firebase !== 'undefined') {
+  initFirebaseApp();
+}
+
+if (typeof window !== 'undefined') {
+  window.fbApp = fbApp;
+  window.fbAuth = fbAuth;
+  window.fbDb = fbDb;
+  window.initFirebaseApp = initFirebaseApp;
+}
+
 const API_ENDPOINT = (function() {
   // Use relative endpoint so it works identically on localhost and production HostPapa
   return '/api/vehicles.php';
