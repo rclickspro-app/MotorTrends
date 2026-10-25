@@ -807,7 +807,7 @@ function getDeletedVehicleIds() {
       ...(Array.isArray(listLive) ? listLive : []),
       ...(Array.isArray(listLegacy) ? listLegacy : [])
     ];
-    return [...new Set(merged.map(String))];
+    return [...new Set(merged.map(s => String(s || '').trim()).filter(Boolean))];
   } catch (e) {
     return [];
   }
@@ -894,16 +894,38 @@ function getStoredVehicles() {
   return DEFAULT_VEHICLES_DATA.filter(v => !deletedIds.includes(String(v.id)));
 }
 
+function sanitizeVehiclesForStorage(vehicles) {
+  if (!Array.isArray(vehicles)) return [];
+  return vehicles.map(v => {
+    if (!v || typeof v !== 'object') return v;
+    const copy = { ...v };
+    if (Array.isArray(copy.images)) {
+      copy.images = copy.images.map(img => {
+        // Strip large base64 data URLs from localStorage payload
+        if (typeof img === 'string' && img.startsWith('data:image/')) {
+          return 'images/slide1.jpg';
+        }
+        return img;
+      });
+    }
+    return copy;
+  });
+}
+
 function saveVehiclesData(data) {
   const deletedIds = getDeletedVehicleIds();
   const items = Array.isArray(data)
     ? data.filter(v => v && v.id && !deletedIds.includes(String(v.id)) && !deletedIds.includes(String(v.stockNumber || '')))
     : [];
   if (typeof localStorage !== 'undefined') {
-    const payload = JSON.stringify(items);
-    ALL_VEHICLE_CACHE_KEYS.forEach(k => {
-      try { localStorage.setItem(k, payload); } catch (e) {}
-    });
+    try {
+      const safePayload = JSON.stringify(sanitizeVehiclesForStorage(items));
+      ALL_VEHICLE_CACHE_KEYS.forEach(k => {
+        try { localStorage.setItem(k, safePayload); } catch (e) {}
+      });
+    } catch (err) {
+      console.warn('LocalStorage save warning:', err);
+    }
   }
   if (typeof VEHICLES_DATA !== 'undefined') {
     VEHICLES_DATA.length = 0;

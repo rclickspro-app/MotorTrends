@@ -68,8 +68,10 @@ function readCatalog() {
             // If physical photos exist in this folder, use them
             if (imageFiles.length > 0) {
               vData.images = imageFiles;
-            } else if (!Array.isArray(vData.images) || vData.images.length === 0) {
-              vData.images = ['images/slide1.jpg'];
+            } else {
+              const clean = (Array.isArray(vData.images) ? vData.images : [])
+                .filter(img => typeof img === 'string' && !img.startsWith('data:image/'));
+              vData.images = clean.length > 0 ? clean : ['images/slide1.jpg'];
             }
             vehiclesMap.set(String(vData.id), vData);
           } else if (imageFiles.length > 0) {
@@ -254,19 +256,23 @@ const server = http.createServer((req, res) => {
           rawImages.forEach((img, idx) => {
             if (typeof img !== 'string' || !img.trim()) return;
 
-            const base64Match = img.match(/^data:image\/(\w+);base64,(.+)$/);
-            if (base64Match) {
-              let ext = base64Match[1].toLowerCase();
-              if (ext === 'jpeg') ext = 'jpg';
-              if (!['jpg', 'png', 'webp', 'gif'].includes(ext)) ext = 'jpg';
+            if (img.startsWith('data:image/') && img.includes(';base64,')) {
+              const parts = img.split(';base64,');
+              let ext = 'jpg';
+              if (parts[0].includes('png')) ext = 'png';
+              else if (parts[0].includes('webp')) ext = 'webp';
+              else if (parts[0].includes('gif')) ext = 'gif';
 
-              const buffer = Buffer.from(base64Match[2], 'base64');
-              const fileName = `photo_${idx + 1}.${ext}`;
-              const filePath = path.join(vehicleFolder, fileName);
-              fs.writeFileSync(filePath, buffer);
-
-              processedImages.push(`uploads/vehicles/${cleanId}/${fileName}`);
-            } else {
+              try {
+                const buffer = Buffer.from(parts[1], 'base64');
+                const fileName = `photo_${idx + 1}.${ext}`;
+                const filePath = path.join(vehicleFolder, fileName);
+                fs.writeFileSync(filePath, buffer);
+                processedImages.push(`uploads/vehicles/${cleanId}/${fileName}`);
+              } catch (err) {
+                console.error(`Error saving image ${idx + 1} for ${cleanId}:`, err);
+              }
+            } else if (!img.startsWith('data:image/')) {
               processedImages.push(img);
             }
           });

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 @ini_set('post_max_size', '64M');
 @ini_set('memory_limit', '256M');
 
-$rootDir = realpath(__DIR__ . '/..');
+$rootDir = dirname(__DIR__);
 $uploadsVehiclesDir = $rootDir . '/uploads/vehicles';
 $dataDir = $rootDir . '/data';
 $catalogFile = $dataDir . '/vehicles.json';
@@ -69,8 +69,16 @@ function readCatalog($catalogFile, $uploadsVehiclesDir) {
             if (is_array($vData) && !empty($vData['id'])) {
                 if (!empty($imageFiles)) {
                     $vData['images'] = $imageFiles;
-                } elseif (empty($vData['images'])) {
-                    $vData['images'] = ['images/slide1.jpg'];
+                } else {
+                    $cleanImgs = [];
+                    if (isset($vData['images']) && is_array($vData['images'])) {
+                        foreach ($vData['images'] as $imgItem) {
+                            if (is_string($imgItem) && strpos($imgItem, 'data:image/') !== 0) {
+                                $cleanImgs[] = $imgItem;
+                            }
+                        }
+                    }
+                    $vData['images'] = !empty($cleanImgs) ? $cleanImgs : ['images/slide1.jpg'];
                 }
                 $vehiclesMap[(string)$vData['id']] = $vData;
             } elseif (!empty($imageFiles)) {
@@ -240,26 +248,29 @@ if ($method === 'POST') {
     foreach ($rawImages as $idx => $img) {
         if (!is_string($img) || empty(trim($img))) continue;
 
-        // Check for base64 image data (e.g., data:image/jpeg;base64,....)
-        if (preg_match('/^data:image\/(\w+);base64,(.+)$/', $img, $matches)) {
-            $ext = strtolower($matches[1]);
-            if ($ext === 'jpeg') $ext = 'jpg';
-            if (!in_array($ext, ['jpg', 'png', 'webp', 'gif'])) $ext = 'jpg';
+        // Fast, reliable base64 image decoding without PCRE backtrack limit issues
+        if (strpos($img, 'data:image/') === 0 && strpos($img, ';base64,') !== false) {
+            list($meta, $base64Data) = explode(';base64,', $img, 2);
+            $ext = 'jpg';
+            if (strpos($meta, 'png') !== false) $ext = 'png';
+            elseif (strpos($meta, 'webp') !== false) $ext = 'webp';
+            elseif (strpos($meta, 'gif') !== false) $ext = 'gif';
 
-            $base64Data = $matches[2];
             $binaryData = base64_decode($base64Data);
-
             if ($binaryData !== false) {
                 $fileName = 'photo_' . ($idx + 1) . '.' . $ext;
                 $destPath = $vehicleFolder . '/' . $fileName;
-                @file_put_contents($destPath, $binaryData);
-                $processedImages[] = 'uploads/vehicles/' . $cleanId . '/' . $fileName;
-                continue;
+                if (@file_put_contents($destPath, $binaryData) !== false) {
+                    $processedImages[] = 'uploads/vehicles/' . $cleanId . '/' . $fileName;
+                    continue;
+                }
             }
         }
 
-        // If it's already a relative path or external URL, keep as is
-        $processedImages[] = $img;
+        // If it's already a relative path or external URL (not base64), keep as is
+        if (strpos($img, 'data:image/') !== 0) {
+            $processedImages[] = $img;
+        }
     }
 
     // Default fallback image if none provided
@@ -273,7 +284,14 @@ if ($method === 'POST') {
 
     // 1. Save metadata inside the vehicle's dedicated folder
     $metadataFile = $vehicleFolder . '/vehicle.json';
-    @file_put_contents($metadataFile, json_encode($vehicle, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    $savedMeta = @file_put_contents($metadataFile, json_encode($vehicle, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    if ($savedMeta === false) {
+        http_response_code(500);
+        echo json_encode([
+            'error' => "Cannot write to {$metadataFile}. Please check file permissions on HostPapa File Manager (chmod 755 for uploads/vehicles/)."
+        ]);
+        exit;
+    }
 
     // 2. Update central catalog
     $catalog = readCatalog($catalogFile, $uploadsVehiclesDir);

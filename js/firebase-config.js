@@ -63,8 +63,9 @@ const cloudDeletedIds = new Set(
 
 // Fetch catalog from Server File Storage (/api/vehicles.php or data/vehicles.json)
 async function fetchVehiclesFromServer() {
+  const timestamp = Date.now();
   try {
-    const res = await fetch(API_ENDPOINT, { cache: 'no-cache' });
+    const res = await fetch(`${API_ENDPOINT}?t=${timestamp}`, { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -75,7 +76,7 @@ async function fetchVehiclesFromServer() {
   } catch (err) {
     console.warn('Could not fetch from /api/vehicles.php, trying static fallback:', err);
     try {
-      const fallbackRes = await fetch('data/vehicles.json', { cache: 'no-cache' });
+      const fallbackRes = await fetch(`data/vehicles.json?t=${timestamp}`, { cache: 'no-cache' });
       if (fallbackRes.ok) {
         const data = await fallbackRes.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -121,23 +122,10 @@ async function saveVehicleToServer(vehicleObj) {
 
   // Un-tombstone if re-adding
   cloudDeletedIds.delete(strId);
-  if (vehicleObj.stockNumber) cloudDeletedIds.delete(String(vehicleObj.stockNumber));
+  if (vehicleObj.stockNumber) cloudDeletedIds.delete(String(vehicleObj.stockNumber).trim());
   if (typeof removeDeletedVehicleId === 'function') {
     removeDeletedVehicleId(strId);
-    if (vehicleObj.stockNumber) removeDeletedVehicleId(String(vehicleObj.stockNumber));
-  }
-
-  // Update in-memory and local cache first
-  if (typeof VEHICLES_DATA !== 'undefined') {
-    const existingIndex = VEHICLES_DATA.findIndex(v => v && String(v.id) === strId);
-    if (existingIndex > -1) {
-      VEHICLES_DATA[existingIndex] = vehicleObj;
-    } else {
-      VEHICLES_DATA.unshift(vehicleObj);
-    }
-    if (typeof saveVehiclesData === 'function') {
-      saveVehiclesData(VEHICLES_DATA);
-    }
+    if (vehicleObj.stockNumber) removeDeletedVehicleId(String(vehicleObj.stockNumber).trim());
   }
 
   // Send to server to create folder and write images as physical files
@@ -150,32 +138,40 @@ async function saveVehicleToServer(vehicleObj) {
 
     if (res.ok) {
       const result = await res.json();
-      if (result && result.vehicle) {
-        // Update local object with newly generated file paths
-        if (typeof VEHICLES_DATA !== 'undefined') {
-          const idx = VEHICLES_DATA.findIndex(v => v && String(v.id) === strId);
-          if (idx > -1) {
-            VEHICLES_DATA[idx] = result.vehicle;
-          }
-          if (typeof saveVehiclesData === 'function') {
-            saveVehiclesData(VEHICLES_DATA);
-          }
+      const updatedVehicle = result && result.vehicle ? result.vehicle : vehicleObj;
+
+      // Update in-memory array with the server's clean file paths
+      if (typeof VEHICLES_DATA !== 'undefined') {
+        const idx = VEHICLES_DATA.findIndex(v => v && String(v.id) === strId);
+        if (idx > -1) {
+          VEHICLES_DATA[idx] = updatedVehicle;
+        } else {
+          VEHICLES_DATA.unshift(updatedVehicle);
         }
-        marketplaceSubscribers.forEach(cb => {
-          try { cb(VEHICLES_DATA); } catch (e) {}
-        });
-        return { success: true, vehicle: result.vehicle, folder: result.folder };
+        if (typeof saveVehiclesData === 'function') {
+          saveVehiclesData(VEHICLES_DATA);
+        }
       }
-      return { success: true };
+
+      marketplaceSubscribers.forEach(cb => {
+        try { cb(VEHICLES_DATA); } catch (e) {}
+      });
+
+      return { success: true, vehicle: updatedVehicle, folder: result ? result.folder : null };
     } else {
       const errText = await res.text();
-      console.warn('Server save warning:', errText);
+      let errMsg = `Server returned HTTP ${res.status}`;
+      try {
+        const parsed = JSON.parse(errText);
+        if (parsed.error) errMsg = parsed.error;
+      } catch (e) {}
+      console.error('Server save error:', errMsg);
+      return { success: false, error: errMsg };
     }
   } catch (err) {
-    console.warn('Network error saving to server API, saved in local cache:', err);
+    console.error('Network error saving to server API:', err);
+    return { success: false, error: err.message || 'Network connection failed' };
   }
-
-  return { success: true, vehicle: vehicleObj };
 }
 
 // Delete vehicle folder and catalog entry from server

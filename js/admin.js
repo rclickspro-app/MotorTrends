@@ -1376,6 +1376,10 @@ function openVehicleEditorModal(carId = null) {
         return;
       }
       const filesToProcess = files.slice(0, remainingSlots);
+      if (filesToProcess.length === 0) return;
+      showToast(`Processing ${filesToProcess.length} photos...`, 'info');
+      let completedCount = 0;
+
       filesToProcess.forEach(file => {
         const reader = new FileReader();
         reader.onload = (re) => {
@@ -1400,8 +1404,21 @@ function openVehicleEditorModal(carId = null) {
               currentEditingImages.push(compressedBase64);
               renderImageSlots();
             }
+
+            completedCount++;
+            if (completedCount === filesToProcess.length) {
+              showToast(`All ${completedCount} photos attached and ready to save!`, 'success');
+            }
+          };
+          img.onerror = () => {
+            completedCount++;
+            showToast(`Could not process ${file.name}`, 'warning');
           };
           img.src = re.target.result;
+        };
+        reader.onerror = () => {
+          completedCount++;
+          showToast(`Error reading ${file.name}`, 'warning');
         };
         reader.readAsDataURL(file);
       });
@@ -1616,6 +1633,16 @@ async function saveVehicleFromForm() {
     // Sync to Server File Storage (uploads/vehicles/{id}/)
     if (typeof saveVehicleToServer === 'function') {
       const serverResult = await saveVehicleToServer(vehicleObject);
+      if (!serverResult || !serverResult.success) {
+        // Rollback optimistic addition if server failed
+        const rollbackIdx = VEHICLES_DATA.findIndex(v => String(v.id) === String(id));
+        if (rollbackIdx > -1) {
+          VEHICLES_DATA.splice(rollbackIdx, 1);
+        }
+        showToast('Server error: ' + (serverResult?.error || 'Failed to save vehicle folder on disk'), 'error');
+        alert('Server Error: ' + (serverResult?.error || 'Could not save vehicle folder on disk') + '\n\nPlease check your server connection or cPanel File Manager permissions.');
+        return;
+      }
       if (serverResult && serverResult.vehicle) {
         vehicleObject.images = serverResult.vehicle.images;
         const curIdx = VEHICLES_DATA.findIndex(v => String(v.id) === String(id));
