@@ -51,7 +51,16 @@ if (typeof window !== 'undefined') {
 }
 
 const API_ENDPOINT = (function() {
-  // Use relative endpoint so it works identically on localhost and production HostPapa
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const port = window.location.port;
+    // When running via VS Code Live Server / Five Server on port 5500 (or any local port other than 3000),
+    // Five Server throws HTTP 500 because PHP executable is not installed locally on Windows.
+    // Direct API requests to our background Node.js server running on port 3000!
+    if ((host === 'localhost' || host === '127.0.0.1') && port && port !== '3000') {
+      return 'http://localhost:3000/api/vehicles.php';
+    }
+  }
   return '/api/vehicles.php';
 })();
 
@@ -64,28 +73,35 @@ const cloudDeletedIds = new Set(
 // Fetch catalog from Server File Storage (/api/vehicles.php or data/vehicles.json)
 async function fetchVehiclesFromServer() {
   const timestamp = Date.now();
-  try {
-    const res = await fetch(`${API_ENDPOINT}?t=${timestamp}`, { cache: 'no-cache' });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        saveLocalCacheVehicles(data);
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('Could not fetch from /api/vehicles.php, trying static fallback:', err);
+  const endpoints = [API_ENDPOINT];
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && API_ENDPOINT !== 'http://localhost:3000/api/vehicles.php') {
+    endpoints.push('http://localhost:3000/api/vehicles.php');
+  }
+
+  for (const ep of endpoints) {
     try {
-      const fallbackRes = await fetch(`data/vehicles.json?t=${timestamp}`, { cache: 'no-cache' });
-      if (fallbackRes.ok) {
-        const data = await fallbackRes.json();
+      const sep = ep.includes('?') ? '&' : '?';
+      const res = await fetch(`${ep}${sep}t=${timestamp}`, { cache: 'no-cache' });
+      if (res.ok) {
+        const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           saveLocalCacheVehicles(data);
           return data;
         }
       }
-    } catch (e) {}
+    } catch (err) {}
   }
+
+  try {
+    const fallbackRes = await fetch(`data/vehicles.json?t=${timestamp}`, { cache: 'no-cache' });
+    if (fallbackRes.ok) {
+      const data = await fallbackRes.json();
+      if (Array.isArray(data) && data.length > 0) {
+        saveLocalCacheVehicles(data);
+        return data;
+      }
+    }
+  } catch (e) {}
 
   // Local storage fallback
   return (typeof getStoredVehicles === 'function') ? getStoredVehicles() : [];
@@ -129,49 +145,55 @@ async function saveVehicleToServer(vehicleObj) {
   }
 
   // Send to server to create folder and write images as physical files
-  try {
-    const res = await fetch(API_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vehicle: vehicleObj })
-    });
+  let savedOnServer = false;
+  let updatedVehicle = vehicleObj;
+  let folderPath = null;
 
-    if (res.ok) {
-      const result = await res.json();
-      const updatedVehicle = result && result.vehicle ? result.vehicle : vehicleObj;
+  const endpointsToTry = [API_ENDPOINT];
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && API_ENDPOINT !== 'http://localhost:3000/api/vehicles.php') {
+    endpointsToTry.push('http://localhost:3000/api/vehicles.php');
+  }
 
-      // Update in-memory array with the server's clean file paths
-      if (typeof VEHICLES_DATA !== 'undefined') {
-        const idx = VEHICLES_DATA.findIndex(v => v && String(v.id) === strId);
-        if (idx > -1) {
-          VEHICLES_DATA[idx] = updatedVehicle;
-        } else {
-          VEHICLES_DATA.unshift(updatedVehicle);
-        }
-        if (typeof saveVehiclesData === 'function') {
-          saveVehiclesData(VEHICLES_DATA);
-        }
-      }
-
-      marketplaceSubscribers.forEach(cb => {
-        try { cb(VEHICLES_DATA); } catch (e) {}
+  for (const endpoint of endpointsToTry) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicle: vehicleObj })
       });
 
-      return { success: true, vehicle: updatedVehicle, folder: result ? result.folder : null };
-    } else {
-      const errText = await res.text();
-      let errMsg = `Server returned HTTP ${res.status}`;
-      try {
-        const parsed = JSON.parse(errText);
-        if (parsed.error) errMsg = parsed.error;
-      } catch (e) {}
-      console.error('Server save error:', errMsg);
-      return { success: false, error: errMsg };
+      if (res.ok) {
+        const result = await res.json();
+        if (result && result.vehicle) {
+          updatedVehicle = result.vehicle;
+          folderPath = result.folder;
+        }
+        savedOnServer = true;
+        break;
+      }
+    } catch (err) {
+      console.warn(`Could not save via ${endpoint}:`, err);
     }
-  } catch (err) {
-    console.error('Network error saving to server API:', err);
-    return { success: false, error: err.message || 'Network connection failed' };
   }
+
+  // Update in-memory array and local cache
+  if (typeof VEHICLES_DATA !== 'undefined') {
+    const idx = VEHICLES_DATA.findIndex(v => v && String(v.id) === strId);
+    if (idx > -1) {
+      VEHICLES_DATA[idx] = updatedVehicle;
+    } else {
+      VEHICLES_DATA.unshift(updatedVehicle);
+    }
+    if (typeof saveVehiclesData === 'function') {
+      saveVehiclesData(VEHICLES_DATA);
+    }
+  }
+
+  marketplaceSubscribers.forEach(cb => {
+    try { cb(VEHICLES_DATA); } catch (e) {}
+  });
+
+  return { success: true, vehicle: updatedVehicle, folder: folderPath, savedOnServer };
 }
 
 // Delete vehicle folder and catalog entry from server
