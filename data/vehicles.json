@@ -1,5 +1,48 @@
 [
   {
+    "id": "veh-1792947419431",
+    "year": 2023,
+    "make": "Nissan",
+    "model": "Rogue",
+    "trim": "",
+    "price": 28500,
+    "monthlyEst": 0,
+    "mileage": 24000,
+    "bodyType": "SUV",
+    "fuelType": "Gasoline",
+    "transmission": "Automatic",
+    "drivetrain": "AWD",
+    "engine": "",
+    "exteriorColor": "",
+    "interiorColor": "",
+    "vin": "N/A",
+    "stockNumber": "MT-2245",
+    "condition": "Certified Pre-Owned",
+    "featured": true,
+    "isNewVehicle": true,
+    "heroSlide": true,
+    "isSlideshow": true,
+    "onTestDrive": false,
+    "badges": [
+      "Clean Title",
+      "Inspected",
+      "New Arrival"
+    ],
+    "images": [
+      "images/slide1.jpg"
+    ],
+    "video": "",
+    "features": [
+      "Apple CarPlay & Android Auto",
+      "Blind Spot Monitoring",
+      "Rearview Backup Camera",
+      "Bluetooth Hands-free"
+    ],
+    "overview": "",
+    "createdAt": "2026-10-25T16:56:59.431Z",
+    "updatedAt": "2026-10-25T16:56:59.443Z"
+  },
+  {
     "id": "veh-1792939660963",
     "year": 2022,
     "make": "Toyota",
