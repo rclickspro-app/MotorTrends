@@ -351,11 +351,17 @@ main { flex: 1; }
 /* ----------------------------------------------------------------
    Preloader
 ---------------------------------------------------------------- */
-.mt-page-preloader,
+.mt-page-preloader {
+  position: fixed; inset: 0;
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
 .mt-page-preloader.hidden,
 .mt-page-preloader.preloader-hidden,
 .preloader-hidden {
-  display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
@@ -395,7 +401,7 @@ main { flex: 1; }
   height: 100%; width: 0;
   background: linear-gradient(90deg, var(--blue), var(--red));
   border-radius: 3px;
-  animation: preloaderFill 1.8s ease forwards;
+  animation: preloaderFill 0.75s ease forwards;
 }
 @keyframes preloaderFill { to { width: 100%; } }
 .mt-preloader-brand {

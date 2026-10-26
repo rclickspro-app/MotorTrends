@@ -20,24 +20,41 @@
   } catch (e) { }
 })();
 
-// Universal Page Preloader - Instant, single-shot dismiss (Never freeze, never loop)
+// Universal Page Preloader - Plays exactly once (~750ms) and smoothly transitions to page
 function initPreloader() {
   const preloader = document.getElementById('mt-page-preloader');
   if (!preloader) return;
-  preloader.classList.add('hidden');
-  preloader.classList.add('preloader-hidden');
-  setTimeout(() => {
-    if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
-  }, 200);
+
+  const minDuration = 750; // exactly 1 clean animation cycle of the driving car & progress bar
+  const startTime = Date.now();
+  let dismissed = false;
+
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minDuration - elapsed);
+
+    setTimeout(() => {
+      preloader.classList.add('hidden');
+      preloader.classList.add('preloader-hidden');
+      setTimeout(() => {
+        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+      }, 380);
+    }, remaining);
+  }
+
+  // Dismiss once DOM is ready with exact 1-cycle duration and hard ceiling of 850ms
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    dismiss();
+  } else {
+    document.addEventListener('DOMContentLoaded', dismiss);
+    window.addEventListener('load', dismiss);
+    setTimeout(dismiss, 850);
+  }
 }
 
-// Dismiss immediately on script load, DOM ready, and window load
 initPreloader();
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initPreloader);
-}
-window.addEventListener('load', initPreloader);
-setTimeout(initPreloader, 200);
 
 // Global action loader for dynamic operations (filtering, forms, saves)
 window.showActionLoader = function (msg) {
