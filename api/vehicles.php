@@ -130,7 +130,6 @@ function readCatalog($catalogFile, $uploadsVehiclesDir) {
         return $timeB - $timeA;
     });
 
-    @file_put_contents($catalogFile, json_encode($vehicles, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     return $vehicles;
 }
 

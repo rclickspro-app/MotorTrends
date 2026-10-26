@@ -351,32 +351,14 @@ main { flex: 1; }
 /* ----------------------------------------------------------------
    Preloader
 ---------------------------------------------------------------- */
-.mt-page-preloader {
-  position: fixed; inset: 0;
-  background: var(--white);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 99999;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-  /* Auto-dismiss in one go: guarantees screen unblocks smoothly in 350ms */
-  animation: mtAutoDismissPreloader 0.3s ease 0.35s forwards;
-}
-
-@keyframes mtAutoDismissPreloader {
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    display: none;
-  }
-}
-
+.mt-page-preloader,
 .mt-page-preloader.hidden,
 .mt-page-preloader.preloader-hidden,
 .preloader-hidden {
+  display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
-  display: none !important;
 }
 .mt-preloader-content {
   text-align: center;

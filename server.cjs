@@ -134,11 +134,6 @@ function readCatalog() {
     return timeB - timeA;
   });
 
-  // Always keep catalog file updated
-  try {
-    fs.writeFileSync(catalogFile, JSON.stringify(vehicles, null, 2), 'utf8');
-  } catch (e) {}
-
   return vehicles;
 }
 
