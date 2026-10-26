@@ -20,31 +20,24 @@
   } catch (e) { }
 })();
 
-// Universal Page Preloader - Instant, smooth dismiss (no freeze / hang on page switch)
+// Universal Page Preloader - Instant, single-shot dismiss (Never freeze, never loop)
 function initPreloader() {
   const preloader = document.getElementById('mt-page-preloader');
   if (!preloader) return;
-
-  let dismissed = false;
-  function dismiss() {
-    if (dismissed) return;
-    dismissed = true;
-    preloader.classList.add('hidden');
-    preloader.classList.add('preloader-hidden');
-    setTimeout(() => {
-      if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
-    }, 280);
-  }
-
-  // Dismiss promptly as soon as DOM is ready so page transitions are fluid
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
-    setTimeout(dismiss, 100);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(dismiss, 100));
-    window.addEventListener('load', dismiss);
-    setTimeout(dismiss, 600); // hard safety timeout
-  }
+  preloader.classList.add('hidden');
+  preloader.classList.add('preloader-hidden');
+  setTimeout(() => {
+    if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+  }, 200);
 }
+
+// Dismiss immediately on script load, DOM ready, and window load
+initPreloader();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPreloader);
+}
+window.addEventListener('load', initPreloader);
+setTimeout(initPreloader, 200);
 
 // Global action loader for dynamic operations (filtering, forms, saves)
 window.showActionLoader = function (msg) {

@@ -257,10 +257,13 @@ function checkAuthSession() {
     }
   }
 
-  // 2. Check Firebase Auth state if available
+  // 2. Default to login screen immediately so page renders in one go
+  showAuthView('login');
+
+  // 3. In background, check Firebase Auth state if available
   if (typeof firebase !== 'undefined' && fbAuth) {
     fbAuth.onAuthStateChanged((user) => {
-      if (user) {
+      if (user && !currentAdminUser) {
         const loggedUser = {
           id: user.uid,
           name: user.displayName || user.email.split('@')[0],
@@ -273,15 +276,9 @@ function checkAuthSession() {
         currentAdminUser = loggedUser;
         localStorage.setItem(ADMIN_STORAGE_KEY_SESSION, JSON.stringify(loggedUser));
         showDashboardView();
-        return;
-      } else {
-        showAuthView('login');
       }
     });
-    return;
   }
-
-  showAuthView('login');
 }
 
 /* ----------------------------------------------------

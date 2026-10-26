@@ -1,5 +1,51 @@
 [
   {
+    "id": "veh-1792992499662",
+    "year": 2019,
+    "make": "Toyota",
+    "model": "2019 Toyota Mirai Sedan",
+    "trim": "",
+    "price": 14999,
+    "monthlyEst": 0,
+    "mileage": 30363,
+    "bodyType": "Sedan",
+    "fuelType": "Hybrid",
+    "transmission": "Automatic",
+    "drivetrain": "AWD",
+    "engine": "",
+    "exteriorColor": "",
+    "interiorColor": "",
+    "vin": "N/A",
+    "stockNumber": "MT-6602",
+    "condition": "Certified Pre-Owned",
+    "featured": true,
+    "isNewVehicle": true,
+    "heroSlide": true,
+    "isSlideshow": true,
+    "onTestDrive": false,
+    "badges": [
+      "Clean Title",
+      "Inspected",
+      "New Arrival"
+    ],
+    "images": [
+      "uploads/vehicles/veh-1792992499662/photo_1.jpg",
+      "uploads/vehicles/veh-1792992499662/photo_2.jpg",
+      "uploads/vehicles/veh-1792992499662/photo_3.jpg",
+      "uploads/vehicles/veh-1792992499662/photo_4.jpg"
+    ],
+    "video": "",
+    "features": [
+      "Apple CarPlay & Android Auto",
+      "Blind Spot Monitoring",
+      "Rearview Backup Camera",
+      "Bluetooth Hands-free"
+    ],
+    "overview": "",
+    "createdAt": "2026-10-26T05:28:19.663Z",
+    "updatedAt": "2026-10-26T05:28:19.969Z"
+  },
+  {
     "id": "veh-1792989693003",
     "year": 2018,
     "make": "McLaren",
