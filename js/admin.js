@@ -1146,7 +1146,7 @@ function attachTableActionEvents() {
       const carId = targetBtn.dataset.id;
       const car = getVehicleById(carId);
       const stock = car && car.stockNumber ? car.stockNumber : '';
-      window.open(`inventory.html?preview=${encodeURIComponent(carId)}&q=${encodeURIComponent(stock)}`, '_blank');
+      window.open(`inventory?preview=${encodeURIComponent(carId)}&q=${encodeURIComponent(stock)}`, '_blank');
     });
   });
 }
@@ -1978,7 +1978,7 @@ function sendUserInvitation(userId) {
   }
   const isSales = (u.role === 'Sales Agent');
   const origin = window.location.origin || 'http://localhost:3000';
-  const portalUrl = isSales ? `${origin}/sales.html` : `${origin}/admin.html`;
+  const portalUrl = isSales ? `${origin}/sales` : `${origin}/admin`;
   const subject = `Invitation to Motor Trends Auto Group Portal (${u.role})`;
   const body = `Hello ${u.name},
 

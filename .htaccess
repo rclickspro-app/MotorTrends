@@ -35,3 +35,24 @@
     Header set Expires 0
   </IfModule>
 </Files>
+
+# ----------------------------------------------------
+# Clean URLs (Remove .html extension across all pages)
+# ----------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. 301 Redirect /index.html or /index to root /
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*index(\.html)?[\s\?] [NC]
+  RewriteRule ^(.*)index(\.html)?$ /$1 [R=301,L]
+
+  # 2. 301 Redirect any direct *.html request to clean extensionless URL
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /(.*)\.html[\s\?] [NC]
+  RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+  # 3. Internally rewrite extensionless request to existing .html file
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.*)$ $1.html [L]
+</IfModule>

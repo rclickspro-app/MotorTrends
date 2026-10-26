@@ -4,41 +4,45 @@
  * Features animated loader (vw leo.gif) on every page load & action
  */
 
-// Automatically clean 'index.html' from browser address bar if present
+// Automatically clean '.html' and '/index.html' from browser address bar across all pages
 (function () {
   try {
-    if (window.location.pathname.endsWith('/index.html')) {
-      var cleanPath = window.location.pathname.replace(/\/index\.html$/, '/') + window.location.search + window.location.hash;
+    var loc = window.location;
+    var path = loc.pathname;
+    if (/\.html$/i.test(path)) {
+      var cleanPath = path.replace(/\/index\.html$/i, '/').replace(/\.html$/i, '');
+      if (!cleanPath) cleanPath = '/';
+      var fullCleanUrl = cleanPath + loc.search + loc.hash;
       if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, '', cleanPath);
+        window.history.replaceState(null, '', fullCleanUrl);
       }
     }
   } catch (e) { }
 })();
 
-// Universal Page Preloader
+// Universal Page Preloader - Instant, smooth dismiss (no freeze / hang on page switch)
 function initPreloader() {
   const preloader = document.getElementById('mt-page-preloader');
   if (!preloader) return;
-  const minDisplayTime = 500; // brief display for smooth gif playback
-  const startTime = Date.now();
 
+  let dismissed = false;
   function dismiss() {
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(0, minDisplayTime - elapsed);
+    if (dismissed) return;
+    dismissed = true;
+    preloader.classList.add('hidden');
+    preloader.classList.add('preloader-hidden');
     setTimeout(() => {
-      preloader.classList.add('preloader-hidden');
-      setTimeout(() => {
-        if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
-      }, 450);
-    }, remaining);
+      if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+    }, 280);
   }
 
-  if (document.readyState === 'complete') {
-    dismiss();
+  // Dismiss promptly as soon as DOM is ready so page transitions are fluid
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    setTimeout(dismiss, 100);
   } else {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(dismiss, 100));
     window.addEventListener('load', dismiss);
-    setTimeout(dismiss, 3000);
+    setTimeout(dismiss, 600); // hard safety timeout
   }
 }
 
@@ -102,7 +106,7 @@ let currentFilters = {
   fuelType: 'all',
   transmission: 'all',
   minPrice: 0,
-  maxPrice: 250000,
+  maxPrice: Infinity,
   minYear: 2000,
   sortBy: 'featured'
 };
@@ -440,22 +444,22 @@ function initHeroSlideshow() {
   var promos = [
     { pill: '🔥 QUALITY PRE-OWNED VEHICLES',     title: 'USED CARS, TRUCKS & SUVs',            hl: 'PRICED TO SELL!',
       desc: 'Motor Trends Auto Group is Richmond\'s destination for quality pre-owned vehicles — CarFax verified, professionally inspected, and ready to drive.',
-      b1: {h:'inventory.html', l:'Browse Full Inventory →'}, b2: {h:'financing.html', l:'Apply Financing'} },
+      b1: {h:'inventory', l:'Browse Full Inventory →'}, b2: {h:'financing', l:'Apply Financing'} },
     { pill: '🏦 BUY HERE PAY HERE DEALERSHIP',    title: 'FINANCING FOR ALL CANADIANS',          hl: 'ALL CREDIT APPROVED!',
       desc: 'Prime, subprime, first-time buyers, newcomers, and customers rebuilding credit welcome (OAC). Flexible payment options tailored to your budget.',
-      b1: {h:'financing.html', l:'Get Pre-Approved Today'}, b2: {h:'contact.html', l:'Talk to a Specialist →'} },
+      b1: {h:'financing', l:'Get Pre-Approved Today'}, b2: {h:'contact', l:'Talk to a Specialist →'} },
     { pill: '🔄 TRADE-IN & SELL YOUR CAR',        title: 'WE BUY VEHICLES IN ANY CONDITION',     hl: 'TOP DOLLAR PAID!',
       desc: 'Trade in against your next vehicle or sell for cash. Transparent appraisals backed by live BC market data. Same-day payment.',
-      b1: {h:'sell-trade.html', l:'Start Trade-In Valuation'}, b2: {h:'inventory.html', l:'Browse Inventory →'} },
+      b1: {h:'sell-trade', l:'Start Trade-In Valuation'}, b2: {h:'inventory', l:'Browse Inventory →'} },
     { pill: '✅ CARFAX VERIFIED INVENTORY',        title: 'BUY WITH CONFIDENCE',                  hl: '',
       desc: 'Every vehicle on our lot comes with a full CarFax history report. Serving entire Lower Mainland.',
-      b1: {h:'inventory.html', l:'View Available Cars →'}, b2: {h:'about.html', l:'About Motor Trends'} },
+      b1: {h:'inventory', l:'View Available Cars →'}, b2: {h:'about', l:'About Motor Trends'} },
     { pill: '📍 RICHMOND & VANCOUVER BC',         title: "LOWER MAINLAND'S TRUSTED DEALER",      hl: 'DEALER #30859',
       desc: 'Visit us at 10740 Cambie Road in Richmond or browse online. Lease, finance, or buy outright — we have a payment plan that fits your budget.',
-      b1: {h:'contact.html', l:'Visit Our Showroom →'}, b2: {h:'financing.html', l:'Lease & Finance Options'} },
+      b1: {h:'contact', l:'Visit Our Showroom →'}, b2: {h:'financing', l:'Lease & Finance Options'} },
     { pill: '💰 VEHICLES UNDER $10,000 CAD',      title: 'BUDGET-FRIENDLY OPTIONS AVAILABLE',    hl: '',
       desc: 'From vehicles under $10,000 to late-model family SUVs — every vehicle professionally inspected and priced below BC market value.',
-      b1: {h:'inventory.html?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing.html', l:'Explore Financing'} }
+      b1: {h:'inventory?maxPrice=15000', l:'Under $15K Vehicles →'}, b2: {h:'financing', l:'Explore Financing'} }
   ];
 
   /* --- Pick vehicles: admin slideshow picks first, new arrivals next, rest random --- */
@@ -483,8 +487,8 @@ function initHeroSlideshow() {
         '<span class="dealer-tag">Dealer #30859</span>' +
       '</div>' +
       '<div class="slide-actions" style="justify-content: center;">' +
-        '<a href="inventory.html" class="btn btn-blue btn-lg">Browse Inventory</a>' +
-        '<a href="financing.html" class="btn btn-outline btn-lg">Apply for Financing (OAC)</a>' +
+        '<a href="inventory" class="btn btn-blue btn-lg">Browse Inventory</a>' +
+        '<a href="financing" class="btn btn-outline btn-lg">Apply for Financing (OAC)</a>' +
       '</div></div></div></div></div>';
     if (dotsContainer) dotsContainer.innerHTML = '';
     if (prevBtn) prevBtn.style.display = 'none';
@@ -579,8 +583,8 @@ function initHeroSlideshow() {
             '<span class="v-spec-pill">✨ ' + (vehicle.transmission ? vehicle.transmission.split(' ')[0] : 'Auto') + '</span>' +
           '</div>' +
           '<div class="vehicle-card-actions">' +
-            '<a href="inventory.html?q=' + encodeURIComponent(vehicle.stockNumber || vehicle.model || '') + '" class="btn btn-blue btn-sm" style="flex:1;justify-content:center;">View In Stock</a>' +
-            '<a href="financing.html?stock=' + encodeURIComponent(vehicle.stockNumber || '') + '" class="btn btn-silver btn-sm" style="justify-content:center;">Finance This Car</a>' +
+            '<a href="inventory?q=' + encodeURIComponent(vehicle.stockNumber || vehicle.model || '') + '" class="btn btn-blue btn-sm" style="flex:1;justify-content:center;">View In Stock</a>' +
+            '<a href="financing?stock=' + encodeURIComponent(vehicle.stockNumber || '') + '" class="btn btn-silver btn-sm" style="justify-content:center;">Finance This Car</a>' +
           '</div>' +
         '</div>' +
       '</div></div>' +
@@ -783,7 +787,7 @@ function populateHomeDropdowns() {
       if (body !== 'all') queryParams.set('bodyType', body);
       if (maxPrice) queryParams.set('maxPrice', maxPrice);
 
-      window.location.href = `inventory.html?${queryParams.toString()}`;
+      window.location.href = `inventory?${queryParams.toString()}`;
     });
   }
 }
@@ -818,8 +822,8 @@ function renderFeaturedVehicles() {
           Our live inventory is currently being updated. Apply for pre-approval or contact our sales specialists to reserve your vehicle!
         </p>
         <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-          <a href="contact.html" class="btn btn-blue btn-sm">Contact Sales Specialist</a>
-          <a href="financing.html" class="btn btn-outline btn-sm">Get Pre-Approved (OAC)</a>
+          <a href="contact" class="btn btn-blue btn-sm">Contact Sales Specialist</a>
+          <a href="financing" class="btn btn-outline btn-sm">Get Pre-Approved (OAC)</a>
         </div>
       </div>
     `;
@@ -865,7 +869,10 @@ function parseUrlParams() {
   if (params.has('bodyType')) currentFilters.bodyType = params.get('bodyType');
   if (params.has('condition')) currentFilters.condition = params.get('condition');
   if (params.has('fuelType')) currentFilters.fuelType = params.get('fuelType');
-  if (params.has('maxPrice')) currentFilters.maxPrice = parseInt(params.get('maxPrice')) || 250000;
+  if (params.has('maxPrice')) {
+    const p = parseInt(params.get('maxPrice'), 10);
+    currentFilters.maxPrice = (!isNaN(p) && p > 0) ? p : Infinity;
+  }
   if (params.has('q')) currentFilters.keyword = params.get('q').trim().toLowerCase();
   if (params.has('search')) currentFilters.keyword = params.get('search').trim().toLowerCase();
   if (params.has('stock')) currentFilters.keyword = params.get('stock').trim().toLowerCase();
@@ -904,8 +911,13 @@ function populateFilterDropdowns() {
   const priceSlider = document.getElementById('filter-price-slider');
   const priceValText = document.getElementById('filter-price-val');
   if (priceSlider && priceValText) {
-    priceSlider.value = currentFilters.maxPrice;
-    priceValText.textContent = formatPrice(currentFilters.maxPrice);
+    if (currentFilters.maxPrice >= 1000000 || currentFilters.maxPrice === Infinity) {
+      priceSlider.value = 1000000;
+      priceValText.textContent = 'Any Price ($1M+ CAD)';
+    } else {
+      priceSlider.value = currentFilters.maxPrice;
+      priceValText.textContent = formatPrice(currentFilters.maxPrice);
+    }
   }
 
   const keywordInput = document.getElementById('filter-keyword');
@@ -946,9 +958,14 @@ function setupInventoryFilters() {
   const priceValText = document.getElementById('filter-price-val');
   if (priceSlider && priceValText) {
     priceSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      currentFilters.maxPrice = val;
-      priceValText.textContent = formatPrice(val);
+      const val = parseInt(e.target.value, 10);
+      if (val >= 1000000) {
+        currentFilters.maxPrice = Infinity;
+        priceValText.textContent = 'Any Price ($1M+ CAD)';
+      } else {
+        currentFilters.maxPrice = val;
+        priceValText.textContent = formatPrice(val);
+      }
       renderInventory();
     });
   }
@@ -1013,15 +1030,16 @@ function setupInventoryFilters() {
         condition: 'all',
         fuelType: 'all',
         transmission: 'all',
-        maxPrice: 250000,
+        minPrice: 0,
+        maxPrice: Infinity,
         minYear: 2000,
         sortBy: 'featured'
       };
       if (keywordInput) keywordInput.value = '';
       if (makeFilter) makeFilter.value = 'all';
       if (bodyFilter) bodyFilter.value = 'all';
-      if (priceSlider) priceSlider.value = 250000;
-      if (priceValText) priceValText.textContent = formatPrice(250000);
+      if (priceSlider) priceSlider.value = 1000000;
+      if (priceValText) priceValText.textContent = 'Any Price ($1M+ CAD)';
 
       const allConditionRadio = document.querySelector('input[name="filter-condition"][value="all"]');
       if (allConditionRadio) allConditionRadio.checked = true;
@@ -1106,7 +1124,8 @@ function getFilteredVehicles() {
 
     // Price range starting at minPrice ($0 CAD) up to maxPrice
     const carPriceNum = (typeof car.price === 'number') ? car.price : (parseFloat(car.price) || 0);
-    if (carPriceNum < (currentFilters.minPrice || 0) || carPriceNum > currentFilters.maxPrice) return false;
+    if (carPriceNum < (currentFilters.minPrice || 0)) return false;
+    if (currentFilters.maxPrice !== Infinity && currentFilters.maxPrice < 1000000 && carPriceNum > currentFilters.maxPrice) return false;
 
     return true;
   }).sort((a, b) => {
@@ -1696,7 +1715,7 @@ function openVehicleModal(carId) {
           <button class="btn btn-silver" style="flex: 1; min-width: 160px;" onclick="openTestDriveModal('${car.id}')">
             Book a Test Drive
           </button>
-          <a href="financing.html?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 160px;">
+          <a href="financing?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 160px;">
             Calculate Financing
           </a>
         </div>

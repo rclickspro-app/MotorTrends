@@ -1,12 +1,12 @@
 {
-  "id": "veh-1792947419431",
-  "year": 2023,
-  "make": "Nissan",
-  "model": "Rogue",
+  "id": "veh-1792989206116",
+  "year": 2022,
+  "make": "MERCEDES BENZ",
+  "model": "2022 MERCEDES BENZ GLE 350 4MATIC",
   "trim": "",
-  "price": 28500,
+  "price": 37888,
   "monthlyEst": 0,
-  "mileage": 24000,
+  "mileage": 93414,
   "bodyType": "SUV",
   "fuelType": "Gasoline",
   "transmission": "Automatic",
@@ -15,7 +15,7 @@
   "exteriorColor": "",
   "interiorColor": "",
   "vin": "N/A",
-  "stockNumber": "MT-2245",
+  "stockNumber": "MT-9341",
   "condition": "Certified Pre-Owned",
   "featured": true,
   "isNewVehicle": true,
@@ -28,7 +28,9 @@
     "New Arrival"
   ],
   "images": [
-    "images/slide1.jpg"
+    "uploads/vehicles/veh-1792989206116/photo_1.jpg",
+    "uploads/vehicles/veh-1792989206116/photo_2.jpg",
+    "uploads/vehicles/veh-1792989206116/photo_3.jpg"
   ],
   "video": "",
   "features": [
@@ -38,6 +40,6 @@
     "Bluetooth Hands-free"
   ],
   "overview": "",
-  "createdAt": "2026-10-25T16:56:59.431Z",
-  "updatedAt": "2026-10-25T16:56:59.443Z"
+  "createdAt": "2026-10-26T04:33:26.116Z",
+  "updatedAt": "2026-10-26T04:33:26.422Z"
 }

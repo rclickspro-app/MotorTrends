@@ -131,23 +131,23 @@
 
         <ul class="nav-links">
           <li><a href="./" class="nav-link active" data-i18n="nav_home">Home</a></li>
-          <li><a href="inventory.html" class="nav-link" data-i18n="nav_inventory">Inventory</a></li>
-          <li><a href="financing.html" class="nav-link" data-i18n="nav_financing">Financing</a></li>
-          <li><a href="sell-trade.html" class="nav-link" data-i18n="nav_sell_trade">Sell / Trade</a></li>
-          <li><a href="about.html" class="nav-link" data-i18n="nav_why_us">Why Choose Us</a></li>
-          <li><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+          <li><a href="inventory" class="nav-link" data-i18n="nav_inventory">Inventory</a></li>
+          <li><a href="financing" class="nav-link" data-i18n="nav_financing">Financing</a></li>
+          <li><a href="sell-trade" class="nav-link" data-i18n="nav_sell_trade">Sell / Trade</a></li>
+          <li><a href="about" class="nav-link" data-i18n="nav_why_us">Why Choose Us</a></li>
+          <li><a href="contact" class="nav-link" data-i18n="nav_contact">Contact</a></li>
           <li><a href="#about-us" class="nav-link" data-i18n="nav_about">About Us</a></li>
         </ul>
 
         <div class="nav-actions">
-          <a href="inventory.html" class="btn btn-dark btn-sm btn-fav-count" title="Saved Vehicles">
+          <a href="inventory" class="btn btn-dark btn-sm btn-fav-count" title="Saved Vehicles">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             <span class="fav-counter" style="display: none;">0</span>
           </a>
-          <a href="financing.html" class="btn btn-blue btn-sm">
+          <a href="financing" class="btn btn-blue btn-sm">
             Apply
           </a>
-          <a href="inventory.html" class="btn btn-silver btn-sm">
+          <a href="inventory" class="btn btn-silver btn-sm">
             Browse All Cars
           </a>
           <button class="mobile-toggle" aria-label="Toggle navigation">
@@ -238,10 +238,10 @@
 
         <div class="search-tabs">
           <button type="button" class="search-tab active" data-tab="all">All Vehicles</button>
-          <button type="button" class="search-tab" onclick="window.location.href='inventory.html?bodyType=SUV'">SUVs & Crossovers</button>
-          <button type="button" class="search-tab" onclick="window.location.href='inventory.html?bodyType=Sedan'">Sedans & Hatchbacks</button>
-          <button type="button" class="search-tab" onclick="window.location.href='inventory.html?bodyType=Truck'">Trucks & 4x4</button>
-          <button type="button" class="search-tab" onclick="window.location.href='inventory.html?fuelType=Hybrid'">Hybrids & EVs</button>
+          <button type="button" class="search-tab" onclick="window.location.href='inventory?bodyType=SUV'">SUVs & Crossovers</button>
+          <button type="button" class="search-tab" onclick="window.location.href='inventory?bodyType=Sedan'">Sedans & Hatchbacks</button>
+          <button type="button" class="search-tab" onclick="window.location.href='inventory?bodyType=Truck'">Trucks & 4x4</button>
+          <button type="button" class="search-tab" onclick="window.location.href='inventory?fuelType=Hybrid'">Hybrids & EVs</button>
         </div>
 
         <form id="home-search-form" class="search-grid">
@@ -283,13 +283,13 @@
 
         <div class="quick-tags">
           <span class="quick-tags-title">Popular Searches:</span>
-          <a href="inventory.html?maxPrice=10000" class="quick-tag-chip">Under $10,000 CAD</a>
-          <a href="inventory.html?bodyType=SUV" class="quick-tag-chip">Compact SUVs</a>
-          <a href="inventory.html?fuelType=Hybrid" class="quick-tag-chip">35+ MPG Hybrids</a>
-          <a href="inventory.html?condition=Certified+Pre-Owned" class="quick-tag-chip">Certified Pre-Owned</a>
-          <a href="inventory.html?make=Toyota" class="quick-tag-chip">Toyota</a>
-          <a href="inventory.html?make=Honda" class="quick-tag-chip">Honda</a>
-          <a href="inventory.html?bodyType=Truck" class="quick-tag-chip">Work Trucks</a>
+          <a href="inventory?maxPrice=10000" class="quick-tag-chip">Under $10,000 CAD</a>
+          <a href="inventory?bodyType=SUV" class="quick-tag-chip">Compact SUVs</a>
+          <a href="inventory?fuelType=Hybrid" class="quick-tag-chip">35+ MPG Hybrids</a>
+          <a href="inventory?condition=Certified+Pre-Owned" class="quick-tag-chip">Certified Pre-Owned</a>
+          <a href="inventory?make=Toyota" class="quick-tag-chip">Toyota</a>
+          <a href="inventory?make=Honda" class="quick-tag-chip">Honda</a>
+          <a href="inventory?bodyType=Truck" class="quick-tag-chip">Work Trucks</a>
         </div>
       </div>
     </div>
@@ -303,11 +303,11 @@
           <h2 class="section-title">Shop by Body Style</h2>
           <p class="section-subtitle">Find the vehicle layout tailored for your daily driving and BC lifestyle</p>
         </div>
-        <a href="inventory.html" class="btn btn-outline btn-sm">View All Categories →</a>
+        <a href="inventory" class="btn btn-outline btn-sm">View All Categories →</a>
       </div>
 
       <div class="body-type-grid">
-        <a href="inventory.html?bodyType=SUV" class="body-type-card">
+        <a href="inventory?bodyType=SUV" class="body-type-card">
           <div class="body-type-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="5" width="22" height="14" rx="3"></rect><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="19" r="2"></circle><line x1="1" y1="12" x2="23" y2="12"></line></svg>
           </div>
@@ -315,7 +315,7 @@
           <div class="body-type-count" id="body-count-suv">6 Available</div>
         </a>
 
-        <a href="inventory.html?bodyType=Sedan" class="body-type-card">
+        <a href="inventory?bodyType=Sedan" class="body-type-card">
           <div class="body-type-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
           </div>
@@ -323,7 +323,7 @@
           <div class="body-type-count" id="body-count-sedan">5 Available</div>
         </a>
 
-        <a href="inventory.html?bodyType=Truck" class="body-type-card">
+        <a href="inventory?bodyType=Truck" class="body-type-card">
           <div class="body-type-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 3h15v13H1z"></path><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
           </div>
@@ -331,7 +331,7 @@
           <div class="body-type-count" id="body-count-truck">2 Available</div>
         </a>
 
-        <a href="inventory.html?fuelType=Hybrid" class="body-type-card">
+        <a href="inventory?fuelType=Hybrid" class="body-type-card">
           <div class="body-type-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
           </div>
@@ -339,7 +339,7 @@
           <div class="body-type-count" id="body-count-hybrid">4 Available</div>
         </a>
 
-        <a href="inventory.html?bodyType=Van" class="body-type-card">
+        <a href="inventory?bodyType=Van" class="body-type-card">
           <div class="body-type-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle><line x1="12" y1="6" x2="12" y2="18"></line></svg>
           </div>
@@ -364,7 +364,7 @@
             </span>
           </div>
         </div>
-        <a href="inventory.html" class="btn btn-blue" id="featured-view-all-btn">
+        <a href="inventory" class="btn btn-blue" id="featured-view-all-btn">
           View All Inventory (<span id="featured-view-all-count">22</span>) →
         </a>
       </div>
@@ -404,7 +404,7 @@
             </li>
           </ul>
 
-          <a href="sell-trade.html" class="btn btn-blue btn-lg">
+          <a href="sell-trade" class="btn btn-blue btn-lg">
             Start Free Trade-In Valuation
           </a>
         </div>
@@ -465,7 +465,7 @@
             <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Estimated Dealership Offer</div>
             <div id="trade-in-offer-amount" style="font-size: 2.2rem; font-weight: 800; color: var(--blue); font-family: var(--font-heading);">$21,400 CAD</div>
             <div style="font-size: 0.85rem; color: var(--blue); margin-top: 0.25rem;">Market Range: <span id="trade-in-offer-range" style="font-weight: 700;">$20,100 - $22,700 CAD</span></div>
-            <a href="sell-trade.html" class="btn btn-blue btn-sm" style="margin-top: 1rem; width: 100%;">Lock In This Offer →</a>
+            <a href="sell-trade" class="btn btn-blue btn-sm" style="margin-top: 1rem; width: 100%;">Lock In This Offer →</a>
           </div>
         </div>
       </div>
@@ -605,13 +605,13 @@
               </div>
 
               <div class="about-actions-group">
-                <a href="inventory.html" class="btn btn-blue" style="justify-content: center;">
+                <a href="inventory" class="btn btn-blue" style="justify-content: center;">
                   Browse Quality Inventory →
                 </a>
-                <a href="financing.html" class="btn btn-silver" style="justify-content: center;">
+                <a href="financing" class="btn btn-silver" style="justify-content: center;">
                   Apply For Financing
                 </a>
-                <a href="sell-trade.html" class="btn btn-outline" style="justify-content: center;">
+                <a href="sell-trade" class="btn btn-outline" style="justify-content: center;">
                   Value My Trade-In
                 </a>
               </div>
@@ -722,23 +722,23 @@
         <div>
           <div class="footer-col-title" data-i18n="footer_quick_links">Inventory & Makes</div>
           <ul class="footer-links">
-            <li><a href="inventory.html">All Vehicles In Stock</a></li>
-            <li><a href="inventory.html?bodyType=SUV">SUVs & Crossovers</a></li>
-            <li><a href="inventory.html?bodyType=Sedan">Sedans & Hatchbacks</a></li>
-            <li><a href="inventory.html?bodyType=Truck">Trucks & 4x4</a></li>
-            <li><a href="inventory.html?fuelType=Hybrid">Hybrids & Electric</a></li>
-            <li><a href="inventory.html?maxPrice=10000">Cars Under $10,000 CAD</a></li>
+            <li><a href="inventory">All Vehicles In Stock</a></li>
+            <li><a href="inventory?bodyType=SUV">SUVs & Crossovers</a></li>
+            <li><a href="inventory?bodyType=Sedan">Sedans & Hatchbacks</a></li>
+            <li><a href="inventory?bodyType=Truck">Trucks & 4x4</a></li>
+            <li><a href="inventory?fuelType=Hybrid">Hybrids & Electric</a></li>
+            <li><a href="inventory?maxPrice=10000">Cars Under $10,000 CAD</a></li>
           </ul>
         </div>
 
         <div>
           <div class="footer-col-title" data-i18n="footer_services">Financing & Services</div>
           <ul class="footer-links">
-            <li><a href="financing.html">Buy Here Pay Here Financing</a></li>
-            <li><a href="financing.html">Financing BC</a></li>
-            <li><a href="sell-trade.html">Instant Trade-In Appraisal</a></li>
-            <li><a href="about.html">Comprehensive Safety Check</a></li>
-            <li><a href="contact.html">Schedule Test Drive</a></li>
+            <li><a href="financing">Buy Here Pay Here Financing</a></li>
+            <li><a href="financing">Financing BC</a></li>
+            <li><a href="sell-trade">Instant Trade-In Appraisal</a></li>
+            <li><a href="about">Comprehensive Safety Check</a></li>
+            <li><a href="contact">Schedule Test Drive</a></li>
           </ul>
         </div>
 

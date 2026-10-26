@@ -319,11 +319,28 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Static File Serving
+  // 301 Redirect direct .html requests to clean URLs (No .html in address bar)
+  if (reqPath.endsWith('.html')) {
+    let clean = reqPath.slice(0, -5);
+    if (clean === '/index' || clean === '') clean = '/';
+    const query = urlObj.search || '';
+    res.writeHead(301, { 'Location': clean + query });
+    res.end();
+    return;
+  }
+
+  // Static File Serving with Clean URLs
   let filePath = path.join(__dirname, reqPath === '/' ? '/index.html' : reqPath);
 
-  if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
-    filePath = filePath + '.html';
+  // If path has no extension, check if corresponding .html file exists
+  if (!path.extname(reqPath)) {
+    if (fs.existsSync(filePath + '.html')) {
+      filePath = filePath + '.html';
+    } else if (reqPath === '/admin' && fs.existsSync(path.join(__dirname, 'admin.html'))) {
+      filePath = path.join(__dirname, 'admin.html');
+    } else if (reqPath === '/sales' && fs.existsSync(path.join(__dirname, 'sales.html'))) {
+      filePath = path.join(__dirname, 'sales.html');
+    }
   }
 
   fs.stat(filePath, (err, stats) => {

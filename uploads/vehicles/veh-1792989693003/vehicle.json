@@ -1,0 +1,48 @@
+{
+  "id": "veh-1792989693003",
+  "year": 2018,
+  "make": "McLaren",
+  "model": "2018 McLaren 720S",
+  "trim": "",
+  "price": 360888,
+  "monthlyEst": 0,
+  "mileage": 8155,
+  "bodyType": "Coupe",
+  "fuelType": "Gasoline",
+  "transmission": "Automatic",
+  "drivetrain": "RWD",
+  "engine": "",
+  "exteriorColor": "",
+  "interiorColor": "",
+  "vin": "N/A",
+  "stockNumber": "MT-8850",
+  "condition": "Certified Pre-Owned",
+  "featured": true,
+  "isNewVehicle": true,
+  "heroSlide": true,
+  "isSlideshow": true,
+  "onTestDrive": false,
+  "badges": [
+    "Clean Title",
+    "Inspected",
+    "New Arrival"
+  ],
+  "images": [
+    "uploads/vehicles/veh-1792989693003/photo_1.jpg",
+    "uploads/vehicles/veh-1792989693003/photo_2.jpg",
+    "uploads/vehicles/veh-1792989693003/photo_3.jpg",
+    "uploads/vehicles/veh-1792989693003/photo_4.jpg",
+    "uploads/vehicles/veh-1792989693003/photo_5.jpg"
+  ],
+  "video": "",
+  "features": [
+    "Apple CarPlay & Android Auto",
+    "Blind Spot Monitoring",
+    "Rearview Backup Camera",
+    "Bluetooth Hands-free"
+  ],
+  "overview": "",
+  "createdAt": "2026-10-26T04:41:33.003Z",
+  "updatedAt": "2026-10-26T04:44:28.675Z",
+  "testDriveUpdatedAt": "2026-10-26T04:42:42.024Z"
+}
