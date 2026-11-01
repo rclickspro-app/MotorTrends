@@ -21,7 +21,7 @@
   "isNewVehicle": true,
   "heroSlide": true,
   "isSlideshow": true,
-  "onTestDrive": false,
+  "onTestDrive": true,
   "badges": [
     "Clean Title",
     "Inspected",
@@ -41,5 +41,6 @@
   ],
   "overview": "",
   "createdAt": "2026-10-26T04:33:26.116Z",
-  "updatedAt": "2026-10-26T04:33:26.422Z"
+  "updatedAt": "2026-10-26T11:07:38.934Z",
+  "testDriveUpdatedAt": "2026-10-26T11:07:38.933Z"
 }

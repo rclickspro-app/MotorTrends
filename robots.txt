@@ -5,7 +5,6 @@ Allow: /
 Allow: /index.html
 Allow: /inventory.html
 Allow: /financing.html
-Allow: /about.html
 Allow: /contact.html
 Allow: /sell-trade.html
 

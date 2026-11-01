@@ -22,7 +22,7 @@
     "isNewVehicle": true,
     "heroSlide": true,
     "isSlideshow": true,
-    "onTestDrive": false,
+    "onTestDrive": true,
     "badges": [
       "Clean Title",
       "Inspected",
@@ -43,7 +43,8 @@
     ],
     "overview": "",
     "createdAt": "2026-10-26T05:28:19.663Z",
-    "updatedAt": "2026-10-26T05:28:19.969Z"
+    "updatedAt": "2026-10-26T11:07:36.537Z",
+    "testDriveUpdatedAt": "2026-10-26T11:07:36.534Z"
   },
   {
     "id": "veh-1792989693003",
@@ -68,7 +69,7 @@
     "isNewVehicle": true,
     "heroSlide": true,
     "isSlideshow": true,
-    "onTestDrive": false,
+    "onTestDrive": true,
     "badges": [
       "Clean Title",
       "Inspected",
@@ -90,8 +91,8 @@
     ],
     "overview": "",
     "createdAt": "2026-10-26T04:41:33.003Z",
-    "updatedAt": "2026-10-26T04:44:28.675Z",
-    "testDriveUpdatedAt": "2026-10-26T04:42:42.024Z"
+    "updatedAt": "2026-10-26T11:07:37.351Z",
+    "testDriveUpdatedAt": "2026-10-26T11:07:37.350Z"
   },
   {
     "id": "veh-1792989206116",
@@ -116,7 +117,7 @@
     "isNewVehicle": true,
     "heroSlide": true,
     "isSlideshow": true,
-    "onTestDrive": false,
+    "onTestDrive": true,
     "badges": [
       "Clean Title",
       "Inspected",
@@ -136,7 +137,8 @@
     ],
     "overview": "",
     "createdAt": "2026-10-26T04:33:26.116Z",
-    "updatedAt": "2026-10-26T04:33:26.422Z"
+    "updatedAt": "2026-10-26T11:07:38.934Z",
+    "testDriveUpdatedAt": "2026-10-26T11:07:38.933Z"
   },
   {
     "id": "veh-1792989066933",
