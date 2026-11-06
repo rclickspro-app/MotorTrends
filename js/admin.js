@@ -1241,6 +1241,65 @@ function renderImageSlots() {
   });
 }
 
+// Populate datalists and selects from Super Admin managed taxonomy options
+function populateEditorDropdowns(car = {}) {
+  const options = (typeof getDropdownOptions === 'function')
+    ? getDropdownOptions()
+    : ((typeof DEFAULT_DROPDOWN_OPTIONS !== 'undefined') ? DEFAULT_DROPDOWN_OPTIONS : {
+        makes: ['Toyota', 'Honda', 'McLaren', 'Mercedes Benz', 'MINI Cooper', 'Jeep', 'Ford'],
+        models: ['2019 Toyota Mirai Sedan', '2018 McLaren 720S', '2022 MERCEDES BENZ GLE 350 4MATIC', '2009 MINI Cooper S', 'Mirai'],
+        fuelTypes: ['Gasoline', 'Hybrid', 'Electric', 'Diesel', 'Hydrogen', 'Plug-in Hybrid'],
+        bodyStyles: ['SUV', 'Sedan', 'Truck', 'Hatchback', 'Minivan', 'Coupe', 'Convertible', 'Wagon'],
+        transmissions: ['Automatic', 'Manual', 'CVT', 'Dual-Clutch (DCT)', '1-Speed Direct-Drive (EV/Hydrogen)'],
+        drivetrains: ['AWD', 'FWD', '4WD', 'RWD']
+      });
+
+  // 1. Makes Datalist
+  const makesDl = document.getElementById('makes-datalist');
+  if (makesDl && Array.isArray(options.makes)) {
+    makesDl.innerHTML = options.makes.map(m => `<option value="${m}"></option>`).join('');
+  }
+
+  // 2. Models Datalist
+  const modelsDl = document.getElementById('models-datalist');
+  if (modelsDl && Array.isArray(options.models)) {
+    modelsDl.innerHTML = options.models.map(m => `<option value="${m}"></option>`).join('');
+  }
+
+  // 3. Fuel Type Select (includes Hydrogen)
+  const fuelSel = document.getElementById('form-car-fuel');
+  if (fuelSel && Array.isArray(options.fuelTypes)) {
+    const curFuel = car.fuelType || fuelSel.value || 'Gasoline';
+    fuelSel.innerHTML = options.fuelTypes.map(f => `<option value="${f}">${f}</option>`).join('');
+    fuelSel.value = curFuel;
+    if (!fuelSel.value && options.fuelTypes.length > 0) fuelSel.value = options.fuelTypes[0];
+  }
+
+  // 4. Body Style Select
+  const bodySel = document.getElementById('form-car-body');
+  if (bodySel && Array.isArray(options.bodyStyles)) {
+    const curBody = car.bodyType || bodySel.value || 'SUV';
+    bodySel.innerHTML = options.bodyStyles.map(b => `<option value="${b}">${b}</option>`).join('');
+    bodySel.value = curBody;
+    if (!bodySel.value && options.bodyStyles.length > 0) bodySel.value = options.bodyStyles[0];
+  }
+
+  // 5. Drivetrain Select
+  const driveSel = document.getElementById('form-car-drivetrain');
+  if (driveSel && Array.isArray(options.drivetrains)) {
+    const curDrive = car.drivetrain || driveSel.value || 'AWD';
+    driveSel.innerHTML = options.drivetrains.map(d => `<option value="${d}">${d}</option>`).join('');
+    driveSel.value = curDrive;
+    if (!driveSel.value && options.drivetrains.length > 0) driveSel.value = options.drivetrains[0];
+  }
+
+  // 6. Transmission Datalist
+  const transDl = document.getElementById('transmissions-datalist');
+  if (transDl && Array.isArray(options.transmissions)) {
+    transDl.innerHTML = options.transmissions.map(t => `<option value="${t}"></option>`).join('');
+  }
+}
+
 function openVehicleEditorModal(carId = null) {
   editingVehicleId = carId;
   const modalBackdrop = document.getElementById('vehicle-edit-modal-backdrop');
@@ -1254,6 +1313,8 @@ function openVehicleEditorModal(carId = null) {
     if (!car) return;
 
     modalTitle.textContent = `Edit Vehicle: ${car.year} ${car.make} ${car.model}`;
+    populateEditorDropdowns(car);
+
     document.getElementById('form-car-id').value = car.id;
     document.getElementById('form-car-year').value = car.year;
     document.getElementById('form-car-make').value = car.make;
@@ -1287,19 +1348,30 @@ function openVehicleEditorModal(carId = null) {
     const videoVal = car.video || '';
     document.getElementById('form-car-video').value = videoVal;
     updateVideoPreviewUI(videoVal);
+
+    if (document.getElementById('form-car-external-gallery')) {
+      document.getElementById('form-car-external-gallery').value = car.externalGalleryUrl || '';
+    }
     
     const maxSlots = getSystemSettings().maxUploadSlots || 12;
-    currentEditingImages = car.images ? [...car.images].slice(0, maxSlots) : [];
+    currentEditingImages = (typeof getVehicleImages === 'function')
+      ? getVehicleImages(car).slice(0, maxSlots)
+      : (car.images ? [...car.images].slice(0, maxSlots) : []);
     document.getElementById('form-car-features').value = car.features ? car.features.join('\n') : '';
     document.getElementById('form-car-badges').value = car.badges ? car.badges.join(', ') : '';
     document.getElementById('form-car-overview').value = car.overview || '';
   } else {
     modalTitle.textContent = 'Add New Vehicle to Marketplace';
     form.reset();
+    populateEditorDropdowns({});
+
     document.getElementById('form-car-id').value = '';
     document.getElementById('form-car-stock').value = `MT-${Math.floor(1000 + Math.random() * 9000)}`;
     document.getElementById('form-car-video').value = '';
     updateVideoPreviewUI('');
+    if (document.getElementById('form-car-external-gallery')) {
+      document.getElementById('form-car-external-gallery').value = '';
+    }
     if (document.getElementById('form-car-featured')) {
       document.getElementById('form-car-featured').checked = true;
     }
@@ -1322,21 +1394,33 @@ function openVehicleEditorModal(carId = null) {
 
   renderImageSlots();
 
-  // Handle URL Add Button (Allows up to maxSlots images)
+  // Handle URL Add Button (Allows direct URLs, Google Drive, OneDrive, Dropbox, and multiple links)
   const addUrlBtn = document.getElementById('btn-add-image-url');
   const urlInput = document.getElementById('quick-image-url-input');
   if (addUrlBtn && urlInput) {
     addUrlBtn.onclick = () => {
-      const url = urlInput.value.trim();
-      if (url) {
+      const rawVal = urlInput.value.trim();
+      if (rawVal) {
+        const urls = rawVal.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
         const maxSlots = getSystemSettings().maxUploadSlots || 12;
-        if (currentEditingImages.length >= maxSlots) {
-          showToast(`Maximum ${maxSlots} images reached for this vehicle.`, 'warning');
-          return;
+        let addedCount = 0;
+
+        for (const u of urls) {
+          if (currentEditingImages.length >= maxSlots) {
+            showToast(`Maximum ${maxSlots} images reached for this vehicle.`, 'warning');
+            break;
+          }
+          const normalized = (typeof normalizeImageUrl === 'function') ? normalizeImageUrl(u) : u;
+          if (normalized) {
+            currentEditingImages.push(normalized);
+            addedCount++;
+          }
         }
-        currentEditingImages.push(url);
         urlInput.value = '';
         renderImageSlots();
+        if (addedCount > 0) {
+          showToast(`✅ Added ${addedCount} photo URL(s) successfully!`, 'success');
+        }
       }
     };
   }
@@ -1559,9 +1643,11 @@ async function saveVehicleFromForm() {
     const heroSlide = document.getElementById('form-car-slideshow') ? document.getElementById('form-car-slideshow').checked : false;
     const onTestDrive = document.getElementById('form-car-test-drive') ? document.getElementById('form-car-test-drive').checked : false;
     const video = document.getElementById('form-car-video').value.trim();
+    const externalGalleryUrl = (document.getElementById('form-car-external-gallery')?.value || '').trim();
 
     const maxSlots = getSystemSettings().maxUploadSlots || 12;
-    const images = currentEditingImages.length > 0 ? currentEditingImages.slice(0, maxSlots) : ['images/slide1.jpg'];
+    const rawImages = currentEditingImages.length > 0 ? currentEditingImages.slice(0, maxSlots) : ['images/slide1.jpg'];
+    const images = rawImages.map(img => (typeof normalizeImageUrl === 'function' ? normalizeImageUrl(img) : img));
 
     const features = document.getElementById('form-car-features').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
     let badges = document.getElementById('form-car-badges').value.trim().split(',').map(b => b.trim()).filter(Boolean);
@@ -1602,10 +1688,30 @@ async function saveVehicleFromForm() {
       onTestDrive,
       badges,
       images,
+      externalGalleryUrl,
       video,
       features,
       overview
     };
+
+    // Auto-learn new make and model into Super Admin dropdown options
+    if (typeof getDropdownOptions === 'function' && typeof saveDropdownOptions === 'function') {
+      try {
+        const dOpts = getDropdownOptions();
+        let changed = false;
+        if (make && !dOpts.makes.some(m => m.toLowerCase() === make.toLowerCase())) {
+          dOpts.makes.push(make);
+          dOpts.makes.sort();
+          changed = true;
+        }
+        if (model && !dOpts.models.some(m => m.toLowerCase() === model.toLowerCase())) {
+          dOpts.models.push(model);
+          dOpts.models.sort();
+          changed = true;
+        }
+        if (changed) saveDropdownOptions(dOpts);
+      } catch (e) {}
+    }
 
     const existingIndex = VEHICLES_DATA.findIndex(v => String(v.id) === String(id));
     if (existingIndex > -1) {
@@ -2012,6 +2118,8 @@ https://motortrendsautogroup.com`;
   }
 }
 
+let activeTaxonomyCategory = 'models';
+
 // TAB 4 / 7: SUPERADMIN SETTINGS VIEW
 function renderSettingsView() {
   const container = document.getElementById('tab-view-settings');
@@ -2019,6 +2127,11 @@ function renderSettingsView() {
 
   const isSuper = isSuperAdminUser();
   const settings = getSystemSettings();
+  const dOpts = (typeof getDropdownOptions === 'function')
+    ? getDropdownOptions()
+    : ((typeof DEFAULT_DROPDOWN_OPTIONS !== 'undefined') ? DEFAULT_DROPDOWN_OPTIONS : {
+        makes: [], models: [], fuelTypes: [], bodyStyles: [], transmissions: [], drivetrains: [], conditions: []
+      });
 
   if (!isSuper) {
     container.innerHTML = `
@@ -2037,6 +2150,8 @@ function renderSettingsView() {
     `;
     return;
   }
+
+  const activeItems = Array.isArray(dOpts[activeTaxonomyCategory]) ? dOpts[activeTaxonomyCategory] : [];
 
   container.innerHTML = `
     <div style="background: #FFFFFF; border: 1px solid var(--admin-border); border-radius: var(--radius-lg); padding: 2rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
@@ -2107,7 +2222,150 @@ function renderSettingsView() {
         </div>
       </form>
     </div>
+
+    <!-- Dropdown Options & Taxonomy Management Section (Super Admin Only) -->
+    <div style="background: #FFFFFF; border: 1px solid var(--admin-border); border-radius: var(--radius-lg); padding: 2rem; margin-top: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="badge" style="background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; font-size: 0.75rem; font-weight: 700;">🎛️ SUPER ADMIN TAXONOMY</span>
+            <span class="badge" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; font-size: 0.75rem;">DYNAMIC DROPDOWN OPTIONS</span>
+          </div>
+          <h2 style="font-size: 1.45rem; font-weight: 800; color: #0F172A;">
+            Manage All Vehicle Dropdown Options
+          </h2>
+          <p style="font-size: 0.85rem; color: #64748B; margin-top: 0.25rem;">
+            Add, edit, and organize dropdown options across the marketplace: Vehicle Models, Makes, Fuel Types (including Hydrogen), Body Styles, Transmissions, and Drivetrains.
+          </p>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'models' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="models" style="font-weight: 700;">
+          🚘 Vehicle Models (${dOpts.models?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'makes' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="makes" style="font-weight: 700;">
+          🚗 Vehicle Makes (${dOpts.makes?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'fuelTypes' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="fuelTypes" style="font-weight: 700;">
+          ⛽ Fuel Types (Hydrogen) (${dOpts.fuelTypes?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'bodyStyles' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="bodyStyles" style="font-weight: 700;">
+          🚙 Body Styles (${dOpts.bodyStyles?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'transmissions' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="transmissions" style="font-weight: 700;">
+          ⚙️ Transmissions (${dOpts.transmissions?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'drivetrains' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="drivetrains" style="font-weight: 700;">
+          🛞 Drivetrains (${dOpts.drivetrains?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'conditions' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="conditions" style="font-weight: 700;">
+          🏷️ Conditions (${dOpts.conditions?.length || 0})
+        </button>
+      </div>
+
+      <!-- Add New Option Form -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <label style="font-weight: 700; color: #0F172A; font-size: 0.9rem; display: block; margin-bottom: 0.4rem;">
+          Add New Option to ${activeTaxonomyCategory.toUpperCase()}:
+        </label>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+          <input type="text" id="input-new-taxonomy-item" class="form-control" placeholder="e.g. Type new item name..." style="max-width: 360px; font-size: 0.85rem;">
+          <button type="button" id="btn-add-taxonomy-item" class="btn btn-blue btn-sm" style="font-weight: 700;">
+            + Add Option
+          </button>
+          <button type="button" id="btn-reset-taxonomy-cat" class="btn btn-outline btn-sm" style="margin-left: auto;">
+            Reset Category to Defaults
+          </button>
+        </div>
+      </div>
+
+      <!-- Active List Tags Grid -->
+      <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem; min-height: 100px; background: #FFFFFF;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #64748B; margin-bottom: 0.75rem; text-transform: uppercase;">
+          Current Active ${activeTaxonomyCategory} (${activeItems.length}):
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          ${activeItems.map((item, idx) => `
+            <span style="display: inline-flex; align-items: center; gap: 6px; background: #F1F5F9; border: 1px solid #CBD5E1; color: #1E293B; padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;">
+              ${item}
+              <button type="button" class="btn-del-taxonomy-item" data-index="${idx}" style="background: transparent; border: none; color: #EF4444; cursor: pointer; font-size: 12px; padding: 0 3px; font-weight: 800;" title="Remove this option">✕</button>
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    </div>
   `;
+
+  // Taxonomy Category Switching
+  container.querySelectorAll('.btn-taxonomy-cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTaxonomyCategory = btn.dataset.category;
+      renderSettingsView();
+    });
+  });
+
+  // Add Item to active Taxonomy Category
+  const addTaxonomyBtn = document.getElementById('btn-add-taxonomy-item');
+  const addTaxonomyInput = document.getElementById('input-new-taxonomy-item');
+  if (addTaxonomyBtn && addTaxonomyInput) {
+    const doAdd = () => {
+      const val = addTaxonomyInput.value.trim();
+      if (!val) return;
+      if (!Array.isArray(dOpts[activeTaxonomyCategory])) dOpts[activeTaxonomyCategory] = [];
+      if (!dOpts[activeTaxonomyCategory].some(it => it.toLowerCase() === val.toLowerCase())) {
+        dOpts[activeTaxonomyCategory].push(val);
+        if (typeof saveDropdownOptions === 'function') {
+          saveDropdownOptions(dOpts);
+        }
+        showToast(`✅ Added "${val}" to ${activeTaxonomyCategory}!`, 'success');
+        renderSettingsView();
+      } else {
+        showToast(`"${val}" already exists in ${activeTaxonomyCategory}.`, 'warning');
+      }
+    };
+    addTaxonomyBtn.addEventListener('click', doAdd);
+    addTaxonomyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        doAdd();
+      }
+    });
+  }
+
+  // Delete Item from active Taxonomy Category
+  container.querySelectorAll('.btn-del-taxonomy-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.index, 10);
+      const removed = dOpts[activeTaxonomyCategory][idx];
+      dOpts[activeTaxonomyCategory].splice(idx, 1);
+      // Ensure Hydrogen is never permanently deleted from fuelTypes
+      if (activeTaxonomyCategory === 'fuelTypes' && !dOpts.fuelTypes.includes('Hydrogen')) {
+        dOpts.fuelTypes.push('Hydrogen');
+      }
+      if (typeof saveDropdownOptions === 'function') {
+        saveDropdownOptions(dOpts);
+      }
+      showToast(`Removed "${removed}" from ${activeTaxonomyCategory}.`, 'info');
+      renderSettingsView();
+    });
+  });
+
+  // Reset active Category to Defaults
+  document.getElementById('btn-reset-taxonomy-cat')?.addEventListener('click', () => {
+    if (confirm(`Reset ${activeTaxonomyCategory} to default factory options?`)) {
+      if (typeof DEFAULT_DROPDOWN_OPTIONS !== 'undefined' && DEFAULT_DROPDOWN_OPTIONS[activeTaxonomyCategory]) {
+        dOpts[activeTaxonomyCategory] = [...DEFAULT_DROPDOWN_OPTIONS[activeTaxonomyCategory]];
+        if (typeof saveDropdownOptions === 'function') {
+          saveDropdownOptions(dOpts);
+        }
+        showToast(`Reset ${activeTaxonomyCategory} to defaults.`, 'success');
+        renderSettingsView();
+      }
+    }
+  });
 
   const form = document.getElementById('superadmin-settings-form');
   if (form) {

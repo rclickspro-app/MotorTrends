@@ -1005,6 +1005,158 @@ function formatMileageKm(val) {
   return `${num.toLocaleString('en-CA')} km`;
 }
 
+// Transform cloud storage & external URLs (Google Drive, Dropbox, OneDrive, etc.) into direct renderable image links
+function normalizeImageUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  url = url.trim();
+  if (!url) return '';
+
+  // Google Drive File Share Link: https://drive.google.com/file/d/FILE_ID/view...
+  const gDriveFileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+  if (gDriveFileMatch && gDriveFileMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${gDriveFileMatch[1]}`;
+  }
+
+  // Google Drive Open/UC Link: https://drive.google.com/open?id=FILE_ID or https://drive.google.com/uc?id=FILE_ID
+  const gDriveIdMatch = url.match(/drive\.google\.com\/(?:open\?id=|uc\?(?:export=view&)?id=|uc\?id=)([a-zA-Z0-9_-]+)/i);
+  if (gDriveIdMatch && gDriveIdMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${gDriveIdMatch[1]}`;
+  }
+
+  // Dropbox Share Link (change dl=0 to raw=1)
+  if (url.includes('dropbox.com')) {
+    if (url.includes('dl=0')) {
+      return url.replace('dl=0', 'raw=1');
+    }
+    if (!url.includes('raw=1') && !url.includes('dl=1')) {
+      return url + (url.includes('?') ? '&raw=1' : '?raw=1');
+    }
+  }
+
+  // Imgur page link to direct image link
+  const imgurMatch = url.match(/^https?:\/\/imgur\.com\/([a-zA-Z0-9]+)$/i);
+  if (imgurMatch && imgurMatch[1]) {
+    return `https://i.imgur.com/${imgurMatch[1]}.jpg`;
+  }
+
+  // OneDrive Share Link conversion to download stream
+  if (url.includes('onedrive.live.com') && url.includes('resid=') && !url.includes('/download?')) {
+    return url.replace(/\/redir\?/i, '/download?').replace(/\/view\.aspx\?/i, '/download?');
+  }
+
+  return url;
+}
+
+// Safely get all normalized images for a vehicle
+function getVehicleImages(v) {
+  if (!v) return ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+  let list = [];
+  if (Array.isArray(v.images) && v.images.length > 0) {
+    list = v.images.map(normalizeImageUrl).filter(Boolean);
+  } else if (v.image) {
+    list = [normalizeImageUrl(v.image)].filter(Boolean);
+  }
+  if (list.length === 0) {
+    list = ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'];
+  }
+  return list;
+}
+
+// Dealership Taxonomy & Dropdown Options Management (Configurable in Super Admin)
+const DROPDOWN_OPTIONS_STORAGE_KEY = 'motortrends_dropdown_options_v2';
+
+const DEFAULT_DROPDOWN_OPTIONS = {
+  makes: [
+    'Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge',
+    'Ford', 'GMC', 'Honda', 'Hyundai', 'Infiniti', 'Jaguar', 'Jeep', 'Kia',
+    'Land Rover', 'Lexus', 'Lincoln', 'Maserati', 'Mazda', 'McLaren', 'Mercedes Benz',
+    'MINI Cooper', 'Mitsubishi', 'Nissan', 'Porsche', 'Ram', 'Subaru', 'Tesla',
+    'Toyota', 'Volkswagen', 'Volvo'
+  ],
+  models: [
+    '2019 Toyota Mirai Sedan', '2018 McLaren 720S', '2022 MERCEDES BENZ GLE 350 4MATIC', '2009 MINI Cooper S',
+    'Mirai', '720S', 'GLE 350', 'Cooper S', 'Wrangler', 'Outlander', 'RAV4', 'Civic', 'CR-V', 'Corolla', 'Camry', 'F-150', 'Silverado', 'Rogue', 'Model 3', 'Model Y'
+  ],
+  fuelTypes: [
+    'Gasoline',
+    'Hybrid',
+    'Electric',
+    'Diesel',
+    'Hydrogen',
+    'Plug-in Hybrid'
+  ],
+  bodyStyles: [
+    'SUV',
+    'Sedan',
+    'Truck',
+    'Hatchback',
+    'Minivan',
+    'Coupe',
+    'Convertible',
+    'Wagon'
+  ],
+  transmissions: [
+    'Automatic',
+    'Manual',
+    'CVT',
+    'Dual-Clutch (DCT)',
+    '1-Speed Direct-Drive (EV/Hydrogen)'
+  ],
+  drivetrains: [
+    'AWD',
+    'FWD',
+    '4WD',
+    'RWD'
+  ],
+  conditions: [
+    'Certified Pre-Owned',
+    'Pre-Owned',
+    'New'
+  ]
+};
+
+function getDropdownOptions() {
+  try {
+    const raw = localStorage.getItem(DROPDOWN_OPTIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.fuelTypes) && !parsed.fuelTypes.includes('Hydrogen')) {
+        parsed.fuelTypes.push('Hydrogen');
+      }
+      return {
+        makes: (parsed.makes && parsed.makes.length > 0) ? parsed.makes : DEFAULT_DROPDOWN_OPTIONS.makes,
+        models: (parsed.models && parsed.models.length > 0) ? parsed.models : DEFAULT_DROPDOWN_OPTIONS.models,
+        fuelTypes: (parsed.fuelTypes && parsed.fuelTypes.length > 0) ? parsed.fuelTypes : DEFAULT_DROPDOWN_OPTIONS.fuelTypes,
+        bodyStyles: (parsed.bodyStyles && parsed.bodyStyles.length > 0) ? parsed.bodyStyles : DEFAULT_DROPDOWN_OPTIONS.bodyStyles,
+        transmissions: (parsed.transmissions && parsed.transmissions.length > 0) ? parsed.transmissions : DEFAULT_DROPDOWN_OPTIONS.transmissions,
+        drivetrains: (parsed.drivetrains && parsed.drivetrains.length > 0) ? parsed.drivetrains : DEFAULT_DROPDOWN_OPTIONS.drivetrains,
+        conditions: (parsed.conditions && parsed.conditions.length > 0) ? parsed.conditions : DEFAULT_DROPDOWN_OPTIONS.conditions
+      };
+    }
+  } catch (e) {
+    console.warn('Error reading dropdown options:', e);
+  }
+  return { ...DEFAULT_DROPDOWN_OPTIONS };
+}
+
+function saveDropdownOptions(options) {
+  try {
+    // Always ensure Hydrogen is preserved
+    if (Array.isArray(options.fuelTypes) && !options.fuelTypes.includes('Hydrogen')) {
+      options.fuelTypes.push('Hydrogen');
+    }
+    localStorage.setItem(DROPDOWN_OPTIONS_STORAGE_KEY, JSON.stringify(options));
+    if (typeof firebase !== 'undefined' && typeof fbDatabase !== 'undefined' && fbDatabase) {
+      try {
+        fbDatabase.ref('settings/dropdownOptions').set(options);
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.warn('Error saving dropdown options:', e);
+  }
+  return options;
+}
+
 // Attach globally if in browser
 if (typeof window !== 'undefined') {
   window.STORAGE_KEY_VEHICLES = STORAGE_KEY_VEHICLES;
@@ -1015,6 +1167,12 @@ if (typeof window !== 'undefined') {
   window.formatPrice = formatPrice;
   window.formatMonthly = formatMonthly;
   window.formatMileageKm = formatMileageKm;
+  window.normalizeImageUrl = normalizeImageUrl;
+  window.getVehicleImages = getVehicleImages;
+  window.DROPDOWN_OPTIONS_STORAGE_KEY = DROPDOWN_OPTIONS_STORAGE_KEY;
+  window.DEFAULT_DROPDOWN_OPTIONS = DEFAULT_DROPDOWN_OPTIONS;
+  window.getDropdownOptions = getDropdownOptions;
+  window.saveDropdownOptions = saveDropdownOptions;
   window.saveVehiclesData = saveVehiclesData;
   window.getStoredVehicles = getStoredVehicles;
   window.getDeletedVehicleIds = getDeletedVehicleIds;
@@ -1040,6 +1198,12 @@ if (typeof module !== 'undefined' && module.exports) {
     formatNumber,
     formatPrice,
     formatMonthly,
-    formatMileageKm
+    formatMileageKm,
+    normalizeImageUrl,
+    getVehicleImages,
+    DROPDOWN_OPTIONS_STORAGE_KEY,
+    DEFAULT_DROPDOWN_OPTIONS,
+    getDropdownOptions,
+    saveDropdownOptions
   };
 }

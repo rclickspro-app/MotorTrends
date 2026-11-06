@@ -719,14 +719,16 @@
           </div>
           <div class="form-group">
             <label class="form-label">Make / Brand *</label>
-            <input type="text" id="form-car-make" class="form-control" required placeholder="e.g. Toyota, Honda, Ford">
+            <input type="text" id="form-car-make" class="form-control" required placeholder="e.g. Toyota, Honda, Ford" list="makes-datalist" autocomplete="off">
+            <datalist id="makes-datalist"></datalist>
           </div>
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Model Name *</label>
-            <input type="text" id="form-car-model" class="form-control" required placeholder="e.g. RAV4, Civic, F-150">
+            <input type="text" id="form-car-model" class="form-control" required placeholder="e.g. RAV4, Civic, Mirai" list="models-datalist" autocomplete="off">
+            <datalist id="models-datalist"></datalist>
           </div>
           <div class="form-group">
             <label class="form-label">Trim / Package (Optional)</label>
@@ -769,6 +771,7 @@
               <option value="Hybrid">Hybrid</option>
               <option value="Electric">Electric (EV)</option>
               <option value="Diesel">Diesel</option>
+              <option value="Hydrogen">Hydrogen</option>
             </select>
           </div>
           <div class="form-group">
@@ -785,7 +788,8 @@
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">Transmission</label>
-            <input type="text" id="form-car-trans" class="form-control" placeholder="8-Speed Automatic" value="Automatic">
+            <input type="text" id="form-car-trans" class="form-control" placeholder="8-Speed Automatic" value="Automatic" list="transmissions-datalist">
+            <datalist id="transmissions-datalist"></datalist>
           </div>
           <div class="form-group">
             <label class="form-label">Engine Description</label>
@@ -878,29 +882,35 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <label class="form-label" style="font-size: 0.95rem; color: #0F172A; margin-bottom: 0.15rem; font-weight: 700;">
-                📸 Vehicle Photo Gallery (Up to 12 Images)
+                📸 Vehicle Photo Gallery
               </label>
               <div style="font-size: 0.8rem; color: #64748B;">
-                Add high-resolution exterior, interior &amp; angle photos. Click any + slot to select files directly from your computer (select up to 12 at once).
+                Add high-resolution exterior, interior &amp; angle photos. Click any + slot to select files directly from your computer (select multiple at once).
               </div>
             </div>
             <label for="bulk-image-upload" class="btn btn-blue btn-sm" style="cursor: pointer; font-weight: 600;">
-              📁 Browse Files (Max 12)
+              📁 Browse Files
             </label>
             <input type="file" id="bulk-image-upload" accept="image/*" multiple style="display: none;">
           </div>
 
           <!-- 10 Visual Image Slots Grid -->
           <div id="image-slots-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
-            <!-- Generated 10 image slots with preview & remove -->
+            <!-- Generated image slots with preview & remove -->
           </div>
 
           <!-- Direct URL Quick Paste Input -->
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <input type="url" id="quick-image-url-input" class="form-control" placeholder="Or paste direct image URL (https://...) and click Add" style="font-size: 0.85rem;">
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.65rem;">
+            <input type="url" id="quick-image-url-input" class="form-control" placeholder="Paste direct or cloud image URL (Google Drive, OneDrive, Dropbox, etc.) and click Add" style="font-size: 0.85rem;">
             <button type="button" id="btn-add-image-url" class="btn btn-outline btn-sm" style="white-space: nowrap; font-weight: 600;">
               + Add URL
             </button>
+          </div>
+
+          <!-- Cloud Album / More Pictures URL -->
+          <div style="display: flex; gap: 0.5rem; align-items: center; background: #EEF2F6; padding: 0.6rem 0.85rem; border-radius: 6px; border: 1px solid #CBD5E1;">
+            <span style="font-size: 0.82rem; font-weight: 700; color: #1E293B; white-space: nowrap;">☁️ Cloud Album / More Pictures URL:</span>
+            <input type="url" id="form-car-external-gallery" class="form-control" placeholder="e.g. Google Drive / OneDrive photo album folder link (viewable by customers in slideshow popup)" style="font-size: 0.82rem; background: #fff;">
           </div>
         </div>
 

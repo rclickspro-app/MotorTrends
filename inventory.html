@@ -143,6 +143,7 @@
           <button class="quick-tag-chip filter-chip-btn" data-filter-type="bodyType" data-filter-value="SUV">SUVs</button>
           <button class="quick-tag-chip filter-chip-btn" data-filter-type="bodyType" data-filter-value="Truck">Trucks</button>
           <button class="quick-tag-chip filter-chip-btn" data-filter-type="fuelType" data-filter-value="Hybrid">Hybrids</button>
+          <button class="quick-tag-chip filter-chip-btn" data-filter-type="fuelType" data-filter-value="Hydrogen">Hydrogen</button>
           <button class="quick-tag-chip filter-chip-btn" data-filter-type="condition" data-filter-value="Certified Pre-Owned">Certified Only</button>
         </div>
       </div>
@@ -253,6 +254,19 @@
               <span>Electric (EV)</span>
             </div>
           </label>
+          <label class="checkbox-label">
+            <div class="checkbox-custom">
+              <input type="radio" name="filter-fuel" value="Hydrogen">
+              <span>Hydrogen</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Mobile Sticky Apply Button -->
+        <div class="mobile-apply-filters-wrap" style="display: none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+          <button type="button" class="btn btn-blue btn-lg" style="width: 100%; font-weight: 700;" onclick="document.getElementById('btn-mobile-filter-close')?.click();">
+            Apply Filters &amp; View Inventory
+          </button>
         </div>
       </aside>
 
@@ -265,6 +279,9 @@
             <div id="inventory-count" class="results-count">
               Showing <strong>16</strong> vehicles available
             </div>
+            <button id="btn-sfx-toggle" class="btn btn-silver btn-sm" title="Automotive Engine SFX - Plays randomly when searching inventory" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem;">
+              <span id="sfx-icon">🔊</span> Engine SFX
+            </button>
             <button id="btn-mobile-filter-open" class="btn btn-silver btn-sm mobile-filter-trigger" style="display: none;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
               Filter Options

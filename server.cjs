@@ -15,6 +15,8 @@ const MIME_TYPES = {
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
 };
 
 const uploadsVehiclesDir = path.join(__dirname, 'uploads', 'vehicles');

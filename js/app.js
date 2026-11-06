@@ -54,7 +54,104 @@ function initPreloader() {
   }
 }
 
-initPreloader();
+// One-Time Startup Welcome Loading Logo Controller (Plays high-res startup welcome GIF on initial visit)
+function initStartupWelcome() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceWelcome = urlParams.has('welcome') || urlParams.has('splash');
+  const isPortal = /admin|sales/i.test(window.location.pathname);
+
+  // Skip welcome splash for admin/sales portals unless explicitly forced
+  if (isPortal && !forceWelcome) {
+    initPreloader();
+    return;
+  }
+
+  let alreadyShown = false;
+  try {
+    alreadyShown = sessionStorage.getItem('mt_welcome_logo_shown') === 'true';
+  } catch (e) {}
+
+  if (!alreadyShown || forceWelcome) {
+    window.__startupWelcomeActive = true;
+    try {
+      sessionStorage.setItem('mt_welcome_logo_shown', 'true');
+    } catch (e) {}
+
+    // Instantly hide the secondary preloader to avoid duplicate animations
+    const standardPreloader = document.getElementById('mt-page-preloader');
+    if (standardPreloader) {
+      standardPreloader.style.display = 'none';
+      if (standardPreloader.parentNode) standardPreloader.parentNode.removeChild(standardPreloader);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'mt-startup-welcome-overlay';
+    overlay.className = 'mt-startup-welcome-overlay';
+    overlay.innerHTML = `
+      <div class="mt-welcome-container">
+        <div class="mt-welcome-media-wrap">
+          <img src="images/motor_trends_startup_welcome.gif" alt="Motor Trends Startup Welcome" class="mt-welcome-gif">
+        </div>
+        <div class="mt-welcome-info">
+          <div class="mt-welcome-brand">MOTOR TRENDS <span>AUTO GROUP</span></div>
+          <div class="mt-welcome-sub">VANCOUVER &amp; RICHMOND, BC • BUY HERE PAY HERE</div>
+          <div class="mt-welcome-progress">
+            <div class="mt-welcome-progress-bar"></div>
+          </div>
+          <button type="button" class="mt-welcome-skip-btn" id="btn-skip-welcome">Skip Intro ✕</button>
+        </div>
+      </div>
+    `;
+
+    function mountWelcome() {
+      if (!document.body) {
+        document.addEventListener('DOMContentLoaded', mountWelcome);
+        return;
+      }
+      const existingPreloader = document.getElementById('mt-page-preloader');
+      if (existingPreloader) {
+        existingPreloader.style.display = 'none';
+        if (existingPreloader.parentNode) existingPreloader.parentNode.removeChild(existingPreloader);
+      }
+      document.body.appendChild(overlay);
+
+      let dismissed = false;
+      function dismissWelcome() {
+        if (dismissed) return;
+        dismissed = true;
+        overlay.classList.add('dismissed');
+        setTimeout(() => {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }, 500);
+      }
+
+      // Auto dismiss after 2.8s
+      const timer = setTimeout(dismissWelcome, 2800);
+
+      const skipBtn = overlay.querySelector('#btn-skip-welcome');
+      if (skipBtn) {
+        skipBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearTimeout(timer);
+          dismissWelcome();
+        });
+      }
+
+      overlay.addEventListener('click', () => {
+        clearTimeout(timer);
+        dismissWelcome();
+      });
+    }
+
+    if (document.body) mountWelcome();
+    else document.addEventListener('DOMContentLoaded', mountWelcome);
+  } else {
+    initPreloader();
+  }
+}
+
+// Start One-Time Welcome or Fast Transition
+initStartupWelcome();
 
 // Global action loader for dynamic operations (filtering, forms, saves)
 window.showActionLoader = function (msg) {
@@ -96,11 +193,13 @@ if (typeof formatNumber !== 'function') {
   };
 }
 
-// Start preloader as early as possible
-if (document.readyState === 'complete') {
-  initPreloader();
-} else {
-  window.addEventListener('DOMContentLoaded', initPreloader);
+// Start preloader as early as possible if welcome screen is not active
+if (!window.__startupWelcomeActive) {
+  if (document.readyState === 'complete') {
+    initPreloader();
+  } else {
+    window.addEventListener('DOMContentLoaded', initPreloader);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -141,6 +240,7 @@ function initApp() {
     parseUrlParams();
     populateFilterDropdowns();
     setupInventoryFilters();
+    initEngineSfxToggle();
     renderInventory();
 
     // Auto-open quick view modal if vehicle id or preview is specified in URL
@@ -221,20 +321,27 @@ function initMobileMenu() {
   if (toggleBtn && navLinks) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      navLinks.classList.toggle('mobile-active');
+      const isOpen = navLinks.classList.toggle('mobile-active');
+      navLinks.classList.toggle('open', isOpen);
+      toggleBtn.classList.toggle('active', isOpen);
+      toggleBtn.setAttribute('aria-expanded', String(isOpen));
     });
 
     // Close when clicking nav links
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        navLinks.classList.remove('mobile-active');
+        navLinks.classList.remove('mobile-active', 'open');
+        toggleBtn.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
       });
     });
 
     // Close when clicking outside
     document.addEventListener('click', (e) => {
       if (!navLinks.contains(e.target) && !toggleBtn.contains(e.target)) {
-        navLinks.classList.remove('mobile-active');
+        navLinks.classList.remove('mobile-active', 'open');
+        toggleBtn.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -855,7 +962,7 @@ function updateHomeLiveStockCounts() {
   const suvCount = VEHICLES_DATA.filter(v => v.bodyType === 'SUV').length;
   const sedanCount = VEHICLES_DATA.filter(v => v.bodyType === 'Sedan').length;
   const truckCount = VEHICLES_DATA.filter(v => v.bodyType === 'Truck').length;
-  const hybridCount = VEHICLES_DATA.filter(v => v.fuelType === 'Hybrid' || v.fuelType === 'Electric').length;
+  const hybridCount = VEHICLES_DATA.filter(v => v.fuelType === 'Hybrid' || v.fuelType === 'Electric' || v.fuelType === 'Hydrogen').length;
   const vanCount = VEHICLES_DATA.filter(v => v.bodyType === 'Van').length;
 
   const suvEl = document.getElementById('body-count-suv');
@@ -936,12 +1043,67 @@ function populateFilterDropdowns() {
   }
 }
 
+// Engine Start Sound Effect Controller (Plays randomly once in a while during inventory search)
+let _lastEngineSfxTime = 0;
+let _engineAudioObj = null;
+
+function triggerRandomEngineSfx() {
+  const now = Date.now();
+  // Minimum 40 seconds cooldown between random sounds
+  if (now - _lastEngineSfxTime < 40000) return;
+  if (localStorage.getItem('mt_engine_sfx_disabled') === 'true') return;
+
+  // 28% probability when interacting with search/filters
+  if (Math.random() < 0.28) {
+    _lastEngineSfxTime = now;
+    playEngineSound();
+  }
+}
+
+function playEngineSound() {
+  try {
+    if (!_engineAudioObj) {
+      _engineAudioObj = new Audio('audio/car-engine-start.mp3');
+    }
+    _engineAudioObj.volume = 0.35;
+    _engineAudioObj.currentTime = 0;
+    const p = _engineAudioObj.play();
+    if (p !== undefined) {
+      p.catch(() => {});
+    }
+  } catch (e) {}
+}
+
+function initEngineSfxToggle() {
+  const btn = document.getElementById('btn-sfx-toggle');
+  if (!btn) return;
+  const isMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
+  const icon = document.getElementById('sfx-icon');
+  if (icon) icon.textContent = isMuted ? '🔇' : '🔊';
+
+  btn.addEventListener('click', () => {
+    const currentlyMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
+    if (currentlyMuted) {
+      localStorage.removeItem('mt_engine_sfx_disabled');
+      if (icon) icon.textContent = '🔊';
+      playEngineSound();
+      showToast('🔊 Engine Start Sound Effect enabled (plays randomly on search)');
+    } else {
+      localStorage.setItem('mt_engine_sfx_disabled', 'true');
+      if (icon) icon.textContent = '🔇';
+      if (_engineAudioObj) _engineAudioObj.pause();
+      showToast('🔇 Engine Start Sound Effect muted');
+    }
+  });
+}
+
 function setupInventoryFilters() {
   // Keyword search input
   const keywordInput = document.getElementById('filter-keyword');
   if (keywordInput) {
     keywordInput.addEventListener('input', (e) => {
       currentFilters.keyword = e.target.value.trim().toLowerCase();
+      triggerRandomEngineSfx();
       renderInventory();
     });
   }
@@ -951,6 +1113,7 @@ function setupInventoryFilters() {
   if (makeFilter) {
     makeFilter.addEventListener('change', (e) => {
       currentFilters.make = e.target.value;
+      triggerRandomEngineSfx();
       renderInventory();
     });
   }
@@ -959,6 +1122,7 @@ function setupInventoryFilters() {
   if (bodyFilter) {
     bodyFilter.addEventListener('change', (e) => {
       currentFilters.bodyType = e.target.value;
+      triggerRandomEngineSfx();
       renderInventory();
     });
   }
@@ -976,7 +1140,11 @@ function setupInventoryFilters() {
         currentFilters.maxPrice = val;
         priceValText.textContent = formatPrice(val);
       }
+      triggerRandomEngineSfx();
       renderInventory();
+    });
+    priceSlider.addEventListener('change', () => {
+      triggerRandomEngineSfx();
     });
   }
 
@@ -986,6 +1154,7 @@ function setupInventoryFilters() {
     radio.addEventListener('change', (e) => {
       if (e.target.checked) {
         currentFilters.condition = e.target.value;
+        triggerRandomEngineSfx();
         renderInventory();
       }
     });
@@ -997,6 +1166,7 @@ function setupInventoryFilters() {
     radio.addEventListener('change', (e) => {
       if (e.target.checked) {
         currentFilters.fuelType = e.target.value;
+        triggerRandomEngineSfx();
         renderInventory();
       }
     });
@@ -1086,6 +1256,7 @@ function setupInventoryFilters() {
         const condRadio = document.querySelector(`input[name="filter-condition"][value="${value}"]`);
         if (condRadio) condRadio.checked = true;
       }
+      triggerRandomEngineSfx();
       renderInventory();
     });
   });
@@ -1209,9 +1380,11 @@ function renderInventory() {
 function createVehicleCardHtml(car) {
   const isWishlisted = wishlist.includes(car.id);
   const isCompared = compareList.includes(car.id);
-  const carImages = (Array.isArray(car.images) && car.images.length > 0)
-    ? car.images
-    : (car.image ? [car.image] : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80']);
+  const carImages = (typeof getVehicleImages === 'function')
+    ? getVehicleImages(car)
+    : ((Array.isArray(car.images) && car.images.length > 0)
+      ? car.images.map(img => (typeof normalizeImageUrl === 'function' ? normalizeImageUrl(img) : img))
+      : (car.image ? [car.image] : ['https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80']));
   const mainImage = carImages[0];
   const badgesList = Array.isArray(car.badges) ? car.badges : [];
   const transmissionShort = car.transmission ? car.transmission.split(' ')[0] : 'Auto';
@@ -1219,9 +1392,13 @@ function createVehicleCardHtml(car) {
 
   return `
     <article class="vehicle-card" data-vehicle-id="${car.id}">
-      <div class="vehicle-thumb-wrap" data-has-slideshow="${hasMultipleImages ? 'true' : 'false'}">
+      <div class="vehicle-thumb-wrap clickable-slideshow-trigger" data-vehicle-id="${car.id}" style="cursor: pointer;" title="Click to open full photo slideshow popup">
         <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         
+        <button type="button" class="btn-card-more-photos" data-id="${car.id}" title="Click to view full photo slideshow popup">
+          📸 ${carImages.length > 1 ? `${carImages.length} Photos` : 'View Photo'}
+        </button>
+
         ${hasMultipleImages ? `
           <div class="card-photo-counter" style="position: absolute; bottom: 8px; right: 8px; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 12px; backdrop-filter: blur(4px); z-index: 3; pointer-events: none; border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; gap: 3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1285,10 +1462,18 @@ function createVehicleCardHtml(car) {
           <button class="btn btn-silver btn-sm btn-quick-view" data-id="${car.id}">
             View Details
           </button>
+          <button class="btn btn-outline btn-sm btn-open-slideshow" data-id="${car.id}" title="Open Full Photo Slideshow Popup">
+            📸 Photos
+          </button>
           <button class="btn btn-outline btn-sm btn-book-drive" data-id="${car.id}" title="Book Test Drive">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             Test Drive
           </button>
+          ${car.externalGalleryUrl ? `
+            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;" title="Open cloud photo album">
+              ☁️ Cloud Album
+            </a>
+          ` : ''}
         </div>
       </div>
     </article>
@@ -1430,6 +1615,26 @@ function attachCardEvents(parentEl) {
     btn.addEventListener('click', () => {
       const carId = btn.dataset.id;
       openTestDriveModal(carId);
+    });
+  });
+
+  // Slideshow Lightbox Popup triggers (From "More Photos" button or "Photos" button)
+  parentEl.querySelectorAll('.btn-card-more-photos, .btn-open-slideshow').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const carId = btn.dataset.id;
+      openVehicleSlideshow(carId, 0);
+    });
+  });
+
+  // Clicking on thumbnail wrap or vehicle img directly opens full slideshow popup
+  parentEl.querySelectorAll('.clickable-slideshow-trigger').forEach(wrap => {
+    wrap.addEventListener('click', (e) => {
+      // Don't trigger if clicked wishlist button or card nav arrows
+      if (e.target.closest('.btn-wishlist') || e.target.closest('.card-img-nav')) return;
+      const carId = wrap.dataset.vehicleId;
+      if (carId) openVehicleSlideshow(carId, 0);
     });
   });
 
@@ -1630,9 +1835,11 @@ function openVehicleModal(carId) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalBackdrop || !modalContainer) return;
 
-  const carImages = (Array.isArray(car.images) && car.images.length > 0)
-    ? car.images
-    : (car.image ? [car.image] : ['images/vehicles/jeep/main.jpg']);
+  const carImages = (typeof getVehicleImages === 'function')
+    ? getVehicleImages(car)
+    : ((Array.isArray(car.images) && car.images.length > 0)
+      ? car.images.map(img => (typeof normalizeImageUrl === 'function' ? normalizeImageUrl(img) : img))
+      : (car.image ? [car.image] : ['images/vehicles/jeep/main.jpg']));
   const carFeatures = Array.isArray(car.features) ? car.features : [];
 
   let currentImgIdx = 0;
@@ -1644,8 +1851,12 @@ function openVehicleModal(carId) {
       <div class="modal-gallery-wrapper">
         <!-- Main Image with Arrows & Counter -->
         <div class="modal-main-image-stage" id="modal-media-container">
-          <img id="modal-main-img" src="${carImages[0]}" alt="${car.model}">
+          <img id="modal-main-img" src="${carImages[0]}" alt="${car.model}" style="cursor: pointer;" title="Click to open Fullscreen Slideshow">
           
+          <button id="btn-modal-open-slideshow" type="button" style="position: absolute; top: 12px; right: 12px; background: rgba(15,23,42,0.85); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; backdrop-filter: blur(4px); z-index: 5;">
+            📸 Full Slideshow
+          </button>
+
           <div class="modal-image-counter">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span id="modal-img-counter-text">1 / ${totalImgs}</span>
@@ -1675,8 +1886,8 @@ function openVehicleModal(carId) {
           ` : ''}
           <div class="modal-thumbs-scroll" id="modal-thumbs-container">
             ${carImages.map((img, idx) => `
-              <div class="modal-thumb-item ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
-                <img src="${img}" alt="${car.model} Photo ${idx + 1}" loading="lazy">
+              <div class="modal-thumb-item ${idx === 0 ? 'active' : ''}" data-idx="${idx}" style="cursor: pointer;" title="View photo ${idx + 1}">
+                <img src="${img}" alt="${car.model} Photo ${idx + 1}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=300&q=80'">
               </div>
             `).join('')}
           </div>
@@ -1692,6 +1903,7 @@ function openVehicleModal(carId) {
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
             ${car.isNewVehicle ? `<span class="badge badge-new">🔥 New Arrival</span>` : ''}
             <span class="badge ${car.condition === 'Certified Pre-Owned' ? 'badge-blue' : 'badge-silver'}">${car.condition}</span>
+            <span class="badge badge-blue">⚡ ${car.fuelType || 'Gasoline'}</span>
             ${car.vin && car.vin !== 'N/A' ? `<span class="badge badge-green">VIN: ${car.vin}</span>` : `<span class="badge badge-silver" style="opacity: 0.8;">VIN: Optional / N/A</span>`}
           </div>
           <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem; line-height: 1.2; color: #0F172A; font-weight: 800;">${car.year} ${car.make} ${car.model}</h2>
@@ -1705,7 +1917,7 @@ function openVehicleModal(carId) {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; font-size: 0.85rem; margin-bottom: 1.5rem; background: #F8FAFC; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #E2E8F0; color: #334155;">
           <div><strong style="color: #0F172A;">Mileage:</strong> ${formatNumber(car.mileage)} km</div>
           <div><strong style="color: #0F172A;">Drivetrain:</strong> ${car.drivetrain}</div>
-          <div><strong style="color: #0F172A;">Engine:</strong> ${car.engine}</div>
+          <div><strong style="color: #0F172A;">Fuel Type:</strong> ${car.fuelType || 'Gasoline'}</div>
           <div><strong style="color: #0F172A;">Transmission:</strong> ${car.transmission}</div>
           <div><strong style="color: #0F172A;">Exterior:</strong> ${car.exteriorColor}</div>
           <div><strong style="color: #0F172A;">Interior:</strong> ${car.interiorColor}</div>
@@ -1722,16 +1934,32 @@ function openVehicleModal(carId) {
         </ul>
 
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <button class="btn btn-silver" style="flex: 1; min-width: 160px;" onclick="openTestDriveModal('${car.id}')">
+          <button class="btn btn-silver" style="flex: 1; min-width: 150px;" onclick="openTestDriveModal('${car.id}')">
             Book a Test Drive
           </button>
-          <a href="financing?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 160px;">
+          <button type="button" class="btn btn-dark" style="flex: 1; min-width: 150px;" onclick="openVehicleSlideshow('${car.id}', ${currentImgIdx})">
+            📸 View Full Slideshow
+          </button>
+          <a href="financing?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 150px;">
             Calculate Financing
           </a>
+          ${car.externalGalleryUrl ? `
+            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 1rem;">
+              ☁️ View Full Cloud Storage Album (Google Drive / OneDrive)
+            </a>
+          ` : ''}
         </div>
       </div>
     </div>
   `;
+
+  // Click on main image or slideshow button opens the full-screen lightbox slideshow
+  document.getElementById('modal-main-img')?.addEventListener('click', () => {
+    openVehicleSlideshow(carId, currentImgIdx);
+  });
+  document.getElementById('btn-modal-open-slideshow')?.addEventListener('click', () => {
+    openVehicleSlideshow(carId, currentImgIdx);
+  });
 
   // Image Switch Function
   function switchModalImage(index) {
@@ -1881,6 +2109,225 @@ function openVehicleModal(carId) {
     }
   };
   document.addEventListener('keydown', handleEscape);
+}
+
+/* ----------------------------------------------------
+   Full-Screen High-Definition Slideshow Lightbox Popup Window
+----------------------------------------------------- */
+let _currentSlideshowState = {
+  carId: null,
+  car: null,
+  images: [],
+  currentIdx: 0,
+  autoplayTimer: null,
+  touchStartX: 0
+};
+
+function openVehicleSlideshow(carId, startIdx = 0) {
+  const car = getVehicleById(carId);
+  if (!car) return;
+
+  const images = (typeof getVehicleImages === 'function')
+    ? getVehicleImages(car)
+    : ((Array.isArray(car.images) && car.images.length > 0)
+      ? car.images.map(img => (typeof normalizeImageUrl === 'function' ? normalizeImageUrl(img) : img))
+      : [car.image || 'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80']);
+
+  _currentSlideshowState.carId = carId;
+  _currentSlideshowState.car = car;
+  _currentSlideshowState.images = images;
+  _currentSlideshowState.currentIdx = Math.max(0, Math.min(startIdx, images.length - 1));
+
+  let overlay = document.getElementById('mt-slideshow-lightbox-modal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'mt-slideshow-lightbox-modal';
+    overlay.className = 'mt-lightbox-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  const curIdx = _currentSlideshowState.currentIdx;
+  const total = images.length;
+
+  overlay.innerHTML = `
+    <div class="mt-lightbox-container" role="dialog" aria-modal="true" aria-label="${car.year} ${car.make} ${car.model} Photo Gallery">
+      <div class="mt-lightbox-header">
+        <div class="mt-lightbox-title-wrap">
+          <span class="mt-lightbox-title">${car.year || ''} ${car.make || ''} ${car.model || ''}</span>
+          <span class="mt-lightbox-price">${formatPrice(car.price)}</span>
+          <span class="mt-lightbox-badge">${car.fuelType || 'Gasoline'}</span>
+        </div>
+        <div class="mt-lightbox-controls">
+          ${car.externalGalleryUrl ? `
+            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn-lightbox-cloud" title="Open external cloud photo album">
+              ☁️ Full Cloud Album
+            </a>
+          ` : ''}
+          <button type="button" id="btn-slideshow-autoplay" class="btn-lightbox-tool" title="Start / Pause Autoplay">
+            <span id="autoplay-icon">▶</span> <span id="autoplay-text">Slideshow</span>
+          </button>
+          <div class="mt-lightbox-counter" id="lightbox-counter">${curIdx + 1} / ${total}</div>
+          <button type="button" class="btn-lightbox-close" id="btn-lightbox-close" aria-label="Close Slideshow">✕</button>
+        </div>
+      </div>
+
+      <div class="mt-lightbox-stage" id="lightbox-stage">
+        ${total > 1 ? `<button type="button" class="mt-lightbox-nav mt-lightbox-prev" id="btn-lightbox-prev" aria-label="Previous Photo">‹</button>` : ''}
+        <div class="mt-lightbox-img-wrap" id="lightbox-img-wrap">
+          <img id="lightbox-current-img" src="${images[curIdx]}" alt="${car.model}" class="mt-lightbox-main-img" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
+        </div>
+        ${total > 1 ? `<button type="button" class="mt-lightbox-nav mt-lightbox-next" id="btn-lightbox-next" aria-label="Next Photo">›</button>` : ''}
+      </div>
+
+      <div class="mt-lightbox-thumbs-bar" id="lightbox-thumbs-bar">
+        ${images.map((img, i) => `
+          <div class="mt-lightbox-thumb ${i === curIdx ? 'active' : ''}" data-index="${i}">
+            <img src="${img}" alt="Thumbnail ${i+1}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=300&q=80'">
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  function updateSlide(idx) {
+    if (idx < 0) idx = total - 1;
+    if (idx >= total) idx = 0;
+    _currentSlideshowState.currentIdx = idx;
+
+    const mainImg = document.getElementById('lightbox-current-img');
+    const counter = document.getElementById('lightbox-counter');
+    if (mainImg) {
+      mainImg.style.opacity = '0.35';
+      mainImg.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        mainImg.src = images[idx];
+        mainImg.style.opacity = '1';
+        mainImg.style.transform = 'scale(1)';
+      }, 100);
+    }
+    if (counter) {
+      counter.textContent = `${idx + 1} / ${total}`;
+    }
+
+    // Update active thumb
+    overlay.querySelectorAll('.mt-lightbox-thumb').forEach((thumb, tIdx) => {
+      thumb.classList.toggle('active', tIdx === idx);
+      if (tIdx === idx) {
+        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+  }
+
+  // Prev / Next button listeners
+  const prevBtn = document.getElementById('btn-lightbox-prev');
+  const nextBtn = document.getElementById('btn-lightbox-next');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateSlide(_currentSlideshowState.currentIdx - 1);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateSlide(_currentSlideshowState.currentIdx + 1);
+    });
+  }
+
+  // Thumbnails click
+  overlay.querySelectorAll('.mt-lightbox-thumb').forEach(thumb => {
+    thumb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(thumb.dataset.index, 10);
+      updateSlide(idx);
+    });
+  });
+
+  // Autoplay toggle
+  const autoplayBtn = document.getElementById('btn-slideshow-autoplay');
+  const autoIcon = document.getElementById('autoplay-icon');
+  const autoText = document.getElementById('autoplay-text');
+
+  function stopAutoplay() {
+    if (_currentSlideshowState.autoplayTimer) {
+      clearInterval(_currentSlideshowState.autoplayTimer);
+      _currentSlideshowState.autoplayTimer = null;
+      if (autoIcon) autoIcon.textContent = '▶';
+      if (autoText) autoText.textContent = 'Slideshow';
+    }
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    if (autoIcon) autoIcon.textContent = '⏸';
+    if (autoText) autoText.textContent = 'Pause';
+    _currentSlideshowState.autoplayTimer = setInterval(() => {
+      updateSlide(_currentSlideshowState.currentIdx + 1);
+    }, 3200);
+  }
+
+  if (autoplayBtn) {
+    autoplayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (_currentSlideshowState.autoplayTimer) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
+  }
+
+  // Close handlers
+  function closeSlideshow() {
+    stopAutoplay();
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    window.removeEventListener('keydown', handleKeydown);
+  }
+
+  const closeBtn = document.getElementById('btn-lightbox-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeSlideshow);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSlideshow();
+  });
+
+  // Keyboard navigation
+  function handleKeydown(e) {
+    if (!overlay.classList.contains('active')) return;
+    if (e.key === 'Escape') closeSlideshow();
+    else if (e.key === 'ArrowLeft') updateSlide(_currentSlideshowState.currentIdx - 1);
+    else if (e.key === 'ArrowRight') updateSlide(_currentSlideshowState.currentIdx + 1);
+    else if (e.key === ' ') {
+      e.preventDefault();
+      if (_currentSlideshowState.autoplayTimer) stopAutoplay();
+      else startAutoplay();
+    }
+  }
+  window.addEventListener('keydown', handleKeydown);
+
+  // Mobile swipe gestures
+  const stage = document.getElementById('lightbox-stage');
+  if (stage) {
+    stage.addEventListener('touchstart', (e) => {
+      _currentSlideshowState.touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].screenX - _currentSlideshowState.touchStartX;
+      if (Math.abs(diffX) > 40) {
+        if (diffX < 0) updateSlide(_currentSlideshowState.currentIdx + 1); // swipe left
+        else updateSlide(_currentSlideshowState.currentIdx - 1); // swipe right
+      }
+    }, { passive: true });
+  }
+}
+
+// Expose globally
+if (typeof window !== 'undefined') {
+  window.openVehicleSlideshow = openVehicleSlideshow;
 }
 
 /* ----------------------------------------------------
