@@ -348,7 +348,9 @@ const server = http.createServer((req, res) => {
     }
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-cache' });
+    const isStaticAsset = /\.(css|js|png|jpe?g|webp|gif|mp3|wav|svg|ico|woff2?)$/i.test(ext);
+    const cacheControl = isStaticAsset ? 'public, max-age=86400' : 'no-cache, no-store, must-revalidate';
+    res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
     fs.createReadStream(filePath).pipe(res);
   });
 });

@@ -1127,13 +1127,17 @@ function initEngineSfxToggle() {
 }
 
 function setupInventoryFilters() {
-  // Keyword search input
+  // Keyword search input with performance debounce
   const keywordInput = document.getElementById('filter-keyword');
   if (keywordInput) {
+    let searchDebounceTimer = null;
     keywordInput.addEventListener('input', (e) => {
       currentFilters.keyword = e.target.value.trim().toLowerCase();
-      triggerRandomEngineSfx();
-      renderInventory();
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        triggerRandomEngineSfx();
+        renderInventory();
+      }, 90);
     });
   }
 
@@ -1156,10 +1160,11 @@ function setupInventoryFilters() {
     });
   }
 
-  // Price Slider
+  // Price Slider with fast feedback and render debounce
   const priceSlider = document.getElementById('filter-price-slider');
   const priceValText = document.getElementById('filter-price-val');
   if (priceSlider && priceValText) {
+    let priceDebounceTimer = null;
     priceSlider.addEventListener('input', (e) => {
       const val = parseInt(e.target.value, 10);
       if (val >= 1000000) {
@@ -1169,11 +1174,15 @@ function setupInventoryFilters() {
         currentFilters.maxPrice = val;
         priceValText.textContent = formatPrice(val);
       }
-      triggerRandomEngineSfx();
-      renderInventory();
+      clearTimeout(priceDebounceTimer);
+      priceDebounceTimer = setTimeout(() => {
+        triggerRandomEngineSfx();
+        renderInventory();
+      }, 60);
     });
     priceSlider.addEventListener('change', () => {
       triggerRandomEngineSfx();
+      renderInventory();
     });
   }
 
@@ -1427,7 +1436,7 @@ function createVehicleCardHtml(car) {
   return `
     <article class="vehicle-card" data-vehicle-id="${car.id}">
       <div class="vehicle-thumb-wrap clickable-slideshow-trigger" data-vehicle-id="${car.id}" style="cursor: pointer;" title="Click to open full photo slideshow popup">
-        <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
+        <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" decoding="async" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
 
         ${hasMultipleImages ? `
           <button type="button" class="card-img-nav card-img-prev" data-dir="-1" title="Previous Photo" aria-label="Previous Photo">‹</button>

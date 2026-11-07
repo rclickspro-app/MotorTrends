@@ -1,18 +1,21 @@
 User-agent: *
 Allow: /
 
-# Priority pages for crawling
-Allow: /index.html
-Allow: /inventory.html
-Allow: /financing.html
-Allow: /contact.html
-Allow: /sell-trade.html
+# Priority clean pages for crawling
+Allow: /
+Allow: /inventory
+Allow: /financing
+Allow: /contact
+Allow: /sell-trade
 
-# Block admin & sales panels
-Disallow: /admin.index.html
+# Block admin, sales, and internal files
+Disallow: /admin
 Disallow: /admin.html
-Disallow: /sales.index.html
+Disallow: /admin.index.html
+Disallow: /sales
 Disallow: /sales.html
-Disallow: /js/admin.js
+Disallow: /sales.index.html
+Disallow: /api/
+Disallow: /staff_accounts.txt
 
 Sitemap: https://www.motortrends.ca/sitemap.xml
