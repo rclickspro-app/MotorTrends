@@ -1108,6 +1108,20 @@ const DEFAULT_DROPDOWN_OPTIONS = {
     '4WD',
     'RWD'
   ],
+  doors: [
+    '2 Doors',
+    '3 Doors',
+    '4 Doors',
+    '5 Doors'
+  ],
+  passengers: [
+    '2 Passengers',
+    '4 Passengers',
+    '5 Passengers',
+    '6 Passengers',
+    '7 Passengers',
+    '8 Passengers'
+  ],
   conditions: [
     'Certified Pre-Owned',
     'Pre-Owned',
@@ -1130,6 +1144,8 @@ function getDropdownOptions() {
         bodyStyles: (parsed.bodyStyles && parsed.bodyStyles.length > 0) ? parsed.bodyStyles : DEFAULT_DROPDOWN_OPTIONS.bodyStyles,
         transmissions: (parsed.transmissions && parsed.transmissions.length > 0) ? parsed.transmissions : DEFAULT_DROPDOWN_OPTIONS.transmissions,
         drivetrains: (parsed.drivetrains && parsed.drivetrains.length > 0) ? parsed.drivetrains : DEFAULT_DROPDOWN_OPTIONS.drivetrains,
+        doors: (parsed.doors && parsed.doors.length > 0) ? parsed.doors : DEFAULT_DROPDOWN_OPTIONS.doors,
+        passengers: (parsed.passengers && parsed.passengers.length > 0) ? parsed.passengers : DEFAULT_DROPDOWN_OPTIONS.passengers,
         conditions: (parsed.conditions && parsed.conditions.length > 0) ? parsed.conditions : DEFAULT_DROPDOWN_OPTIONS.conditions
       };
     }

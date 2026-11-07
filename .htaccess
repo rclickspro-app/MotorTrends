@@ -117,7 +117,10 @@
   # 3. 301 Redirect /about or /about.html to homepage #about-us
   RewriteRule ^about(\.html)?$ /#about-us [R=301,L,NE]
 
-  # 4. Internally rewrite extensionless request to existing .html file
+  # 4. Route /brochure and /brochure/<slug> to brochure.html
+  RewriteRule ^brochure/(.+)$ brochure.html?id=$1 [QSA,L]
+
+  # 5. Internally rewrite extensionless request to existing .html file
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^(.*)$ $1.html [L]

@@ -426,62 +426,104 @@
         </div>
 
         <div class="trade-in-card" style="background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-sm);">
-          <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem; color: var(--gray-900);">Quick Vehicle Appraisal</h3>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Enter your vehicle details to submit for a review request:</p>
-          
-          <form id="trade-in-estimator-form" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="form-row-2">
-              <div class="form-group">
-                <label class="form-label">Year</label>
-                <select id="trade-year" class="form-control">
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2021" selected>2021</option>
-                  <option value="2020">2020</option>
-                  <option value="2019">2019</option>
-                  <option value="2018">2018</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Make</label>
-                <select id="trade-make" class="form-control">
-                  <option value="Toyota">Toyota</option>
-                  <option value="Honda">Honda</option>
-                  <option value="Ford">Ford</option>
-                  <option value="Hyundai">Hyundai</option>
-                  <option value="Mazda">Mazda</option>
-                  <option value="Chevrolet">Chevrolet</option>
-                  <option value="Nissan">Nissan</option>
-                </select>
-              </div>
+          <div id="home-appraisal-form-wrap">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 style="font-size: 1.35rem; color: var(--gray-900); font-weight: 800; margin: 0;">Vehicle Trade-In &amp; Appraisal</h3>
+              <span class="badge badge-green" style="font-size: 0.72rem;">Dealership Direct</span>
             </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+              Submit your car details for an official written appraisal from our Motor Trends Richmond team:
+            </p>
+            
+            <form id="trade-in-estimator-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Year *</label>
+                  <select id="trade-year" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021" selected>2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Make *</label>
+                  <select id="trade-make" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                    <option value="Toyota">Toyota</option>
+                    <option value="Honda">Honda</option>
+                    <option value="Ford">Ford</option>
+                    <option value="Hyundai">Hyundai</option>
+                    <option value="Mazda">Mazda</option>
+                    <option value="Chevrolet">Chevrolet</option>
+                    <option value="Nissan">Nissan</option>
+                    <option value="Subaru">Subaru</option>
+                    <option value="Tesla">Tesla</option>
+                    <option value="BMW">BMW</option>
+                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="form-row-2">
-              <div class="form-group">
-                <label class="form-label">Mileage (km)</label>
-                <input type="number" id="trade-mileage" class="form-control" value="45000" placeholder="e.g. 45000">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Model &amp; Trim *</label>
+                  <input type="text" id="trade-model" class="form-control" placeholder="e.g. RAV4 / Civic" required style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Mileage (km) *</label>
+                  <input type="number" id="trade-mileage" class="form-control" value="45000" placeholder="e.g. 45000" required style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Vehicle Condition</label>
-                <select id="trade-condition" class="form-control">
-                  <option value="excellent">Excellent (Like New)</option>
-                  <option value="good" selected>Good (Normal Wear)</option>
-                  <option value="fair">Fair (Needs Minor Work)</option>
-                </select>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Condition *</label>
+                  <select id="trade-condition" class="form-control" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                    <option value="Excellent">Excellent (Like New)</option>
+                    <option value="Good" selected>Good (Normal Wear)</option>
+                    <option value="Fair">Fair (Needs Work)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Your Phone / Contact *</label>
+                  <input type="tel" id="trade-phone" class="form-control" required placeholder="(604) 270-7662" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                </div>
               </div>
+
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem;">Your Name &amp; Email *</label>
+                <div class="form-row-2">
+                  <input type="text" id="trade-name" class="form-control" required placeholder="Full Name" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                  <input type="email" id="trade-email" class="form-control" required placeholder="Email Address" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                </div>
+              </div>
+
+              <button type="submit" id="trade-submit-btn" class="btn btn-blue" style="margin-top: 0.25rem; width: 100%; font-weight: 700;">
+                📤 Submit Appraisal Request to Dealership
+              </button>
+            </form>
+          </div>
+
+          <!-- Official Submission Confirmation (No calculated estimate) -->
+          <div id="trade-in-result-card" style="display: none; background: #F0FDF4; padding: 1.5rem; border-radius: var(--radius-md); border: 2px solid #86EFAC; text-align: center;">
+            <div style="width: 44px; height: 44px; background: #22C55E; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 0.75rem;">
+              ✓
             </div>
-
-            <button type="submit" class="btn btn-blue" style="margin-top: 0.5rem; width: 100%;">
-              Submit for Review Request
-            </button>
-          </form>
-
-          <div id="trade-in-result-card" style="display: none; margin-top: 1.5rem; background: var(--off-white); padding: 1.25rem; border-radius: var(--radius-md); border: 1.5px solid var(--border-blue); text-align: center;">
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Estimated Dealership Offer</div>
-            <div id="trade-in-offer-amount" style="font-size: 2.2rem; font-weight: 800; color: var(--blue); font-family: var(--font-heading);">$21,400 CAD</div>
-            <div style="font-size: 0.85rem; color: var(--blue); margin-top: 0.25rem;">Market Range: <span id="trade-in-offer-range" style="font-weight: 700;">$20,100 - $22,700 CAD</span></div>
-            <a href="sell-trade" class="btn btn-blue btn-sm" style="margin-top: 1rem; width: 100%;">Lock In This Offer →</a>
+            <div style="font-size: 0.8rem; color: #166534; text-transform: uppercase; font-weight: 700;">Appraisal Submitted</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0.35rem 0 0.5rem;">Request Received!</div>
+            <p style="font-size: 0.85rem; color: #374151; line-height: 1.5; margin-bottom: 1rem;">
+              Your vehicle details have been sent directly to our appraisal managers at Motor Trends Richmond (<strong style="color: #1B3A6B;">sales@motortrends.ca</strong>). We will contact you within 30 minutes with an official valuation.
+            </p>
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+              <a href="inventory" class="btn btn-blue btn-sm">Browse Inventory</a>
+              <a href="tel:6042707662" class="btn btn-outline btn-sm">Call 604-270-7662</a>
+            </div>
           </div>
         </div>
       </div>

@@ -333,6 +333,8 @@ const server = http.createServer((req, res) => {
   if (!path.extname(reqPath)) {
     if (fs.existsSync(filePath + '.html')) {
       filePath = filePath + '.html';
+    } else if (reqPath.startsWith('/brochure')) {
+      filePath = path.join(__dirname, 'brochure.html');
     } else if (reqPath === '/admin' && fs.existsSync(path.join(__dirname, 'admin.html'))) {
       filePath = path.join(__dirname, 'admin.html');
     } else if (reqPath === '/sales' && fs.existsSync(path.join(__dirname, 'sales.html'))) {

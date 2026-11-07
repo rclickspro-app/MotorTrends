@@ -1485,17 +1485,23 @@ function createVehicleCardHtml(car) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span>${formatNumber(car.mileage || 0)} km</span>
           </div>
-          <div class="spec-item" title="Drivetrain">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            <span>${car.drivetrain || 'FWD'}</span>
-          </div>
           <div class="spec-item" title="Fuel Type">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
             <span>${car.fuelType || 'Gasoline'}</span>
           </div>
-          <div class="spec-item" title="Transmission">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span>${transmissionShort}</span>
+          ${(car.horsepower || car.hp) ? `
+            <div class="spec-item" title="Performance">
+              <span style="font-weight: 800; color: #EF4444; font-size: 0.72rem;">⚡</span>
+              <span>${car.horsepower || car.hp}</span>
+            </div>
+          ` : `
+            <div class="spec-item" title="Drivetrain">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>${car.drivetrain || 'FWD'}</span>
+            </div>
+          `}
+          <div class="spec-item" title="Doors">
+            <span>🚪 ${car.doors || '4 Doors'}</span>
           </div>
         </div>
 
@@ -1513,15 +1519,21 @@ function createVehicleCardHtml(car) {
           <button class="btn btn-silver btn-sm btn-quick-view" data-id="${car.id}">
             View Details
           </button>
+          <a href="brochure?id=${encodeURIComponent(car.id)}" class="btn btn-blue btn-sm" title="View Official Digital Brochure" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            📄 Brochure
+          </a>
           <button class="btn btn-outline btn-sm btn-book-drive" data-id="${car.id}" title="Book Test Drive">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            Test Drive
+            Drive
           </button>
         </div>
 
         <div class="vehicle-card-sub-actions">
-          <button type="button" class="btn btn-sub-action btn-open-slideshow ${car.externalGalleryUrl ? '' : 'btn-sub-action-full'}" data-id="${car.id}" title="Open Slideshow">
+          <button type="button" class="btn btn-sub-action btn-open-slideshow" data-id="${car.id}" title="Open Slideshow">
             📸 Slideshow
+          </button>
+          <button type="button" class="btn btn-sub-action btn-share-vehicle" data-id="${car.id}" title="Share vehicle via WhatsApp, SMS, or Email">
+            🔗 Share
           </button>
           ${car.externalGalleryUrl ? `
             <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sub-action btn-all-pictures" title="Open All Pictures in new window">
@@ -1656,12 +1668,22 @@ function attachCardEvents(parentEl) {
     });
   });
 
-  // Quick View Modal (Auto-scroll to top)
+  // Quick View Modal
   parentEl.querySelectorAll('.btn-quick-view').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const carId = btn.dataset.id;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       openVehicleModal(carId);
+    });
+  });
+
+  // Share Vehicle trigger
+  parentEl.querySelectorAll('.btn-share-vehicle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const carId = btn.dataset.id;
+      openShareModal(carId);
     });
   });
 
@@ -1890,8 +1912,8 @@ function openVehicleModal(carId) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalBackdrop || !modalContainer) return;
 
-  // Auto scroll window and modal back to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Prevent background scroll bleed and ensure modal starts at top
+  document.body.classList.add('modal-open');
   modalBackdrop.scrollTop = 0;
   modalContainer.scrollTop = 0;
 
@@ -1976,11 +1998,15 @@ function openVehicleModal(carId) {
         <h4 style="font-size: 0.85rem; text-transform: uppercase; color: #0F172A; margin-bottom: 0.75rem; letter-spacing: 0.05em; font-weight: 700;">Key Specifications</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; font-size: 0.85rem; margin-bottom: 1.5rem; background: #F8FAFC; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #E2E8F0; color: #334155;">
           <div><strong style="color: #0F172A;">Mileage:</strong> ${formatNumber(car.mileage)} km</div>
-          <div><strong style="color: #0F172A;">Drivetrain:</strong> ${car.drivetrain}</div>
+          <div><strong style="color: #0F172A;">Drivetrain:</strong> ${car.drivetrain || 'FWD'}</div>
           <div><strong style="color: #0F172A;">Fuel Type:</strong> ${car.fuelType || 'Gasoline'}</div>
-          <div><strong style="color: #0F172A;">Transmission:</strong> ${car.transmission}</div>
-          <div><strong style="color: #0F172A;">Exterior:</strong> ${car.exteriorColor}</div>
-          <div><strong style="color: #0F172A;">Interior:</strong> ${car.interiorColor}</div>
+          <div><strong style="color: #0F172A;">Transmission:</strong> ${car.transmission || 'Automatic'}</div>
+          ${(car.horsepower || car.hp) ? `<div><strong style="color: #0F172A;">Performance:</strong> ${car.horsepower || car.hp}</div>` : ''}
+          <div><strong style="color: #0F172A;">Doors:</strong> ${car.doors || '4 Doors'}</div>
+          <div><strong style="color: #0F172A;">Passengers:</strong> ${car.passengers || '5 Passengers'}</div>
+          <div><strong style="color: #0F172A;">Exterior:</strong> ${car.exteriorColor || 'N/A'}</div>
+          <div><strong style="color: #0F172A;">Interior:</strong> ${car.interiorColor || 'N/A'}</div>
+          ${car.stockNumber ? `<div><strong style="color: #0F172A;">Stock #:</strong> ${car.stockNumber}</div>` : ''}
         </div>
 
         <h4 style="font-size: 0.85rem; text-transform: uppercase; color: #0F172A; margin-bottom: 0.75rem; letter-spacing: 0.05em; font-weight: 700;">Top Features</h4>
@@ -1993,23 +2019,29 @@ function openVehicleModal(carId) {
           `).join('')}
         </ul>
 
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <button class="btn btn-silver" style="flex: 1; min-width: 150px;" onclick="openTestDriveModal('${car.id}')">
-            Book a Test Drive
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+          <a href="brochure?id=${encodeURIComponent(car.id)}" class="btn btn-blue" style="flex: 1; min-width: 150px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;" title="Official Printable Vehicle Brochure">
+            📄 Official Brochure
+          </a>
+          <button type="button" class="btn btn-silver" style="flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="openShareModal('${car.id}')" title="Share via WhatsApp, SMS, Email">
+            🔗 Share Vehicle
           </button>
-          <button type="button" class="btn btn-dark" style="flex: 1; min-width: 150px;" onclick="openVehicleSlideshow('${car.id}', ${currentImgIdx})">
-            📸 View Full Slideshow
+          <button class="btn btn-silver" style="flex: 1; min-width: 140px;" onclick="openTestDriveModal('${car.id}')">
+            Book Test Drive
           </button>
-          <a href="financing?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 150px;">
-            Calculate Financing
+          <button type="button" class="btn btn-dark" style="flex: 1; min-width: 140px;" onclick="openVehicleSlideshow('${car.id}', ${currentImgIdx})">
+            📸 View Slideshow
+          </button>
+          <a href="financing?price=${car.price}&vehicle=${encodeURIComponent(car.year + ' ' + car.make + ' ' + car.model)}" class="btn btn-outline" style="flex: 1; min-width: 130px;">
+            Financing
           </a>
           ${car.externalGalleryUrl ? `
             <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm" style="flex: 1; min-width: 150px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.55rem 0.9rem; font-size: 0.82rem;" title="View all pictures on cloud storage">
               🖼️ All Pictures (Cloud Album)
             </a>
           ` : ''}
-          <button type="button" class="btn btn-outline" style="flex: 1; min-width: 150px;" onclick="document.getElementById('modal-close')?.click(); window.scrollTo({ top: 0, behavior: 'smooth' });">
-            ↑ Back to Inventory
+          <button type="button" class="btn btn-outline btn-sm" style="flex: 1; min-width: 140px;" onclick="document.getElementById('global-modal-container').scrollTo({ top: 0, behavior: 'smooth' });">
+            ↑ Top of Details
           </button>
         </div>
       </div>
@@ -2155,9 +2187,14 @@ function openVehicleModal(carId) {
   function closeModal() {
     stopModalSlideshow();
     modalBackdrop.classList.remove('active');
+    document.body.classList.remove('modal-open');
   }
 
   modalBackdrop.classList.add('active');
+  requestAnimationFrame(() => {
+    modalContainer.scrollTop = 0;
+    modalBackdrop.scrollTop = 0;
+  });
   const closeBtn = document.getElementById('modal-close');
   if (closeBtn) closeBtn.onclick = closeModal;
 
@@ -2519,10 +2556,19 @@ function openTestDriveModal(carId) {
 
 /* ----------------------------------------------------
    Unified Global Email Submission Function
-   Direct delivery to rightclicksapp@gmail.com
+   Direct delivery to dealership admin email
 ----------------------------------------------------- */
 async function sendEmailSubmission(formData, formSubject) {
-  const TARGET_EMAIL = 'rightclicksapp@gmail.com';
+  let TARGET_EMAIL = 'sales@motortrends.ca';
+  try {
+    const raw = localStorage.getItem('motortrends_system_settings_v1');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.inquiryNotificationEmail) TARGET_EMAIL = parsed.inquiryNotificationEmail;
+      else if (parsed.superAdminEmail) TARGET_EMAIL = parsed.superAdminEmail;
+    }
+  } catch(e) {}
+
   const endpoint = `https://formsubmit.co/ajax/${TARGET_EMAIL}`;
 
   // Local storage backup for dealer records
@@ -2560,6 +2606,142 @@ async function sendEmailSubmission(formData, formSubject) {
   }
 }
 window.sendEmailSubmission = sendEmailSubmission;
+
+/* ----------------------------------------------------
+   Vehicle Digital Brochure & Social Share Modal
+----------------------------------------------------- */
+function openShareModal(carId) {
+  const car = (typeof getVehicleById === 'function') ? getVehicleById(carId) : null;
+  if (!car) return;
+
+  let shareBackdrop = document.getElementById('share-modal-backdrop');
+  if (!shareBackdrop) {
+    shareBackdrop = document.createElement('div');
+    shareBackdrop.id = 'share-modal-backdrop';
+    shareBackdrop.className = 'modal-backdrop';
+    shareBackdrop.style.zIndex = '6000';
+    shareBackdrop.innerHTML = `<div id="share-modal-container" class="modal-container" style="max-width: 520px; padding: 2rem;"></div>`;
+    document.body.appendChild(shareBackdrop);
+
+    shareBackdrop.addEventListener('click', (e) => {
+      if (e.target === shareBackdrop) {
+        shareBackdrop.classList.remove('active');
+      }
+    });
+  }
+
+  const container = document.getElementById('share-modal-container');
+  if (!container) return;
+
+  const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+  const pathPrefix = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+  const brochureUrl = `${origin}${pathPrefix}brochure?id=${encodeURIComponent(car.id)}`;
+  const carTitle = `${car.year} ${car.make} ${car.model}${car.trim ? ' ' + car.trim : ''}`;
+  const carPrice = (typeof formatPrice === 'function') ? formatPrice(car.price) : `$${Number(car.price).toLocaleString()} CAD`;
+  const carImg = (Array.isArray(car.images) && car.images.length > 0) ? car.images[0] : (car.image || 'images/logo.png');
+
+  const shareText = `Check out this ${carTitle} (${carPrice}) at Motor Trends Auto Group (Richmond, BC):\n${brochureUrl}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+  const smsUrl = `sms:?&body=${encodeURIComponent(`Check out this ${carTitle} (${carPrice}) at Motor Trends: ${brochureUrl}`)}`;
+  const emailUrl = `mailto:?subject=${encodeURIComponent(`Motor Trends Vehicle: ${carTitle}`)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share this ${carTitle} at Motor Trends Auto Group in Richmond, BC.\n\nPrice: ${carPrice}\nMileage: ${Number(car.mileage).toLocaleString()} km\nStock #: ${car.stockNumber || 'N/A'}\n\nView official digital brochure and full specifications:\n${brochureUrl}\n\nMotor Trends Auto Group\n10740 Cambie Road, Richmond, BC\nPhone: 604-270-7662\nDealer #30859\nwww.motortrends.ca`)}`;
+
+  container.innerHTML = `
+    <button class="modal-close-btn" id="share-modal-close" style="position: absolute; top: 1rem; right: 1rem;">✕</button>
+
+    <div style="text-align: center; margin-bottom: 1.25rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.75rem; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 999px; font-size: 0.75rem; font-weight: 700; color: #1D4ED8; margin-bottom: 0.5rem;">
+        <span>🔗</span> MOTOR TRENDS SHARE
+      </div>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin: 0;">Share Vehicle &amp; Brochure</h3>
+      <p style="font-size: 0.82rem; color: #64748B; margin-top: 0.25rem;">Share this vehicle listing with family, friends, or your client:</p>
+    </div>
+
+    <!-- Vehicle Card Preview -->
+    <div style="display: flex; gap: 1rem; align-items: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.85rem; margin-bottom: 1.5rem;">
+      <img src="${carImg}" alt="${carTitle}" style="width: 76px; height: 56px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onerror="this.src='images/logo.png'">
+      <div style="min-width: 0; flex: 1;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${carTitle}</div>
+        <div style="font-size: 0.8rem; color: #64748B;">Stock #${car.stockNumber || 'MT-INVENTORY'} · ${car.fuelType || 'Gasoline'}</div>
+        <div style="font-weight: 800; color: #1B3A6B; font-size: 1.05rem;">${carPrice}</div>
+      </div>
+    </div>
+
+    <!-- Direct Share Action Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.25rem;">
+      <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #25D366; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
+        <span>💬</span> WhatsApp
+      </a>
+      <a href="${smsUrl}" class="btn" style="background: #0284C7; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
+        <span>📱</span> SMS Text
+      </a>
+      <a href="${emailUrl}" class="btn" style="background: #475569; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
+        <span>✉️</span> Email Link
+      </a>
+      <a href="brochure?id=${encodeURIComponent(car.id)}" target="_blank" class="btn" style="background: #1B3A6B; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
+        <span>📄</span> Open Brochure
+      </a>
+    </div>
+
+    <!-- Copy Link Input Box -->
+    <div style="background: #F1F5F9; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <input type="text" id="share-link-input" readonly value="${brochureUrl}" style="background: transparent; border: none; outline: none; font-size: 0.8rem; color: #334155; width: 100%; font-family: monospace;">
+      <button type="button" id="btn-copy-share-link" class="btn btn-blue btn-sm" style="flex-shrink: 0; font-weight: 700; padding: 0.4rem 0.85rem; font-size: 0.78rem;">
+        📋 Copy Link
+      </button>
+    </div>
+
+    ${navigator.share ? `
+      <button type="button" id="btn-native-share" class="btn btn-outline" style="width: 100%; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.5rem;">
+        <span>📲</span> More Share Options...
+      </button>
+    ` : ''}
+  `;
+
+  shareBackdrop.classList.add('active');
+
+  document.getElementById('share-modal-close')?.addEventListener('click', () => {
+    shareBackdrop.classList.remove('active');
+  });
+
+  const copyBtn = document.getElementById('btn-copy-share-link');
+  const copyInput = document.getElementById('share-link-input');
+  if (copyBtn && copyInput) {
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(brochureUrl);
+        copyBtn.innerHTML = '✓ Copied!';
+        copyBtn.style.background = '#10B981';
+        if (typeof showToast === 'function') {
+          showToast('🔗 Brochure link copied to clipboard!', 'success');
+        }
+        setTimeout(() => {
+          copyBtn.innerHTML = '📋 Copy Link';
+          copyBtn.style.background = '';
+        }, 2500);
+      } catch (e) {
+        copyInput.select();
+        document.execCommand('copy');
+        if (typeof showToast === 'function') {
+          showToast('🔗 Link selected and copied!', 'success');
+        }
+      }
+    };
+  }
+
+  const nativeBtn = document.getElementById('btn-native-share');
+  if (nativeBtn && navigator.share) {
+    nativeBtn.onclick = async () => {
+      try {
+        await navigator.share({
+          title: carTitle + ' - Motor Trends Auto Group',
+          text: `Check out this ${carTitle} for ${carPrice} at Motor Trends Auto Group in Richmond, BC:`,
+          url: brochureUrl
+        });
+      } catch (err) {}
+    };
+  }
+}
+window.openShareModal = openShareModal;
 
 /* ----------------------------------------------------
    Global Modals Setup & Toast Notifications

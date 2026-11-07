@@ -1173,11 +1173,11 @@ input[type=range]::-webkit-slider-thumb {
   gap: 0.35rem;
 }
 
-/* Secondary compact action row (Slideshow & All Pictures) */
+/* Secondary compact action row (Slideshow, Brochure, Share & All Pictures) */
 .vehicle-card-sub-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  gap: 0.35rem;
   margin-top: 0.45rem;
 }
 .vehicle-card-sub-actions .btn-sub-action {
@@ -1745,6 +1745,10 @@ input[type=range]::-webkit-slider-thumb {
 /* ----------------------------------------------------------------
    Modal
 ---------------------------------------------------------------- */
+body.modal-open {
+  overflow: hidden !important;
+}
+
 .modal-overlay, .modal-backdrop {
   position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);

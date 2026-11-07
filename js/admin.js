@@ -11,7 +11,8 @@ const DEFAULT_SYSTEM_SETTINGS = {
   maxUploadSlots: 12,
   maxInventoryLimit: 25,
   salesPassword: '^^0ToRTre&d$',
-  superAdminEmail: 'rclickspro@gmail.com'
+  superAdminEmail: 'rclickspro@gmail.com',
+  inquiryNotificationEmail: 'sales@motortrends.ca'
 };
 
 function getSystemSettings() {
@@ -1298,6 +1299,24 @@ function populateEditorDropdowns(car = {}) {
   if (transDl && Array.isArray(options.transmissions)) {
     transDl.innerHTML = options.transmissions.map(t => `<option value="${t}"></option>`).join('');
   }
+
+  // 7. Doors Select
+  const doorsSel = document.getElementById('form-car-doors');
+  if (doorsSel && Array.isArray(options.doors)) {
+    const curDoors = car.doors || doorsSel.value || '4 Doors';
+    doorsSel.innerHTML = options.doors.map(d => `<option value="${d}">${d}</option>`).join('');
+    doorsSel.value = curDoors;
+    if (!doorsSel.value && options.doors.length > 0) doorsSel.value = options.doors[0];
+  }
+
+  // 8. Passengers Select
+  const passSel = document.getElementById('form-car-passengers');
+  if (passSel && Array.isArray(options.passengers)) {
+    const curPass = car.passengers || passSel.value || '5 Passengers';
+    passSel.innerHTML = options.passengers.map(p => `<option value="${p}">${p}</option>`).join('');
+    passSel.value = curPass;
+    if (!passSel.value && options.passengers.length > 0) passSel.value = options.passengers[0];
+  }
 }
 
 function openVehicleEditorModal(carId = null) {
@@ -1329,12 +1348,21 @@ function openVehicleEditorModal(carId = null) {
     document.getElementById('form-car-fuel').value = car.fuelType;
     document.getElementById('form-car-trans').value = car.transmission;
     document.getElementById('form-car-drivetrain').value = car.drivetrain;
-    document.getElementById('form-car-engine').value = car.engine;
-    document.getElementById('form-car-ext-color').value = car.exteriorColor;
-    document.getElementById('form-car-int-color').value = car.interiorColor;
-    document.getElementById('form-car-vin').value = car.vin;
-    document.getElementById('form-car-stock').value = car.stockNumber;
-    document.getElementById('form-car-condition').value = car.condition;
+    document.getElementById('form-car-engine').value = car.engine || '';
+    if (document.getElementById('form-car-hp')) {
+      document.getElementById('form-car-hp').value = car.horsepower || car.hp || '';
+    }
+    if (document.getElementById('form-car-doors')) {
+      document.getElementById('form-car-doors').value = car.doors || '4 Doors';
+    }
+    if (document.getElementById('form-car-passengers')) {
+      document.getElementById('form-car-passengers').value = car.passengers || '5 Passengers';
+    }
+    document.getElementById('form-car-ext-color').value = car.exteriorColor || '';
+    document.getElementById('form-car-int-color').value = car.interiorColor || '';
+    document.getElementById('form-car-vin').value = car.vin || '';
+    document.getElementById('form-car-stock').value = car.stockNumber || '';
+    document.getElementById('form-car-condition').value = car.condition || 'Certified Pre-Owned';
     document.getElementById('form-car-featured').checked = !!car.featured;
     if (document.getElementById('form-car-new-arrival')) {
       document.getElementById('form-car-new-arrival').checked = !!car.isNewVehicle;
@@ -1367,6 +1395,9 @@ function openVehicleEditorModal(carId = null) {
 
     document.getElementById('form-car-id').value = '';
     document.getElementById('form-car-stock').value = `MT-${Math.floor(1000 + Math.random() * 9000)}`;
+    if (document.getElementById('form-car-hp')) document.getElementById('form-car-hp').value = '';
+    if (document.getElementById('form-car-doors')) document.getElementById('form-car-doors').value = '4 Doors';
+    if (document.getElementById('form-car-passengers')) document.getElementById('form-car-passengers').value = '5 Passengers';
     document.getElementById('form-car-video').value = '';
     updateVideoPreviewUI('');
     if (document.getElementById('form-car-external-gallery')) {
@@ -1633,6 +1664,9 @@ async function saveVehicleFromForm() {
     const transmission = document.getElementById('form-car-trans').value || 'Automatic';
     const drivetrain = document.getElementById('form-car-drivetrain').value || 'AWD';
     const engine = document.getElementById('form-car-engine').value.trim();
+    const horsepower = (document.getElementById('form-car-hp')?.value || '').trim();
+    const doors = document.getElementById('form-car-doors')?.value || '4 Doors';
+    const passengers = document.getElementById('form-car-passengers')?.value || '5 Passengers';
     const exteriorColor = document.getElementById('form-car-ext-color').value.trim();
     const interiorColor = document.getElementById('form-car-int-color').value.trim();
     const vin = document.getElementById('form-car-vin').value.trim() || 'N/A'; // Optional VIN
@@ -1676,6 +1710,9 @@ async function saveVehicleFromForm() {
       transmission,
       drivetrain,
       engine,
+      horsepower,
+      doors,
+      passengers,
       exteriorColor,
       interiorColor,
       vin,
@@ -2215,6 +2252,17 @@ function renderSettingsView() {
           <input type="email" id="setting-superadmin-email" class="form-control" value="${settings.superAdminEmail || 'rclickspro@gmail.com'}" required style="max-width: 360px;">
         </div>
 
+        <!-- Setting 5: Dealership Inquiries & Appraisal Notification Email -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 1.25rem;">
+          <label style="font-weight: 700; color: #0F172A; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">
+            📬 Dealership Appraisal &amp; Inquiry Submission Email
+          </label>
+          <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 0.75rem;">
+            Customer trade-in appraisal forms and test drive inquiries are delivered directly to this dealership inbox.
+          </div>
+          <input type="email" id="setting-inquiry-email" class="form-control" value="${settings.inquiryNotificationEmail || 'sales@motortrends.ca'}" required style="max-width: 360px;">
+        </div>
+
         <div>
           <button type="submit" class="btn btn-blue btn-lg" style="font-weight: 700; padding: 0.75rem 2rem;">
             💾 Save &amp; Apply System Settings
@@ -2259,6 +2307,12 @@ function renderSettingsView() {
         </button>
         <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'drivetrains' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="drivetrains" style="font-weight: 700;">
           🛞 Drivetrains (${dOpts.drivetrains?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'doors' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="doors" style="font-weight: 700;">
+          🚪 Doors (${dOpts.doors?.length || 0})
+        </button>
+        <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'passengers' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="passengers" style="font-weight: 700;">
+          👥 Passengers (${dOpts.passengers?.length || 0})
         </button>
         <button type="button" class="btn btn-sm ${activeTaxonomyCategory === 'conditions' ? 'btn-blue' : 'btn-outline'} btn-taxonomy-cat" data-category="conditions" style="font-weight: 700;">
           🏷️ Conditions (${dOpts.conditions?.length || 0})
@@ -2375,12 +2429,14 @@ function renderSettingsView() {
       const maxInventory = parseInt(document.getElementById('setting-max-inventory').value) || 25;
       const salesPass = document.getElementById('setting-sales-password').value.trim();
       const superEmail = document.getElementById('setting-superadmin-email').value.trim().toLowerCase();
+      const inquiryEmail = (document.getElementById('setting-inquiry-email')?.value || 'sales@motortrends.ca').trim().toLowerCase();
 
       saveSystemSettings({
         maxUploadSlots: maxUploads,
         maxInventoryLimit: maxInventory,
         salesPassword: salesPass,
-        superAdminEmail: superEmail
+        superAdminEmail: superEmail,
+        inquiryNotificationEmail: inquiryEmail
       });
 
       showToast('✅ Super Admin System Settings saved and synced to cloud!', 'success');

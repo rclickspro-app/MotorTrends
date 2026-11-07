@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Digital Brochure | Motor Trends Auto Group Richmond BC</title>
+  <meta name="description" content="Official printable vehicle specification brochure from Motor Trends Auto Group in Richmond, BC. Dealer #30859.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#1B3A6B">
+
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Brochure Document Stylesheet */
+    :root {
+      --brochure-navy: #1B3A6B;
+      --brochure-dark: #0F172A;
+      --brochure-blue: #0284C7;
+      --brochure-silver: #64748B;
+      --brochure-border: #E2E8F0;
+      --brochure-bg: #F8FAFC;
+    }
+
+    body {
+      background: #F1F5F9;
+      color: #0F172A;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Action Bar (Sticky Toolbar) */
+    .brochure-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: #fff;
+    }
+
+    .brochure-toolbar-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .brochure-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Printable Brochure Sheet Container */
+    .brochure-container {
+      max-width: 920px;
+      margin: 1.75rem auto 3rem;
+      padding: 0 1rem;
+    }
+
+    .brochure-sheet {
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--brochure-border);
+      overflow: hidden;
+    }
+
+    /* Header Band */
+    .brochure-header-band {
+      background: linear-gradient(135deg, #1B3A6B 0%, #0F172A 100%);
+      color: #FFFFFF;
+      padding: 1.75rem 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+      border-bottom: 3px solid #38BDF8;
+    }
+
+    .brochure-logo-img {
+      height: 54px;
+      width: auto;
+      object-fit: contain;
+      background: #ffffff;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    .brochure-dealer-info h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.25rem;
+      color: #FFFFFF;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .brochure-dealer-meta {
+      font-size: 0.82rem;
+      color: #CBD5E1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .brochure-dealer-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .brochure-qr-box {
+      background: #FFFFFF;
+      padding: 0.5rem;
+      border-radius: 8px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .brochure-qr-box img {
+      width: 72px;
+      height: 72px;
+      display: block;
+    }
+
+    .brochure-qr-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #0F172A;
+      margin-top: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Vehicle Title & Price Hero Row */
+    .brochure-hero-row {
+      padding: 1.5rem 2rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--brochure-border);
+      background: #F8FAFC;
+    }
+
+    .brochure-title-block {
+      max-width: 65%;
+    }
+
+    .brochure-badges-strip {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .brochure-vehicle-title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: #0F172A;
+      margin: 0 0 0.25rem;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.15;
+    }
+
+    .brochure-vehicle-trim {
+      font-size: 0.95rem;
+      color: var(--brochure-silver);
+      font-weight: 600;
+    }
+
+    .brochure-price-block {
+      text-align: right;
+    }
+
+    .brochure-price-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--brochure-silver);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .brochure-price-main {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #1B3A6B;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1;
+      margin: 0.15rem 0;
+    }
+
+    .brochure-price-terms {
+      font-size: 0.75rem;
+      color: var(--brochure-silver);
+    }
+
+    /* Visual Photo Gallery Stage */
+    .brochure-gallery-stage {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--brochure-border);
+    }
+
+    .brochure-gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 150px 150px;
+      gap: 0.75rem;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .brochure-gallery-main {
+      grid-row: span 2;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .brochure-gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .brochure-gallery-thumb {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .brochure-gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s ease;
+    }
+
+    .brochure-gallery-thumb:hover img {
+      transform: scale(1.04);
+    }
+
+    /* Specifications Grid */
+    .brochure-specs-section {
+      padding: 1.75rem 2rem;
+      border-bottom: 1px solid var(--brochure-border);
+    }
+
+    .brochure-section-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #1B3A6B;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .brochure-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem 1.25rem;
+    }
+
+    .brochure-spec-cell {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+    }
+
+    .brochure-spec-name {
+      font-size: 0.72rem;
+      color: #64748B;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+      letter-spacing: 0.04em;
+    }
+
+    .brochure-spec-value {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    /* Features & Equipment */
+    .brochure-features-section {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--brochure-border);
+    }
+
+    .brochure-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+      list-style: none;
+      padding: 0;
+    }
+
+    .brochure-chip {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .brochure-chip-accent {
+      background: #F0FDF4;
+      color: #15803D;
+      border-color: #BBF7D0;
+    }
+
+    .brochure-overview-text {
+      font-size: 0.9rem;
+      color: #475569;
+      line-height: 1.6;
+      background: #F8FAFC;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border-left: 3px solid #1B3A6B;
+      margin: 0;
+    }
+
+    /* Included Trust Guarantees */
+    .brochure-included-section {
+      padding: 1.5rem 2rem;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--brochure-border);
+    }
+
+    .brochure-included-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .brochure-included-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .brochure-included-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .brochure-included-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 0.25rem;
+    }
+
+    .brochure-included-desc {
+      font-size: 0.75rem;
+      color: #64748B;
+      line-height: 1.4;
+    }
+
+    /* Legal & Footer */
+    .brochure-footer {
+      padding: 1.5rem 2rem;
+      background: #FFFFFF;
+      font-size: 0.75rem;
+      color: #64748B;
+      line-height: 1.5;
+    }
+
+    .brochure-footer-legal {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .brochure-footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #0F172A;
+    }
+
+    /* Print Formatting */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+      }
+
+      .brochure-toolbar,
+      .site-header,
+      .site-footer,
+      .btn,
+      #mt-page-preloader {
+        display: none !important;
+      }
+
+      .brochure-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .brochure-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+      }
+
+      .brochure-header-band {
+        background: #1B3A6B !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .brochure-spec-cell,
+      .brochure-chip,
+      .brochure-hero-row {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      @page {
+        margin: 0.4in;
+        size: letter portrait;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .brochure-header-band {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .brochure-dealer-meta {
+        justify-content: center;
+      }
+
+      .brochure-qr-box {
+        margin: 0 auto;
+      }
+
+      .brochure-hero-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .brochure-title-block {
+        max-width: 100%;
+      }
+
+      .brochure-price-block {
+        text-align: left;
+      }
+
+      .brochure-gallery-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      .brochure-specs-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .brochure-included-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Top Action Toolbar -->
+  <div class="brochure-toolbar" id="brochure-toolbar">
+    <div class="brochure-toolbar-info">
+      <span>📄 <strong>Official Vehicle Digital Brochure</strong> · Dealer #30859</span>
+    </div>
+    <div class="brochure-toolbar-actions">
+      <button type="button" class="btn btn-blue btn-sm" onclick="window.print()" title="Print or Save as PDF">
+        🖨️ Save as PDF / Print
+      </button>
+      <button type="button" class="btn btn-silver btn-sm" id="btn-brochure-share" title="Share via WhatsApp, SMS, or Email">
+        🔗 Share Brochure
+      </button>
+      <a href="inventory" class="btn btn-dark btn-sm">
+        ← Inventory
+      </a>
+      <a href="tel:6042707662" class="btn btn-outline btn-sm" style="color: #fff; border-color: rgba(255,255,255,0.4);">
+        📞 604-270-7662
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Sheet Container -->
+  <div class="brochure-container">
+    <article class="brochure-sheet" id="brochure-sheet">
+      
+      <!-- Dealer Brand Header Band -->
+      <header class="brochure-header-band">
+        <a href="./">
+          <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" class="brochure-logo-img" onerror="this.src='images/logo.png'">
+        </a>
+        <div class="brochure-dealer-info">
+          <h1>Motor Trends Auto Group</h1>
+          <div class="brochure-dealer-meta">
+            <span><strong>Dealer # 30859</strong></span>
+            <span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span>
+            <span>📞 604-270-7662</span>
+            <span>🌐 www.motortrends.ca</span>
+          </div>
+        </div>
+        <div class="brochure-qr-box">
+          <img id="brochure-qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://www.motortrends.ca" alt="Scan QR Code for live vehicle details">
+          <div class="brochure-qr-label">Scan Live Page</div>
+        </div>
+      </header>
+
+      <!-- Vehicle Title & Price Hero -->
+      <div class="brochure-hero-row">
+        <div class="brochure-title-block">
+          <div class="brochure-badges-strip" id="brochure-badges">
+            <span class="badge badge-green">✓ Certified Pre-Owned</span>
+            <span class="badge badge-blue">⚡ Hydrogen Fuel Cell</span>
+            <span class="badge badge-silver">Local BC</span>
+          </div>
+          <h2 class="brochure-vehicle-title" id="brochure-vehicle-name">2019 Toyota Mirai Sedan</h2>
+          <div class="brochure-vehicle-trim" id="brochure-vehicle-trim">Base Technology Package · FWD Zero Emissions</div>
+        </div>
+
+        <div class="brochure-price-block">
+          <div class="brochure-price-label">Retail Price (CAD)</div>
+          <div class="brochure-price-main" id="brochure-price">$14,999 CAD</div>
+          <div class="brochure-price-terms">Plus applicable documentation &amp; BC taxes</div>
+        </div>
+      </div>
+
+      <!-- High-Resolution Vehicle Gallery -->
+      <section class="brochure-gallery-stage">
+        <div class="brochure-gallery-grid" id="brochure-gallery-grid">
+          <div class="brochure-gallery-main" id="brochure-gallery-main">
+            <img id="brochure-main-photo" src="uploads/vehicles/veh-1792992499662/photo_1.jpg" alt="Featured Vehicle Photo" onerror="this.src='images/slide1.jpg'">
+          </div>
+          <div class="brochure-gallery-thumb" data-idx="1">
+            <img id="brochure-photo-2" src="uploads/vehicles/veh-1792992499662/photo_2.jpg" alt="Vehicle Photo 2" onerror="this.src='images/slide2.jpg'">
+          </div>
+          <div class="brochure-gallery-thumb" data-idx="2">
+            <img id="brochure-photo-3" src="uploads/vehicles/veh-1792992499662/photo_3.jpg" alt="Vehicle Photo 3" onerror="this.src='images/slide3.jpg'">
+          </div>
+          <div class="brochure-gallery-thumb" data-idx="3">
+            <img id="brochure-photo-4" src="uploads/vehicles/veh-1792992499662/photo_4.jpg" alt="Vehicle Photo 4" onerror="this.src='images/slide1.jpg'">
+          </div>
+          <div class="brochure-gallery-thumb" data-idx="0">
+            <img id="brochure-photo-5" src="uploads/vehicles/veh-1792992499662/photo_1.jpg" alt="Vehicle Angle" onerror="this.src='images/slide2.jpg'">
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Specifications Grid -->
+      <section class="brochure-specs-section">
+        <div class="brochure-section-label">
+          <span>⚙️</span> Vehicle Specifications &amp; Performance
+        </div>
+        <div class="brochure-specs-grid" id="brochure-specs-grid">
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Kilometres</div>
+            <div class="brochure-spec-value" id="spec-mileage">30,363 km</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Body Style</div>
+            <div class="brochure-spec-value" id="spec-bodystyle">Sedan</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Transmission</div>
+            <div class="brochure-spec-value" id="spec-trans">Automatic</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Horsepower / Power</div>
+            <div class="brochure-spec-value" id="spec-hp" style="color: #EF4444;">151 HP</div>
+          </div>
+
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Fuel Type</div>
+            <div class="brochure-spec-value" id="spec-fuel" style="color: #0284C7;">Hydrogen</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Drivetrain</div>
+            <div class="brochure-spec-value" id="spec-drivetrain">FWD</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Doors</div>
+            <div class="brochure-spec-value" id="spec-doors">4 Doors</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Passengers</div>
+            <div class="brochure-spec-value" id="spec-passengers">4 Passengers</div>
+          </div>
+
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Exterior Colour</div>
+            <div class="brochure-spec-value" id="spec-ext-color">Atmospheric White</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Interior Colour</div>
+            <div class="brochure-spec-value" id="spec-int-color">Black SofTex</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">Stock Number</div>
+            <div class="brochure-spec-value" id="spec-stock">MT-6602</div>
+          </div>
+          <div class="brochure-spec-cell">
+            <div class="brochure-spec-name">VIN Number</div>
+            <div class="brochure-spec-value" id="spec-vin" style="font-family: monospace; font-size: 0.82rem;">JTDKA3DE0K0008198</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Options & Equipment Checklist -->
+      <section class="brochure-features-section">
+        <div class="brochure-section-label">
+          <span>✨</span> Standard Equipment &amp; Highlights
+        </div>
+        <ul class="brochure-chips" id="brochure-features-list">
+          <li class="brochure-chip">Hydrogen Fuel Cell Zero-Emission Powertrain</li>
+          <li class="brochure-chip">Front &amp; Rear Heated Seats</li>
+          <li class="brochure-chip">Heated Steering Wheel</li>
+          <li class="brochure-chip">JBL Premium Audio System</li>
+          <li class="brochure-chip">Toyota Safety Sense</li>
+          <li class="brochure-chip">Backup Camera</li>
+          <li class="brochure-chip">Alloy Wheels</li>
+          <li class="brochure-chip">Dual-Zone Climate Control</li>
+          <li class="brochure-chip">Apple CarPlay &amp; Bluetooth</li>
+        </ul>
+
+        <p class="brochure-overview-text" id="brochure-overview">
+          2019 Toyota Mirai, hydrogen-powered zero-emission sedan. Front-Wheel Drive, ABS, Cruise Control, Alloy Wheels, Fog Lights, Front Heated Seats, 4 Passenger, Backup Camera, and Toyota Safety Sense.
+        </p>
+      </section>
+
+      <!-- Included with Every Vehicle -->
+      <section class="brochure-included-section">
+        <div class="brochure-section-label">
+          <span>🛡️</span> Included with Every Motor Trends Vehicle
+        </div>
+        <div class="brochure-included-grid">
+          <div class="brochure-included-card">
+            <div class="brochure-included-icon">📋</div>
+            <div class="brochure-included-title">CarFax Vehicle History Report</div>
+            <div class="brochure-included-desc">Transparent CarFax documentation with clean title and accident history disclosure.</div>
+          </div>
+          <div class="brochure-included-card">
+            <div class="brochure-included-icon">🔍</div>
+            <div class="brochure-included-title">150-Point Safety Inspection</div>
+            <div class="brochure-included-desc">Certified mechanical and safety multi-point checklist completed by licensed technicians.</div>
+          </div>
+          <div class="brochure-included-card">
+            <div class="brochure-included-icon">🤝</div>
+            <div class="brochure-included-title">Trade-Ins &amp; In-House Financing</div>
+            <div class="brochure-included-desc">Buy Here Pay Here 100% approval financing and top-dollar trade-in valuations accepted.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer & Disclaimers -->
+      <footer class="brochure-footer">
+        <div class="brochure-footer-legal">
+          <p style="margin: 0 0 0.5rem;">
+            <strong>Dealership Disclosure (DL# 30859):</strong> All vehicles have Carfax and inspection reports available. Financing options are available, as well as in-house Buy Here Pay Here leasing and loan programs, on approved credit. All trades welcome.
+          </p>
+          <p style="margin: 0; color: #94A3B8;">
+            Vehicle not exactly as shown. While we make every reasonable effort to ensure accuracy, we encourage all clients to verify vehicle details with an authorized Motor Trends Auto Group representative, as some information may vary. We are a full disclosure BC licensed dealer committed to transparency and integrity.
+          </p>
+        </div>
+
+        <div class="brochure-footer-bottom">
+          <div>
+            10740 Cambie Road, Richmond, BC V6X 1K8 · 604-270-7662 · sales@motortrends.ca
+          </div>
+          <div id="brochure-print-date">
+            Printed: November 6, 2026
+          </div>
+        </div>
+      </footer>
+
+    </article>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Brochure Page Initialization Controller
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Determine vehicle ID from URL parameter or slug
+      const urlParams = new URLSearchParams(window.location.search);
+      let targetId = urlParams.get('id') || urlParams.get('car') || urlParams.get('vehicle');
+      const stockParam = urlParams.get('stock');
+
+      // Check path slug (e.g. /brochure/2019-toyota-mirai-ia8198 or /brochure/veh-1792992499662)
+      if (!targetId) {
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        if (pathParts.length > 1 && pathParts[pathParts.length - 2] === 'brochure') {
+          targetId = pathParts[pathParts.length - 1];
+        }
+      }
+
+      // 2. Fetch inventory
+      let vehicles = [];
+      try {
+        const res = await fetch('data/vehicles.json');
+        if (res.ok) vehicles = await res.json();
+      } catch (e) {}
+
+      if (!vehicles || vehicles.length === 0) {
+        if (typeof getStoredVehicles === 'function') {
+          vehicles = getStoredVehicles();
+        } else if (typeof DEFAULT_VEHICLES_DATA !== 'undefined') {
+          vehicles = DEFAULT_VEHICLES_DATA;
+        }
+      }
+
+      // 3. Find matching vehicle
+      let car = null;
+      if (targetId) {
+        car = vehicles.find(v => String(v.id).toLowerCase() === String(targetId).toLowerCase());
+        if (!car) {
+          // Try matching slug or model name
+          const slug = targetId.toLowerCase().replace(/[^a-z0-9]/g, '');
+          car = vehicles.find(v => {
+            const vSlug = `${v.year}${v.make}${v.model}`.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return vSlug.includes(slug) || slug.includes(vSlug) || (v.stockNumber && targetId.toUpperCase().includes(v.stockNumber.toUpperCase()));
+          });
+        }
+      } else if (stockParam) {
+        car = vehicles.find(v => (v.stockNumber || '').toLowerCase() === stockParam.toLowerCase());
+      }
+
+      // Default to flagship vehicle (2019 Toyota Mirai Sedan)
+      if (!car && vehicles.length > 0) {
+        car = vehicles.find(v => (v.fuelType || '').toLowerCase() === 'hydrogen') || vehicles[0];
+      }
+
+      if (!car) return;
+
+      // 4. Populate Document Fields
+      const fullName = `${car.year} ${car.make} ${car.model}`.trim();
+      document.title = `${fullName} Digital Brochure | Motor Trends Auto Group`;
+      document.getElementById('brochure-vehicle-name').textContent = fullName;
+      document.getElementById('brochure-vehicle-trim').textContent = `${car.trim || ''} ${car.fuelType ? '· ' + car.fuelType : ''} · ${car.condition || 'Certified Pre-Owned'}`;
+      
+      const formattedPrice = (typeof formatPrice === 'function') ? formatPrice(car.price) : `$${Number(car.price).toLocaleString()} CAD`;
+      document.getElementById('brochure-price').textContent = formattedPrice;
+
+      // Badges
+      const badgesContainer = document.getElementById('brochure-badges');
+      if (badgesContainer) {
+        let badgeHtml = '';
+        if (car.fuelType === 'Hydrogen') {
+          badgeHtml += `<span class="badge badge-blue">⚡ Hydrogen Fuel Cell</span>`;
+        } else if (car.fuelType === 'Hybrid' || car.fuelType === 'Electric') {
+          badgeHtml += `<span class="badge badge-blue">⚡ ${car.fuelType}</span>`;
+        }
+        badgeHtml += `<span class="badge badge-green">✓ ${car.condition || 'Certified Pre-Owned'}</span>`;
+        if (car.vin && car.vin !== 'N/A') {
+          badgeHtml += `<span class="badge badge-silver">VIN: ${car.vin}</span>`;
+        }
+        badgesContainer.innerHTML = badgeHtml;
+      }
+
+      // Specs
+      document.getElementById('spec-mileage').textContent = `${Number(car.mileage || 0).toLocaleString()} km`;
+      document.getElementById('spec-bodystyle').textContent = car.bodyType || 'Sedan';
+      document.getElementById('spec-trans').textContent = car.transmission || 'Automatic';
+      document.getElementById('spec-hp').textContent = car.horsepower || car.hp || '151 HP';
+      document.getElementById('spec-fuel').textContent = car.fuelType || 'Gasoline';
+      document.getElementById('spec-drivetrain').textContent = car.drivetrain || 'FWD';
+      document.getElementById('spec-doors').textContent = car.doors || '4 Doors';
+      document.getElementById('spec-passengers').textContent = car.passengers || '4 Passengers';
+      document.getElementById('spec-ext-color').textContent = car.exteriorColor || 'Atmospheric White';
+      document.getElementById('spec-int-color').textContent = car.interiorColor || 'Black SofTex';
+      document.getElementById('spec-stock').textContent = car.stockNumber || 'MT-6602';
+      document.getElementById('spec-vin').textContent = car.vin || 'N/A';
+
+      // Features
+      const featuresList = document.getElementById('brochure-features-list');
+      if (featuresList && Array.isArray(car.features) && car.features.length > 0) {
+        featuresList.innerHTML = car.features.map(f => `<li class="brochure-chip">${f}</li>`).join('');
+      }
+
+      // Overview
+      const overviewEl = document.getElementById('brochure-overview');
+      if (overviewEl) {
+        overviewEl.textContent = car.overview || `${fullName}, ${car.fuelType || ''} powered, ${car.drivetrain || ''}, ${car.doors || ''}, ${car.passengers || ''}, equipped with premium safety and comfort features. Dealer #30859.`;
+      }
+
+      // Photos
+      const images = (Array.isArray(car.images) && car.images.length > 0) ? car.images : [car.image || 'images/slide1.jpg'];
+      const mainPhoto = document.getElementById('brochure-main-photo');
+      if (mainPhoto && images[0]) mainPhoto.src = images[0];
+
+      for (let i = 2; i <= 5; i++) {
+        const thumb = document.getElementById(`brochure-photo-${i}`);
+        if (thumb) {
+          const imgIdx = (i - 1) % images.length;
+          thumb.src = images[imgIdx] || images[0];
+        }
+      }
+
+      // Setup Full Slideshow Lightbox triggers on photos
+      document.querySelectorAll('.brochure-gallery-main, .brochure-gallery-thumb').forEach((el, idx) => {
+        el.addEventListener('click', () => {
+          if (typeof openVehicleSlideshow === 'function') {
+            openVehicleSlideshow(car.id, idx);
+          }
+        });
+      });
+
+      // QR Code pointing to this vehicle's brochure or listing
+      const qrEl = document.getElementById('brochure-qr-code');
+      if (qrEl) {
+        const liveUrl = encodeURIComponent(window.location.href);
+        qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${liveUrl}`;
+      }
+
+      // Print timestamp
+      const printDateEl = document.getElementById('brochure-print-date');
+      if (printDateEl) {
+        const now = new Date();
+        printDateEl.textContent = `Printed: ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+      }
+
+      // Share button in toolbar
+      document.getElementById('btn-brochure-share')?.addEventListener('click', () => {
+        if (typeof openShareModal === 'function') {
+          openShareModal(car.id);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
