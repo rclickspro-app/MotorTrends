@@ -1532,7 +1532,7 @@ function createVehicleCardHtml(car) {
           <button type="button" class="btn btn-sub-action btn-open-slideshow" data-id="${car.id}" title="Open Slideshow">
             📸 Slideshow
           </button>
-          <button type="button" class="btn btn-sub-action btn-share-vehicle" data-id="${car.id}" title="Share vehicle via WhatsApp or Email">
+          <button type="button" class="btn btn-sub-action btn-share-vehicle" data-id="${car.id}" title="Share vehicle via WhatsApp, Facebook, or Email">
             🔗 Share
           </button>
           ${car.externalGalleryUrl ? `
@@ -2023,7 +2023,7 @@ function openVehicleModal(carId) {
           <a href="brochure?id=${encodeURIComponent(car.id)}" class="btn btn-blue" style="flex: 1; min-width: 150px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;" title="Official Printable Vehicle Brochure">
             📄 Official Brochure
           </a>
-          <button type="button" class="btn btn-silver" style="flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="openShareModal('${car.id}')" title="Share via WhatsApp or Email">
+          <button type="button" class="btn btn-silver" style="flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="openShareModal('${car.id}')" title="Share via WhatsApp, Facebook, or Email">
             🔗 Share Vehicle
           </button>
           <button class="btn btn-silver" style="flex: 1; min-width: 140px;" onclick="openTestDriveModal('${car.id}')">
@@ -2698,6 +2698,7 @@ function openShareModal(carId) {
 
   const shareText = `Check out this ${carTitle} (${carPrice}) at Motor Trends Auto Group (Richmond, BC):\n${brochureUrl}`;
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(brochureUrl)}&quote=${encodeURIComponent(shareText)}`;
   const emailUrl = `mailto:?subject=${encodeURIComponent(`Motor Trends Vehicle: ${carTitle}`)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share this ${carTitle} at Motor Trends Auto Group in Richmond, BC.\n\nPrice: ${carPrice}\nMileage: ${Number(car.mileage).toLocaleString()} km\nStock #: ${car.stockNumber || 'N/A'}\n\nView official digital brochure and full specifications:\n${brochureUrl}\n\nMotor Trends Auto Group\n10740 Cambie Road, Richmond, BC\nPhone: 604-270-7662\nDealer #30859\nwww.motortrends.ca`)}`;
 
   container.innerHTML = `
@@ -2721,15 +2722,18 @@ function openShareModal(carId) {
       </div>
     </div>
 
-    <!-- Direct Share Action Grid (WhatsApp, Email & Brochure) -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.55rem; margin-bottom: 1.25rem;">
-      <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #25D366; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Share on WhatsApp">
+    <!-- Direct Share Action Grid (WhatsApp, Facebook, Email & Brochure) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.25rem;">
+      <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #25D366; color: #fff; border: none; font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem; text-decoration: none; border-radius: 8px;" title="Share on WhatsApp">
         <span>💬</span> WhatsApp
       </a>
-      <a href="${emailUrl}" class="btn" style="background: #475569; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Share via Email">
+      <a href="${facebookUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #1877F2; color: #fff; border: none; font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem; text-decoration: none; border-radius: 8px;" title="Share on Facebook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook
+      </a>
+      <a href="${emailUrl}" class="btn" style="background: #475569; color: #fff; border: none; font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem; text-decoration: none; border-radius: 8px;" title="Share via Email">
         <span>✉️</span> Email
       </a>
-      <a href="brochure?id=${encodeURIComponent(car.id)}" target="_blank" class="btn" style="background: #1B3A6B; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Open Digital Brochure">
+      <a href="brochure?id=${encodeURIComponent(car.id)}" target="_blank" class="btn" style="background: #1B3A6B; color: #fff; border: none; font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem; text-decoration: none; border-radius: 8px;" title="Open Digital Brochure">
         <span>📄</span> Brochure
       </a>
     </div>
