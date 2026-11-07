@@ -81,71 +81,30 @@
       overflow: hidden;
     }
 
-    /* Header Band */
+    /* Header Band (Logo Only) */
     .brochure-header-band {
       background: linear-gradient(135deg, #1B3A6B 0%, #0F172A 100%);
       color: #FFFFFF;
-      padding: 1.75rem 2rem;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: center;
       align-items: center;
       border-bottom: 3px solid #38BDF8;
     }
 
     .brochure-logo-img {
-      height: 54px;
+      height: 60px;
       width: auto;
       object-fit: contain;
       background: #ffffff;
-      padding: 4px 8px;
-      border-radius: 8px;
+      padding: 6px 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease;
     }
 
-    .brochure-dealer-info h1 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      margin: 0 0 0.25rem;
-      color: #FFFFFF;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    .brochure-dealer-meta {
-      font-size: 0.82rem;
-      color: #CBD5E1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.85rem;
-    }
-
-    .brochure-dealer-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .brochure-qr-box {
-      background: #FFFFFF;
-      padding: 0.5rem;
-      border-radius: 8px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .brochure-qr-box img {
-      width: 72px;
-      height: 72px;
-      display: block;
-    }
-
-    .brochure-qr-label {
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: #0F172A;
-      margin-top: 0.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .brochure-logo-img:hover {
+      transform: scale(1.02);
     }
 
     /* Vehicle Title & Price Hero Row */
@@ -514,7 +473,7 @@
       <button type="button" class="btn btn-blue btn-sm" onclick="window.print()" title="Print or Save as PDF">
         🖨️ Save as PDF / Print
       </button>
-      <button type="button" class="btn btn-silver btn-sm" id="btn-brochure-share" title="Share via WhatsApp, SMS, or Email">
+      <button type="button" class="btn btn-silver btn-sm" id="btn-brochure-share" title="Share via WhatsApp or Email">
         🔗 Share Brochure
       </button>
       <a href="inventory" class="btn btn-dark btn-sm">
@@ -530,24 +489,11 @@
   <div class="brochure-container">
     <article class="brochure-sheet" id="brochure-sheet">
       
-      <!-- Dealer Brand Header Band -->
+      <!-- Dealer Brand Header Band (Logo Only) -->
       <header class="brochure-header-band">
-        <a href="./">
+        <a href="./" title="Motor Trends Auto Group">
           <img src="images/logo-slideshow-hq.gif" alt="Motor Trends Auto Group" class="brochure-logo-img" onerror="this.src='images/logo.png'">
         </a>
-        <div class="brochure-dealer-info">
-          <h1>Motor Trends Auto Group</h1>
-          <div class="brochure-dealer-meta">
-            <span><strong>Dealer # 30859</strong></span>
-            <span>📍 10740 Cambie Road, Richmond, BC V6X 1K8</span>
-            <span>📞 604-270-7662</span>
-            <span>🌐 www.motortrends.ca</span>
-          </div>
-        </div>
-        <div class="brochure-qr-box">
-          <img id="brochure-qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://www.motortrends.ca" alt="Scan QR Code for live vehicle details">
-          <div class="brochure-qr-label">Scan Live Page</div>
-        </div>
       </header>
 
       <!-- Vehicle Title & Price Hero -->

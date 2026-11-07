@@ -1524,7 +1524,7 @@ function createVehicleCardHtml(car) {
           </a>
           <button class="btn btn-outline btn-sm btn-book-drive" data-id="${car.id}" title="Book Test Drive">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            Drive
+            Book Test Drive
           </button>
         </div>
 
@@ -1532,7 +1532,7 @@ function createVehicleCardHtml(car) {
           <button type="button" class="btn btn-sub-action btn-open-slideshow" data-id="${car.id}" title="Open Slideshow">
             📸 Slideshow
           </button>
-          <button type="button" class="btn btn-sub-action btn-share-vehicle" data-id="${car.id}" title="Share vehicle via WhatsApp, SMS, or Email">
+          <button type="button" class="btn btn-sub-action btn-share-vehicle" data-id="${car.id}" title="Share vehicle via WhatsApp or Email">
             🔗 Share
           </button>
           ${car.externalGalleryUrl ? `
@@ -2023,7 +2023,7 @@ function openVehicleModal(carId) {
           <a href="brochure?id=${encodeURIComponent(car.id)}" class="btn btn-blue" style="flex: 1; min-width: 150px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;" title="Official Printable Vehicle Brochure">
             📄 Official Brochure
           </a>
-          <button type="button" class="btn btn-silver" style="flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="openShareModal('${car.id}')" title="Share via WhatsApp, SMS, Email">
+          <button type="button" class="btn btn-silver" style="flex: 1; min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="openShareModal('${car.id}')" title="Share via WhatsApp or Email">
             🔗 Share Vehicle
           </button>
           <button class="btn btn-silver" style="flex: 1; min-width: 140px;" onclick="openTestDriveModal('${car.id}')">
@@ -2220,7 +2220,8 @@ let _currentSlideshowState = {
   images: [],
   currentIdx: 0,
   autoplayTimer: null,
-  touchStartX: 0
+  touchStartX: 0,
+  motionFxEnabled: true
 };
 
 function openVehicleSlideshow(carId, startIdx = 0) {
@@ -2237,6 +2238,9 @@ function openVehicleSlideshow(carId, startIdx = 0) {
   _currentSlideshowState.car = car;
   _currentSlideshowState.images = images;
   _currentSlideshowState.currentIdx = Math.max(0, Math.min(startIdx, images.length - 1));
+  if (_currentSlideshowState.motionFxEnabled === undefined) {
+    _currentSlideshowState.motionFxEnabled = true;
+  }
 
   let overlay = document.getElementById('mt-slideshow-lightbox-modal');
   if (!overlay) {
@@ -2248,6 +2252,7 @@ function openVehicleSlideshow(carId, startIdx = 0) {
 
   const curIdx = _currentSlideshowState.currentIdx;
   const total = images.length;
+  const fxActive = _currentSlideshowState.motionFxEnabled;
 
   overlay.innerHTML = `
     <div class="mt-lightbox-container" role="dialog" aria-modal="true" aria-label="${car.year} ${car.make} ${car.model} Photo Gallery">
@@ -2263,6 +2268,9 @@ function openVehicleSlideshow(carId, startIdx = 0) {
               🖼️ All Pictures
             </a>
           ` : ''}
+          <button type="button" id="btn-slideshow-fx" class="btn-lightbox-tool ${fxActive ? 'active' : ''}" title="Toggle Cinematic Dynamic Motion Effects">
+            <span id="fx-icon">✨</span> <span id="fx-text">${fxActive ? 'FX On' : 'FX Off'}</span>
+          </button>
           <button type="button" id="btn-slideshow-autoplay" class="btn-lightbox-tool" title="Start / Pause Autoplay">
             <span id="autoplay-icon">▶</span> <span id="autoplay-text">Slideshow</span>
           </button>
@@ -2271,10 +2279,15 @@ function openVehicleSlideshow(carId, startIdx = 0) {
         </div>
       </div>
 
+      <div class="mt-lightbox-progress-bar" id="lightbox-progress-bar">
+        <div class="mt-lightbox-progress-fill" id="lightbox-progress-fill"></div>
+      </div>
+
       <div class="mt-lightbox-stage" id="lightbox-stage">
+        <div class="mt-lightbox-ambient-bg ${fxActive ? '' : 'fx-disabled'}" id="lightbox-ambient-bg" style="background-image: url('${images[curIdx]}');"></div>
         ${total > 1 ? `<button type="button" class="mt-lightbox-nav mt-lightbox-prev" id="btn-lightbox-prev" aria-label="Previous Photo">‹</button>` : ''}
         <div class="mt-lightbox-img-wrap" id="lightbox-img-wrap">
-          <img id="lightbox-current-img" src="${images[curIdx]}" alt="${car.model}" class="mt-lightbox-main-img" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
+          <img id="lightbox-current-img" src="${images[curIdx]}" alt="${car.model}" class="mt-lightbox-main-img slide-reveal ${fxActive ? 'ken-burns-active' : ''}" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
         </div>
         ${total > 1 ? `<button type="button" class="mt-lightbox-nav mt-lightbox-next" id="btn-lightbox-next" aria-label="Next Photo">›</button>` : ''}
       </div>
@@ -2298,16 +2311,33 @@ function openVehicleSlideshow(carId, startIdx = 0) {
     _currentSlideshowState.currentIdx = idx;
 
     const mainImg = document.getElementById('lightbox-current-img');
+    const ambientBg = document.getElementById('lightbox-ambient-bg');
     const counter = document.getElementById('lightbox-counter');
-    if (mainImg) {
-      mainImg.style.opacity = '0.35';
-      mainImg.style.transform = 'scale(0.98)';
-      setTimeout(() => {
-        mainImg.src = images[idx];
-        mainImg.style.opacity = '1';
-        mainImg.style.transform = 'scale(1)';
-      }, 100);
+    const progressFill = document.getElementById('lightbox-progress-fill');
+
+    if (ambientBg) {
+      ambientBg.style.backgroundImage = `url("${images[idx]}")`;
     }
+
+    if (mainImg) {
+      mainImg.classList.remove('slide-reveal');
+      mainImg.src = images[idx];
+      // Force DOM reflow to re-trigger reveal animation smoothly
+      void mainImg.offsetWidth;
+      mainImg.classList.add('slide-reveal');
+      if (_currentSlideshowState.motionFxEnabled) {
+        mainImg.classList.add('ken-burns-active');
+      } else {
+        mainImg.classList.remove('ken-burns-active');
+      }
+    }
+
+    if (progressFill && _currentSlideshowState.autoplayTimer) {
+      progressFill.classList.remove('animating');
+      void progressFill.offsetWidth;
+      progressFill.classList.add('animating');
+    }
+
     if (counter) {
       counter.textContent = `${idx + 1} / ${total}`;
     }
@@ -2350,6 +2380,7 @@ function openVehicleSlideshow(carId, startIdx = 0) {
   const autoplayBtn = document.getElementById('btn-slideshow-autoplay');
   const autoIcon = document.getElementById('autoplay-icon');
   const autoText = document.getElementById('autoplay-text');
+  const progressFill = document.getElementById('lightbox-progress-fill');
 
   function stopAutoplay() {
     if (_currentSlideshowState.autoplayTimer) {
@@ -2357,6 +2388,7 @@ function openVehicleSlideshow(carId, startIdx = 0) {
       _currentSlideshowState.autoplayTimer = null;
       if (autoIcon) autoIcon.textContent = '▶';
       if (autoText) autoText.textContent = 'Slideshow';
+      if (progressFill) progressFill.classList.remove('animating');
     }
   }
 
@@ -2364,6 +2396,11 @@ function openVehicleSlideshow(carId, startIdx = 0) {
     stopAutoplay();
     if (autoIcon) autoIcon.textContent = '⏸';
     if (autoText) autoText.textContent = 'Pause';
+    if (progressFill) {
+      progressFill.classList.remove('animating');
+      void progressFill.offsetWidth;
+      progressFill.classList.add('animating');
+    }
     _currentSlideshowState.autoplayTimer = setInterval(() => {
       updateSlide(_currentSlideshowState.currentIdx + 1);
     }, 3200);
@@ -2377,6 +2414,25 @@ function openVehicleSlideshow(carId, startIdx = 0) {
       } else {
         startAutoplay();
       }
+    });
+  }
+
+  // Dynamic Motion FX Toggle listener
+  const fxBtn = document.getElementById('btn-slideshow-fx');
+  const fxText = document.getElementById('fx-text');
+  if (fxBtn) {
+    fxBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      _currentSlideshowState.motionFxEnabled = !_currentSlideshowState.motionFxEnabled;
+      const isEnabled = _currentSlideshowState.motionFxEnabled;
+      fxBtn.classList.toggle('active', isEnabled);
+      if (fxText) fxText.textContent = isEnabled ? 'FX On' : 'FX Off';
+      
+      const ambientBg = document.getElementById('lightbox-ambient-bg');
+      if (ambientBg) ambientBg.classList.toggle('fx-disabled', !isEnabled);
+
+      const mainImg = document.getElementById('lightbox-current-img');
+      if (mainImg) mainImg.classList.toggle('ken-burns-active', isEnabled);
     });
   }
 
@@ -2642,7 +2698,6 @@ function openShareModal(carId) {
 
   const shareText = `Check out this ${carTitle} (${carPrice}) at Motor Trends Auto Group (Richmond, BC):\n${brochureUrl}`;
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-  const smsUrl = `sms:?&body=${encodeURIComponent(`Check out this ${carTitle} (${carPrice}) at Motor Trends: ${brochureUrl}`)}`;
   const emailUrl = `mailto:?subject=${encodeURIComponent(`Motor Trends Vehicle: ${carTitle}`)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share this ${carTitle} at Motor Trends Auto Group in Richmond, BC.\n\nPrice: ${carPrice}\nMileage: ${Number(car.mileage).toLocaleString()} km\nStock #: ${car.stockNumber || 'N/A'}\n\nView official digital brochure and full specifications:\n${brochureUrl}\n\nMotor Trends Auto Group\n10740 Cambie Road, Richmond, BC\nPhone: 604-270-7662\nDealer #30859\nwww.motortrends.ca`)}`;
 
   container.innerHTML = `
@@ -2666,35 +2721,26 @@ function openShareModal(carId) {
       </div>
     </div>
 
-    <!-- Direct Share Action Grid -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.25rem;">
-      <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #25D366; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
+    <!-- Direct Share Action Grid (WhatsApp, Email & Brochure) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.55rem; margin-bottom: 1.25rem;">
+      <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="background: #25D366; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Share on WhatsApp">
         <span>💬</span> WhatsApp
       </a>
-      <a href="${smsUrl}" class="btn" style="background: #0284C7; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
-        <span>📱</span> SMS Text
+      <a href="${emailUrl}" class="btn" style="background: #475569; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Share via Email">
+        <span>✉️</span> Email
       </a>
-      <a href="${emailUrl}" class="btn" style="background: #475569; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
-        <span>✉️</span> Email Link
-      </a>
-      <a href="brochure?id=${encodeURIComponent(car.id)}" target="_blank" class="btn" style="background: #1B3A6B; color: #fff; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem;">
-        <span>📄</span> Open Brochure
+      <a href="brochure?id=${encodeURIComponent(car.id)}" target="_blank" class="btn" style="background: #1B3A6B; color: #fff; border: none; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 0.5rem;" title="Open Digital Brochure">
+        <span>📄</span> Brochure
       </a>
     </div>
 
     <!-- Copy Link Input Box -->
-    <div style="background: #F1F5F9; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+    <div style="background: #F1F5F9; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 0.5rem 0.65rem; display: flex; align-items: center; gap: 0.5rem;">
       <input type="text" id="share-link-input" readonly value="${brochureUrl}" style="background: transparent; border: none; outline: none; font-size: 0.8rem; color: #334155; width: 100%; font-family: monospace;">
-      <button type="button" id="btn-copy-share-link" class="btn btn-blue btn-sm" style="flex-shrink: 0; font-weight: 700; padding: 0.4rem 0.85rem; font-size: 0.78rem;">
+      <button type="button" id="btn-copy-share-link" class="btn btn-blue btn-sm" style="flex-shrink: 0; font-weight: 700; padding: 0.45rem 0.95rem; font-size: 0.78rem;">
         📋 Copy Link
       </button>
     </div>
-
-    ${navigator.share ? `
-      <button type="button" id="btn-native-share" class="btn btn-outline" style="width: 100%; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 0.5rem;">
-        <span>📲</span> More Share Options...
-      </button>
-    ` : ''}
   `;
 
   shareBackdrop.classList.add('active');
@@ -2725,19 +2771,6 @@ function openShareModal(carId) {
           showToast('🔗 Link selected and copied!', 'success');
         }
       }
-    };
-  }
-
-  const nativeBtn = document.getElementById('btn-native-share');
-  if (nativeBtn && navigator.share) {
-    nativeBtn.onclick = async () => {
-      try {
-        await navigator.share({
-          title: carTitle + ' - Motor Trends Auto Group',
-          text: `Check out this ${carTitle} for ${carPrice} at Motor Trends Auto Group in Richmond, BC:`,
-          url: brochureUrl
-        });
-      } catch (err) {}
     };
   }
 }
