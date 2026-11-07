@@ -1173,6 +1173,79 @@ input[type=range]::-webkit-slider-thumb {
   gap: 0.35rem;
 }
 
+/* Secondary compact action row (Slideshow & All Pictures) */
+.vehicle-card-sub-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+.vehicle-card-sub-actions .btn-sub-action {
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  border: 1px solid var(--border-md);
+  color: var(--gray-700);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 28px;
+}
+.vehicle-card-sub-actions .btn-sub-action:hover {
+  background: var(--blue-50);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.vehicle-card-sub-actions .btn-sub-action-full {
+  grid-column: 1 / -1;
+}
+.vehicle-card-sub-actions .btn-all-pictures {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+}
+.vehicle-card-sub-actions .btn-all-pictures:hover {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #14532d;
+}
+
+/* Top Navigation Bar Sound Toggle Icon */
+.btn-top-sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.btn-top-sound-toggle:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38BDF8;
+  transform: scale(1.08);
+}
+.btn-top-sound-toggle.muted {
+  opacity: 0.65;
+  filter: grayscale(1);
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .no-results-msg {
   text-align: center; padding: 3rem 1rem;
   color: var(--text-muted); grid-column: 1 / -1;
@@ -2913,7 +2986,7 @@ input[type=range]::-webkit-slider-thumb {
   height: 100%;
   width: 0;
   background: linear-gradient(90deg, #1B3A6B, #38BDF8, #EF4444);
-  animation: welcomeProgress 2.8s linear forwards;
+  animation: welcomeProgress 10s linear forwards;
 }
 @keyframes welcomeProgress {
   0% { width: 0%; }

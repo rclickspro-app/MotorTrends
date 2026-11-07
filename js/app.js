@@ -125,8 +125,8 @@ function initStartupWelcome() {
         }, 500);
       }
 
-      // Auto dismiss after 2.8s
-      const timer = setTimeout(dismissWelcome, 2800);
+      // Auto dismiss after 10s (extended per requirements)
+      const timer = setTimeout(dismissWelcome, 10000);
 
       const skipBtn = overlay.querySelector('#btn-skip-welcome');
       if (skipBtn) {
@@ -1047,14 +1047,14 @@ function populateFilterDropdowns() {
 let _lastEngineSfxTime = 0;
 let _engineAudioObj = null;
 
-function triggerRandomEngineSfx() {
+function triggerRandomEngineSfx(force = false) {
   const now = Date.now();
-  // Minimum 40 seconds cooldown between random sounds
-  if (now - _lastEngineSfxTime < 40000) return;
+  // Minimum 16 seconds cooldown between random sounds
+  if (!force && now - _lastEngineSfxTime < 16000) return;
   if (localStorage.getItem('mt_engine_sfx_disabled') === 'true') return;
 
-  // 28% probability when interacting with search/filters
-  if (Math.random() < 0.28) {
+  // ~35% probability when interacting with search/filters
+  if (force || Math.random() < 0.35) {
     _lastEngineSfxTime = now;
     playEngineSound();
   }
@@ -1062,6 +1062,7 @@ function triggerRandomEngineSfx() {
 
 function playEngineSound() {
   try {
+    if (localStorage.getItem('mt_engine_sfx_disabled') === 'true') return;
     if (!_engineAudioObj) {
       _engineAudioObj = new Audio('audio/car-engine-start.mp3');
     }
@@ -1075,25 +1076,53 @@ function playEngineSound() {
 }
 
 function initEngineSfxToggle() {
-  const btn = document.getElementById('btn-sfx-toggle');
-  if (!btn) return;
   const isMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
-  const icon = document.getElementById('sfx-icon');
-  if (icon) icon.textContent = isMuted ? '🔇' : '🔊';
 
-  btn.addEventListener('click', () => {
-    const currentlyMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
-    if (currentlyMuted) {
-      localStorage.removeItem('mt_engine_sfx_disabled');
-      if (icon) icon.textContent = '🔊';
-      playEngineSound();
-      showToast('🔊 Engine Start Sound Effect enabled (plays randomly on search)');
-    } else {
-      localStorage.setItem('mt_engine_sfx_disabled', 'true');
-      if (icon) icon.textContent = '🔇';
-      if (_engineAudioObj) _engineAudioObj.pause();
-      showToast('🔇 Engine Start Sound Effect muted');
-    }
+  function updateSoundUI(muted) {
+    document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle').forEach(el => {
+      el.classList.toggle('muted', muted);
+      const iconEl = el.querySelector('.top-sound-icon, #sfx-icon') || el;
+      if (iconEl && iconEl !== el) {
+        iconEl.textContent = muted ? '🔇' : '🔊';
+      } else if (iconEl === el) {
+        el.textContent = muted ? '🔇' : '🔊';
+      }
+      el.setAttribute('title', muted ? 'Sound Muted - Click to Unmute' : 'Sound Effects ON - Click to Mute');
+      el.setAttribute('aria-label', muted ? 'Unmute Sound' : 'Mute Sound');
+    });
+  }
+
+  // Set initial icon states
+  updateSoundUI(isMuted);
+
+  // Wire click events across all sound buttons
+  document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle').forEach(btn => {
+    if (btn._sfxBound) return;
+    btn._sfxBound = true;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const currentlyMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
+      if (currentlyMuted) {
+        localStorage.removeItem('mt_engine_sfx_disabled');
+        updateSoundUI(false);
+        playEngineSound();
+        if (typeof showToast === 'function') {
+          showToast('🔊 Engine Start Sound Effect enabled');
+        }
+      } else {
+        localStorage.setItem('mt_engine_sfx_disabled', 'true');
+        updateSoundUI(true);
+        if (_engineAudioObj) {
+          _engineAudioObj.pause();
+          _engineAudioObj.currentTime = 0;
+        }
+        if (typeof showToast === 'function') {
+          showToast('🔇 Sound Effect muted');
+        }
+      }
+    });
   });
 }
 
@@ -1347,6 +1376,11 @@ function renderInventory() {
   const countDisplay = document.getElementById('inventory-count');
   if (!container) return;
 
+  // Trigger random automotive engine SFX when user searches or filters inventory
+  if (currentFilters.keyword || currentFilters.make !== 'all' || currentFilters.bodyType !== 'all' || currentFilters.fuelType !== 'all' || currentFilters.condition !== 'all') {
+    triggerRandomEngineSfx();
+  }
+
   const results = getFilteredVehicles();
 
   if (countDisplay) {
@@ -1394,16 +1428,8 @@ function createVehicleCardHtml(car) {
     <article class="vehicle-card" data-vehicle-id="${car.id}">
       <div class="vehicle-thumb-wrap clickable-slideshow-trigger" data-vehicle-id="${car.id}" style="cursor: pointer;" title="Click to open full photo slideshow popup">
         <img src="${mainImage}" alt="${car.year || ''} ${car.make || ''} ${car.model || ''}" class="vehicle-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=1000&q=80'">
-        
-        <button type="button" class="btn-card-more-photos" data-id="${car.id}" title="Click to view full photo slideshow popup">
-          📸 ${carImages.length > 1 ? `${carImages.length} Photos` : 'View Photo'}
-        </button>
 
         ${hasMultipleImages ? `
-          <div class="card-photo-counter" style="position: absolute; bottom: 8px; right: 8px; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 12px; backdrop-filter: blur(4px); z-index: 3; pointer-events: none; border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; gap: 3px;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span class="card-slide-cur">1</span>/<span class="card-slide-tot">${carImages.length}</span>
-          </div>
           <button type="button" class="card-img-nav card-img-prev" data-dir="-1" title="Previous Photo" aria-label="Previous Photo">‹</button>
           <button type="button" class="card-img-nav card-img-next" data-dir="1" title="Next Photo" aria-label="Next Photo">›</button>
         ` : ''}
@@ -1462,16 +1488,19 @@ function createVehicleCardHtml(car) {
           <button class="btn btn-silver btn-sm btn-quick-view" data-id="${car.id}">
             View Details
           </button>
-          <button class="btn btn-outline btn-sm btn-open-slideshow" data-id="${car.id}" title="Open Full Photo Slideshow Popup">
-            📸 Photos
-          </button>
           <button class="btn btn-outline btn-sm btn-book-drive" data-id="${car.id}" title="Book Test Drive">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             Test Drive
           </button>
+        </div>
+
+        <div class="vehicle-card-sub-actions">
+          <button type="button" class="btn btn-sub-action btn-open-slideshow ${car.externalGalleryUrl ? '' : 'btn-sub-action-full'}" data-id="${car.id}" title="Open Slideshow">
+            📸 Slideshow
+          </button>
           ${car.externalGalleryUrl ? `
-            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;" title="Open cloud photo album">
-              ☁️ Cloud Album
+            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sub-action btn-all-pictures" title="Open All Pictures in new window">
+              🖼️ All Pictures
             </a>
           ` : ''}
         </div>
@@ -1602,10 +1631,11 @@ function attachCardEvents(parentEl) {
     });
   });
 
-  // Quick View Modal
+  // Quick View Modal (Auto-scroll to top)
   parentEl.querySelectorAll('.btn-quick-view').forEach(btn => {
     btn.addEventListener('click', () => {
       const carId = btn.dataset.id;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       openVehicleModal(carId);
     });
   });
@@ -1618,8 +1648,8 @@ function attachCardEvents(parentEl) {
     });
   });
 
-  // Slideshow Lightbox Popup triggers (From "More Photos" button or "Photos" button)
-  parentEl.querySelectorAll('.btn-card-more-photos, .btn-open-slideshow').forEach(btn => {
+  // Slideshow Lightbox Popup triggers (From slideshow trigger buttons)
+  parentEl.querySelectorAll('.btn-open-slideshow').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -1835,6 +1865,11 @@ function openVehicleModal(carId) {
   const modalContainer = document.getElementById('global-modal-container');
   if (!modalBackdrop || !modalContainer) return;
 
+  // Auto scroll window and modal back to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  modalBackdrop.scrollTop = 0;
+  modalContainer.scrollTop = 0;
+
   const carImages = (typeof getVehicleImages === 'function')
     ? getVehicleImages(car)
     : ((Array.isArray(car.images) && car.images.length > 0)
@@ -1944,10 +1979,13 @@ function openVehicleModal(carId) {
             Calculate Financing
           </a>
           ${car.externalGalleryUrl ? `
-            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.65rem 1rem;">
-              ☁️ View Full Cloud Storage Album (Google Drive / OneDrive)
+            <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-blue btn-sm" style="flex: 1; min-width: 150px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0.55rem 0.9rem; font-size: 0.82rem;" title="View all pictures on cloud storage">
+              🖼️ All Pictures (Cloud Album)
             </a>
           ` : ''}
+          <button type="button" class="btn btn-outline" style="flex: 1; min-width: 150px;" onclick="document.getElementById('modal-close')?.click(); window.scrollTo({ top: 0, behavior: 'smooth' });">
+            ↑ Back to Inventory
+          </button>
         </div>
       </div>
     </div>
@@ -2160,7 +2198,7 @@ function openVehicleSlideshow(carId, startIdx = 0) {
         <div class="mt-lightbox-controls">
           ${car.externalGalleryUrl ? `
             <a href="${car.externalGalleryUrl}" target="_blank" rel="noopener noreferrer" class="btn-lightbox-cloud" title="Open external cloud photo album">
-              ☁️ Full Cloud Album
+              🖼️ All Pictures
             </a>
           ` : ''}
           <button type="button" id="btn-slideshow-autoplay" class="btn-lightbox-tool" title="Start / Pause Autoplay">
