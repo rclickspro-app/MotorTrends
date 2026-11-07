@@ -1246,6 +1246,29 @@ input[type=range]::-webkit-slider-thumb {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
+/* Round Sound Toggle Pill in Controls */
+.btn-sound-toggle-circle {
+  border-radius: 50% !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.95rem !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease !important;
+}
+.btn-sound-toggle-circle:hover {
+  transform: scale(1.08);
+  border-color: var(--blue) !important;
+}
+.btn-sound-toggle-circle.muted {
+  opacity: 0.65;
+  filter: grayscale(1);
+}
+
 .no-results-msg {
   text-align: center; padding: 3rem 1rem;
   color: var(--text-muted); grid-column: 1 / -1;
@@ -1973,10 +1996,28 @@ input[type=range]::-webkit-slider-thumb {
    Contact Page
 ---------------------------------------------------------------- */
 .contact-grid {
-  display: grid; grid-template-columns: 1fr 1.4fr;
-  gap: 1.9rem; padding: 2.75rem 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 2.25rem;
+  padding: 1.5rem 0 2.5rem;
+  align-items: start;
 }
-@media (max-width: 760px) { .contact-grid { grid-template-columns: 1fr; } }
+@media (max-width: 920px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+.form-row-2, .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 600px) {
+  .form-row-2, .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
 .contact-info-card {
   background: var(--white); border: 1.5px solid var(--border);
   border-radius: var(--radius-xl); overflow: hidden;

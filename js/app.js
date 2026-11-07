@@ -115,6 +115,11 @@ function initStartupWelcome() {
       }
       document.body.appendChild(overlay);
 
+      // Play Engine Start Sound Effect on welcome screen
+      setTimeout(() => {
+        playEngineSound();
+      }, 350);
+
       let dismissed = false;
       function dismissWelcome() {
         if (dismissed) return;
@@ -1066,11 +1071,22 @@ function playEngineSound() {
     if (!_engineAudioObj) {
       _engineAudioObj = new Audio('audio/car-engine-start.mp3');
     }
-    _engineAudioObj.volume = 0.35;
+    _engineAudioObj.volume = 0.4;
     _engineAudioObj.currentTime = 0;
     const p = _engineAudioObj.play();
     if (p !== undefined) {
-      p.catch(() => {});
+      p.catch(() => {
+        // Unlock on first user gesture if browser autoplay policy requires user interaction
+        const unlockAudio = () => {
+          if (_engineAudioObj && localStorage.getItem('mt_engine_sfx_disabled') !== 'true') {
+            _engineAudioObj.play().catch(() => {});
+          }
+          window.removeEventListener('click', unlockAudio);
+          window.removeEventListener('touchstart', unlockAudio);
+        };
+        window.addEventListener('click', unlockAudio, { once: true });
+        window.addEventListener('touchstart', unlockAudio, { once: true });
+      });
     }
   } catch (e) {}
 }
@@ -1079,7 +1095,7 @@ function initEngineSfxToggle() {
   const isMuted = localStorage.getItem('mt_engine_sfx_disabled') === 'true';
 
   function updateSoundUI(muted) {
-    document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle').forEach(el => {
+    document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle, .btn-sound-toggle-circle').forEach(el => {
       el.classList.toggle('muted', muted);
       const iconEl = el.querySelector('.top-sound-icon, #sfx-icon') || el;
       if (iconEl && iconEl !== el) {
@@ -1096,7 +1112,7 @@ function initEngineSfxToggle() {
   updateSoundUI(isMuted);
 
   // Wire click events across all sound buttons
-  document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle').forEach(btn => {
+  document.querySelectorAll('.btn-top-sound-toggle, #btn-top-sound-toggle, #btn-sfx-toggle, .btn-sound-toggle-circle').forEach(btn => {
     if (btn._sfxBound) return;
     btn._sfxBound = true;
 
